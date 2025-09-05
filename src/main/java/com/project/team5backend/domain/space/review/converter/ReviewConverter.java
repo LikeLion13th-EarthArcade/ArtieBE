@@ -4,12 +4,9 @@ import com.project.team5backend.domain.space.review.dto.request.ReviewRequest;
 import com.project.team5backend.domain.space.review.dto.response.ReviewResponse;
 import com.project.team5backend.domain.space.review.entity.Review;
 import com.project.team5backend.domain.space.space.entity.Space;
-import com.project.team5backend.domain.user.user.entity.User;
-import com.project.team5backend.global.util.S3Uploader;
-import lombok.RequiredArgsConstructor;
+import com.project.team5backend.domain.user.entity.User;
 import org.springframework.stereotype.Component;
 
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.stream.Collectors;
 

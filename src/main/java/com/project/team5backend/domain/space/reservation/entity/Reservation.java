@@ -2,7 +2,7 @@ package com.project.team5backend.domain.space.reservation.entity;
 
 
 import com.project.team5backend.domain.space.space.entity.Space;
-import com.project.team5backend.domain.user.user.entity.User;
+import com.project.team5backend.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 

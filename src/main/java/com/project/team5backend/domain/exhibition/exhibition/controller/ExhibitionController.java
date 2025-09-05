@@ -11,7 +11,8 @@ import com.project.team5backend.domain.image.exception.ImageErrorCode;
 import com.project.team5backend.domain.image.exception.ImageException;
 import com.project.team5backend.global.SwaggerBody;
 import com.project.team5backend.global.apiPayload.CustomResponse;
-import com.project.team5backend.global.apiPayload.CustomUserDetails;
+import com.project.team5backend.global.security.userdetails.CurrentUser;
+import com.project.team5backend.global.security.userdetails.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Encoding;
@@ -50,23 +51,23 @@ public class ExhibitionController {
     )
     @Operation(summary = "전시 생성", description = "전시 생성하면 전시 객체가 심사 대상에 포함됩니다.")
     public CustomResponse<String> createExhibition(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CurrentUser currentUser,
             @RequestPart("request") @Valid ExhibitionReqDTO.CreateExhibitionReqDTO request,
             @RequestPart("images") List<MultipartFile> images
     ) {
         if (images == null || images.isEmpty()) throw new ImageException(ImageErrorCode.IMAGE_NOT_FOUND);
         if (images.size() > 5) throw new ImageException(ImageErrorCode.IMAGE_TOO_MANY_REQUESTS);
 
-        exhibitionCommandService.createExhibition(request, userDetails.getEmail(), images);
+        exhibitionCommandService.createExhibition(request, currentUser.getEmail(), images);
         return CustomResponse.onSuccess("전시글 등록이 완료되었습니다. 관리자 승인 대기열에 추가합니다.");
     }
     @PostMapping("/{exhibitionId}/like")
     @Operation(summary = "전시 좋아요", description = "좋아요 없으면 등록, 있으면 취소")
     public CustomResponse<ExhibitionResDTO.LikeExhibitionResDTO> likeExhibition(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CurrentUser currentUser,
             @PathVariable Long exhibitionId
     ) {
-        return CustomResponse.onSuccess(exhibitionCommandService.likeExhibition(exhibitionId, userDetails.getEmail()));
+        return CustomResponse.onSuccess(exhibitionCommandService.likeExhibition(exhibitionId, currentUser.getEmail()));
     }
 
     @GetMapping("/{exhibitionId}")
@@ -91,9 +92,9 @@ public class ExhibitionController {
     @Operation(summary = "지금 뜨는 전시회", description = "현재 진행중인 전시중에서 reviewCount가 가장 높은 전시 반환")
     @GetMapping("/hot-now")
     public CustomResponse<List<ExhibitionResDTO.HotNowExhibitionResDTO>> hotNowExhibition(
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @AuthenticationPrincipal CurrentUser currentUser
     ) {
-        return CustomResponse.onSuccess(exhibitionQueryService.getHotNowExhibition(userDetails.getEmail()));
+        return CustomResponse.onSuccess(exhibitionQueryService.getHotNowExhibition(currentUser.getEmail()));
     }
 
     @Operation(summary = "지금 뜨는, 다가오는 전시회", description = "아직 시작되지 않은 전시중에서 likeCount가 가장 높은 전시 반환")
@@ -111,9 +112,9 @@ public class ExhibitionController {
     @Operation(summary = "artie 추천 전시회", description = "artie 추천 전시 4개 반환 - 하루 단위로 업데이트")
     @GetMapping("/artie-recommendation")
     public CustomResponse<List<ExhibitionResDTO.ArtieRecommendationResDTO>> artieRecommendation(
-            @AuthenticationPrincipal CustomUserDetails userDetails
+            @AuthenticationPrincipal CurrentUser currentUser
     ) {
-        return CustomResponse.onSuccess(exhibitionQueryService.getTodayArtiePicks(userDetails.getEmail()));
+        return CustomResponse.onSuccess(exhibitionQueryService.getTodayArtiePicks(currentUser.getEmail()));
     }
 
     @DeleteMapping("/{exhibitionId}")

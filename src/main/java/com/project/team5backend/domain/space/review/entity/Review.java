@@ -1,14 +1,13 @@
 package com.project.team5backend.domain.space.review.entity;
 
 import com.project.team5backend.domain.space.space.entity.Space;
-import com.project.team5backend.domain.user.user.entity.User;
+import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.global.entity.BaseOnlyCreateTimeEntity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
