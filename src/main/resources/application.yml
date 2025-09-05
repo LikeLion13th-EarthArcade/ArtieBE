@@ -1,6 +1,8 @@
 spring:
   application:
     name: LikeLion13th-BE-ARTIE
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:local}
   servlet:
     multipart:
       max-file-size: 10MB        # 단일 파일 최대 크기
@@ -50,13 +52,3 @@ openai:
 kakao:
   api:
     rest-key: ${KAKAO_API_REST_KEY}
-
-server:
-  servlet:
-    session:
-      cookie:
-        name: JSESSIONID
-        #domain: artiee.store
-        http-only: true
-        secure: true
-        same-site: none
