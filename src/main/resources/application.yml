@@ -50,13 +50,3 @@ openai:
 kakao:
   api:
     rest-key: ${KAKAO_API_REST_KEY}
-
-server:
-  servlet:
-    session:
-      cookie:
-        name: JSESSIONID
-        #domain: artiee.store
-        http-only: true
-        secure: true
-        same-site: none
