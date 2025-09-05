@@ -7,7 +7,7 @@ import com.project.team5backend.domain.space.review.service.command.ReviewComman
 import com.project.team5backend.domain.space.review.service.query.ReviewQueryService;
 import com.project.team5backend.global.SwaggerBody;
 import com.project.team5backend.global.apiPayload.CustomResponse;
-import com.project.team5backend.global.apiPayload.CustomUserDetails;
+import com.project.team5backend.global.security.userdetails.CurrentUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Encoding;
@@ -42,8 +42,8 @@ public class ReviewController {
             @RequestPart("images") List<MultipartFile> images
     ) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        Long userId = userDetails.getUserId();
+        CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
+        Long userId = currentUser.getId();
 
         reviewCommandService.createReview(spaceId, userId, request, images);
         return CustomResponse.onSuccess(null);
@@ -67,8 +67,8 @@ public class ReviewController {
     @DeleteMapping("/{reviewId}")
     public CustomResponse<Void> deleteReview(@PathVariable Long reviewId) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-        Long userId = userDetails.getUserId();
+        CurrentUser currentUser = (CurrentUser) authentication.getPrincipal();
+        Long userId = currentUser.getId();
 
         reviewCommandService.deleteReview(reviewId, userId);
         return CustomResponse.onSuccess(null);

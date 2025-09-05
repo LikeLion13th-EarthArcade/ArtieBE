@@ -21,31 +21,17 @@ public class User extends BaseEntity {
     @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
-    private String password;
-
     @Column(name = "is_deleted")
     private boolean isDeleted = false;
 
     @Column(name = "is_email_verified")
     private boolean isEmailVerified = false;
 
-    public void verifyEmail() {
-        this.isEmailVerified = true;
-    }
-
-    public void changeName(String name) {
-        this.name = name;
-    }
-
-    public void changePassword(String encodedPassword) {
-        this.password = encodedPassword;
-    }
-
     public void delete() {
         this.isDeleted = true;
     }
 
+    @Column(name = "role", nullable = false)
     @Enumerated(EnumType.STRING)
     private Role role;
 }

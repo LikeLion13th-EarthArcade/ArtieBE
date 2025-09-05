@@ -12,7 +12,7 @@ import com.project.team5backend.domain.space.space.service.query.SpaceQueryServi
 import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.SwaggerBody;
 import com.project.team5backend.global.apiPayload.CustomResponse;
-import com.project.team5backend.global.apiPayload.CustomUserDetails;
+import com.project.team5backend.global.security.userdetails.CurrentUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Encoding;
@@ -48,14 +48,14 @@ public class SpaceController {
     )
     @Operation(summary = "전시 공간 등록", description = "로그인한 사용자가 전시 공간을 등록합니다.")
     public CustomResponse<SpaceResponse.SpaceRegistrationResponse> registerSpace(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CurrentUser currentUser,
             @RequestPart("request") @Valid SpaceRequest.Create request,
             @RequestPart("images") List<MultipartFile> images
     ) {
         if (images == null || images.isEmpty()) throw new ImageException(ImageErrorCode.IMAGE_NOT_FOUND);
         if (images.size() > 5) throw new ImageException(ImageErrorCode.IMAGE_TOO_MANY_REQUESTS);
 
-        SpaceResponse.SpaceRegistrationResponse response = spaceCommandService.registerSpace(request, userDetails.getEmail(), images);
+        SpaceResponse.SpaceRegistrationResponse response = spaceCommandService.registerSpace(request, currentUser.getEmail(), images);
         return CustomResponse.onSuccess(response);
     }
 
@@ -92,8 +92,8 @@ public class SpaceController {
     @Operation(summary = "전시 공간 좋아요 / 좋아요 취소")
     @PostMapping("/{spaceId}/like")
     public CustomResponse<Map<String, Boolean>> toggleLike(@PathVariable Long spaceId,
-                                                           @AuthenticationPrincipal CustomUserDetails userDetails) {
-        Long userId = userDetails.getUserId();
+                                                           @AuthenticationPrincipal CurrentUser currentUser) {
+        Long userId = currentUser.getId();
         boolean liked = spaceCommandService.toggleLike(spaceId, userId);
         return CustomResponse.onSuccess(Map.of("liked", liked));
     }

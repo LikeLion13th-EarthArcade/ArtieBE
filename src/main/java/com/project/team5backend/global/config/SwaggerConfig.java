@@ -19,31 +19,30 @@ public class SwaggerConfig {
                 .description("Artie API 명세서")
                 .version("1.0.0");
 
-        final String COOKIE_SCHEME = "cookieAuth";   // 세션
-        final String XSRF_SCHEME   = "xsrfHeader";   // CSRF 헤더
+        String csrfSchemeName = "X-XSRF-TOKEN";
+        String csrfCookieName = "XSRF-TOKEN";
+        // API 요청헤더에 인증정보 포함
+        SecurityRequirement securityRequirement = new SecurityRequirement().addList(csrfSchemeName).addList(csrfCookieName);
 
+        // SecuritySchemes 등록
         Components components = new Components()
-                // 세션 쿠키
-                .addSecuritySchemes(COOKIE_SCHEME, new SecurityScheme()
+                .addSecuritySchemes(csrfSchemeName, new SecurityScheme()
+                        .name(csrfSchemeName)
+                        .type(SecurityScheme.Type.APIKEY) // csrf token은 api key 방식
+                        .in(SecurityScheme.In.HEADER) // header에 위치
+                        .description("csrf token을 헤더에 입력하세요"));
+
+        components.addSecuritySchemes(csrfCookieName,
+                new SecurityScheme()
+                        .name(csrfCookieName)
                         .type(SecurityScheme.Type.APIKEY)
                         .in(SecurityScheme.In.COOKIE)
-                        .name("JSESSIONID"))
-                // CSRF 헤더
-                .addSecuritySchemes(XSRF_SCHEME, new SecurityScheme()
-                        .type(SecurityScheme.Type.APIKEY)
-                        .in(SecurityScheme.In.HEADER)
-                        .name("X-XSRF-TOKEN"));
-
-        // 두 가지 모두 요구
-        SecurityRequirement security = new SecurityRequirement()
-                .addList(COOKIE_SCHEME)
-                .addList(XSRF_SCHEME);
+                        .description("csrf token 쿠키 입력"));
 
         return new OpenAPI()
                 .addServersItem(new Server().url("/"))
-                .addServersItem(new Server().url("https://artiee.store"))
                 .info(info)
-                .components(components)
-                .addSecurityItem(security);
+                .addSecurityItem(securityRequirement)
+                .components(components);
     }
 }
