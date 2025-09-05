@@ -1,7 +1,7 @@
 package com.project.team5backend.domain.space.space.entity;
 
 
-import com.project.team5backend.domain.user.user.entity.User;
+import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.global.entity.embedded.Address;
 import jakarta.persistence.*;
 import lombok.*;
@@ -9,8 +9,6 @@ import lombok.*;
 
 import java.time.LocalDate;
 import java.util.List;
-
-import org.springframework.data.annotation.CreatedDate;
 
 @Entity
 @Builder

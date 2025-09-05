@@ -13,8 +13,8 @@ import com.project.team5backend.domain.space.space.entity.SpaceLike;
 import com.project.team5backend.domain.space.space.repository.SpaceLikeRepository;
 import com.project.team5backend.domain.space.space.repository.SpaceRepository;
 
-import com.project.team5backend.domain.user.user.entity.User;
-import com.project.team5backend.domain.user.user.repository.UserRepository;
+import com.project.team5backend.domain.user.entity.User;
+import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.address.converter.AddressConverter;
 import com.project.team5backend.global.address.dto.response.AddressResDTO;
 import com.project.team5backend.global.address.service.AddressService;

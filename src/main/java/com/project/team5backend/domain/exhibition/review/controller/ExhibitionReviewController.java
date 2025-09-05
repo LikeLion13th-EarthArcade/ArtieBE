@@ -8,7 +8,8 @@ import com.project.team5backend.domain.image.exception.ImageErrorCode;
 import com.project.team5backend.domain.image.exception.ImageException;
 import com.project.team5backend.global.SwaggerBody;
 import com.project.team5backend.global.apiPayload.CustomResponse;
-import com.project.team5backend.global.apiPayload.CustomUserDetails;
+import com.project.team5backend.global.security.userdetails.CurrentUser;
+import com.project.team5backend.global.security.userdetails.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Encoding;
@@ -48,7 +49,7 @@ public class ExhibitionReviewController {
     )
     @Operation(summary = "리뷰 생성", description = "리뷰 생성 API")
     public CustomResponse<String> createExhibitionReview(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CurrentUser currentUser,
             @PathVariable Long exhibitionId,
             @RequestPart("request") @Valid ExhibitionReviewReqDTO.createExReviewReqDTO request,
             @RequestPart("images") List<MultipartFile> images
@@ -60,7 +61,7 @@ public class ExhibitionReviewController {
             throw new ImageException(ImageErrorCode.IMAGE_TOO_MANY_REQUESTS);
         }
 
-        exReviewCommandService.createExhibitionReview(exhibitionId, userDetails.getEmail(), request, images);
+        exReviewCommandService.createExhibitionReview(exhibitionId, currentUser.getEmail(), request, images);
         return CustomResponse.onSuccess("해당 전시 리뷰가 생성되었습니다.");
     }
 
@@ -85,9 +86,9 @@ public class ExhibitionReviewController {
     @Operation(summary = "리뷰 삭제", description = "리뷰 소프트 삭제")
     @DeleteMapping("/reviews/{reviewId}")
     public CustomResponse<String> deleteExhibitionReview(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CurrentUser currentUser,
             @PathVariable("reviewId") Long exhibitionReviewId) {
-        exReviewCommandService.deleteExhibitionReview(exhibitionReviewId, userDetails.getEmail());
+        exReviewCommandService.deleteExhibitionReview(exhibitionReviewId, currentUser.getEmail());
         return CustomResponse.onSuccess("해당 전시 리뷰가 삭제되었습니다.");
     }
 }

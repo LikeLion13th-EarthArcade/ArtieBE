@@ -18,8 +18,8 @@ import com.project.team5backend.domain.exhibition.review.repository.ExhibitionRe
 import com.project.team5backend.domain.image.repository.ExhibitionImageRepository;
 import com.project.team5backend.domain.image.repository.ExhibitionReviewImageRepository;
 import com.project.team5backend.domain.recommendation.service.InteractLogService;
-import com.project.team5backend.domain.user.user.entity.User;
-import com.project.team5backend.domain.user.user.repository.UserRepository;
+import com.project.team5backend.domain.user.entity.User;
+import com.project.team5backend.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
