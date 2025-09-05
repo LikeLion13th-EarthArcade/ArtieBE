@@ -1,8 +1,5 @@
 package com.project.team5backend.domain.space.space.controller;
 
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Mood;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Type;
-import com.project.team5backend.domain.exhibition.exhibition.repository.ExhibitionSort;
 import com.project.team5backend.domain.image.exception.ImageErrorCode;
 import com.project.team5backend.domain.image.exception.ImageException;
 import com.project.team5backend.domain.space.space.dto.request.SpaceRequest;
@@ -12,7 +9,7 @@ import com.project.team5backend.domain.space.space.entity.SpaceSize;
 import com.project.team5backend.domain.space.space.entity.SpaceType;
 import com.project.team5backend.domain.space.space.service.command.SpaceCommandService;
 import com.project.team5backend.domain.space.space.service.query.SpaceQueryService;
-import com.project.team5backend.domain.user.user.repository.UserRepository;
+import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.SwaggerBody;
 import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.global.apiPayload.CustomUserDetails;

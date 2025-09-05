@@ -4,13 +4,12 @@ import com.project.team5backend.domain.space.reservation.converter.ReservationCo
 import com.project.team5backend.domain.space.reservation.dto.request.ReservationRequest;
 import com.project.team5backend.domain.space.reservation.dto.response.ReservationResponse;
 import com.project.team5backend.domain.space.reservation.entity.Reservation;
-import com.project.team5backend.domain.space.reservation.entity.ReservationStatus;
 import com.project.team5backend.domain.space.reservation.repository.ReservationRepository;
 import com.project.team5backend.domain.space.space.entity.Space;
 import com.project.team5backend.domain.space.space.repository.SpaceRepository;
 
-import com.project.team5backend.domain.user.user.entity.User;
-import com.project.team5backend.domain.user.user.repository.UserRepository;
+import com.project.team5backend.domain.user.entity.User;
+import com.project.team5backend.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
