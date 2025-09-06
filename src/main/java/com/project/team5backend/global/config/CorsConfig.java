@@ -24,6 +24,7 @@ public class CorsConfig implements WebMvcConfigurer {
         allowedOrigins.add("http://localhost:5174");
         allowedOrigins.add("https://artie-blond.vercel.app");
         allowedOrigins.add("https://artiee.store");
+        allowedOrigins.add("https://api.artiee.store");
 
         configuration.setAllowedOrigins(allowedOrigins);
 
