@@ -84,6 +84,7 @@ public class SecurityConfig {
         CorsConfiguration configuration = new CorsConfiguration();
         configuration.setAllowedOriginPatterns(Arrays.asList(
                 "https://artiee.store",
+                "https://api.artiee.store",
                 "https://artie-blond.vercel.app",
                 "http://localhost:5173",
                 "http://localhost:5174"
