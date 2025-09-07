@@ -100,7 +100,12 @@ public class Space extends BaseTimeEntity {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-    public void updateThumbnail(String thumbnail) {
-        this.thumbnail = thumbnail;
+    public void softDelete() {
+        this.isDeleted = true;
+        markDeleted();
+    }
+    public void resetCount() {
+        this.likeCount = 0;
+        this.reviewCount = 0;
     }
 }

@@ -1,11 +1,9 @@
 package com.project.team5backend.domain.image.entity;
 
-import com.project.team5backend.domain.space.review.entity.Review;
+import com.project.team5backend.domain.space.review.entity.SpaceReview;
 import com.project.team5backend.global.entity.BaseCreateDeleteEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -13,7 +11,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ReviewImage extends BaseCreateDeleteEntity {
+public class SpaceReviewImage extends BaseCreateDeleteEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -25,7 +23,7 @@ public class ReviewImage extends BaseCreateDeleteEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "review_id")
-    private Review review;
+    private SpaceReview spaceReview;
 
     public void deleteImage() {
         isDeleted = true;

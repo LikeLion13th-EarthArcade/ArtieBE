@@ -4,9 +4,9 @@ import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.exhibition.review.entity.ExhibitionReview;
 import com.project.team5backend.domain.image.entity.ExhibitionImage;
 import com.project.team5backend.domain.image.entity.ExhibitionReviewImage;
-import com.project.team5backend.domain.image.entity.ReviewImage;
+import com.project.team5backend.domain.image.entity.SpaceReviewImage;
 import com.project.team5backend.domain.image.entity.SpaceImage;
-import com.project.team5backend.domain.space.review.entity.Review;
+import com.project.team5backend.domain.space.review.entity.SpaceReview;
 import com.project.team5backend.domain.space.space.entity.Space;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -38,12 +38,12 @@ public class ImageConverter {
                 .build();
     }
 
-    // Review
-    public static ReviewImage toEntityReviewImage(Review review, String imageUrl) {
-        return ReviewImage.builder()
+    // SpaceReview
+    public static SpaceReviewImage toEntityReviewImage(SpaceReview spaceReview, String imageUrl) {
+        return SpaceReviewImage.builder()
                 .imageUrl(imageUrl)
                 .isDeleted(false)
-                .review(review)
+                .spaceReview(spaceReview)
                 .build();
     }
 }

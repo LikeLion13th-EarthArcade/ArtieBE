@@ -30,7 +30,6 @@ public class SpaceController {
 
     private final SpaceCommandService spaceCommandService;
     private final SpaceQueryService spaceQueryService;
-    private final UserRepository userRepository;
 
     @SwaggerBody(content = @Content(
             encoding = {
@@ -57,6 +56,15 @@ public class SpaceController {
     public CustomResponse<SpaceResDTO.DetailSpaceResDTO> getSpaceDetails(@PathVariable Long spaceId) {
         return CustomResponse.onSuccess(spaceQueryService.getSpaceDetail(spaceId));
     }
+    @Operation(summary = "전시 공간 삭제")
+    @DeleteMapping("/{spaceId}")
+    public CustomResponse<String> deleteSpace(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @PathVariable Long spaceId) {
+        spaceCommandService.deleteSpace(spaceId, currentUser.getId());
+        return CustomResponse.onSuccess("공간이 삭제되었습니다.");
+    }
+
 
 //    @Operation(summary = "전시 공간 검색")
 //    @GetMapping("/search")

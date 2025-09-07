@@ -84,7 +84,7 @@ public class ExhibitionReviewCommandServiceImpl implements ExhibitionReviewComma
             throw new ExhibitionReviewException(ExhibitionReviewErrorCode.EXHIBITION_REVIEW_FORBIDDEN);
         }
 
-        exhibitionReview.delete();
+        exhibitionReview.softDelete();
 
         // 전시이미지 소프트 삭제
         List<ExhibitionReviewImage> images = exhibitionReviewImageRepository.findByExhibitionReviewId(exhibitionReviewId);

@@ -10,4 +10,6 @@ public interface SpaceImageRepository extends JpaRepository<SpaceImage, Long> {
 
     @Query("select si.imageUrl from SpaceImage si where si.space.id = :spaceId")
     List<String> findImageUrlsBySpaceId(@Param("spaceId") Long spaceId);
+
+    List<SpaceImage> findBySpaceId(long spaceId);
 }
