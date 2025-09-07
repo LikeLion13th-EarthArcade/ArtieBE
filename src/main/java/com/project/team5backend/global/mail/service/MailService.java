@@ -1,5 +1,6 @@
 package com.project.team5backend.global.mail.service;
 
+import com.project.team5backend.global.mail.MailType;
 import com.project.team5backend.global.mail.exception.MailErrorCode;
 import com.project.team5backend.global.mail.exception.MailException;
 import jakarta.mail.MessagingException;
@@ -16,6 +17,7 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 
 @Service
 @Slf4j
@@ -25,21 +27,16 @@ public class MailService {
     private final JavaMailSender javaMailSender;
     @Value("${spring.mail.username}") String fromEmail;
 
-    public void sendMail(String toMail, String code) {
+    public void sendMail(MailType mailType, String toMail, Map<String, String> mailContent) {
         MimeMessage mimeMessage = javaMailSender.createMimeMessage();
 
         try {
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
             helper.setFrom(fromEmail);
             helper.setTo(toMail);
-            helper.setSubject("[Artie] - 이메일 인증 코드");
-
-            String template = Files.readString(Path.of("src/main/java/com/project/team5backend/global/mail/template/code.html"), StandardCharsets.UTF_8);
-            String html = template
-                    .replace("{{CODE}}", code)
-                            .replace("{{TTL_MINUTES}}", "5");
-
-            helper.setText(html, true);
+            helper.setSubject(mailType.getSubject());
+            String path = mailType.getTemplatePath();
+            helper.setText(createTemplateWith(path, mailContent), true);
             javaMailSender.send(mimeMessage);
 
         } catch (IOException e) {
@@ -51,5 +48,13 @@ public class MailService {
         } catch (Exception e) {
             throw new MailException(MailErrorCode.NOT_DEFINED_ERROR);
         }
+    }
+
+    private String createTemplateWith(String path, Map<String, String> mailContent) throws IOException {
+        String html = Files.readString(Path.of(path), StandardCharsets.UTF_8);
+        for (String key : mailContent.keySet()) {
+            html = html.replace(key, mailContent.get(key));
+        }
+        return html;
     }
 }
