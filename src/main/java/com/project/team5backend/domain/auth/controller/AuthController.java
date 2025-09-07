@@ -6,14 +6,16 @@ import com.project.team5backend.domain.auth.service.command.AuthCommandService;
 import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.global.security.userdetails.CurrentUser;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/auth")
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/auth")
+@Tag(name = "AUTH", description = "AUTH 관련 API")
 public class AuthController {
 
     private final AuthCommandService authCommandService;
