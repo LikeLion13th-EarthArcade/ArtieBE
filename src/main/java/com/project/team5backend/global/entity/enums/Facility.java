@@ -1,4 +1,4 @@
-package com.project.team5backend.global.entity;
+package com.project.team5backend.global.entity.enums;
 
 import lombok.Getter;
 

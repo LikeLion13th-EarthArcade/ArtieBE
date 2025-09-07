@@ -3,13 +3,18 @@ package com.project.team5backend.domain.space.space.dto.response;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Getter
 @Setter
+public class SpaceResDTO {
 
-public class SpaceResponse {
-
+    @Builder
+    public record CreateSpaceResDTO (
+            Long id,
+            LocalDateTime createdAt
+    ){}
     // 검색 결과 DTO
     @Builder
     public record SpaceSearchResponse (
@@ -83,10 +88,7 @@ public class SpaceResponse {
         ){}
     }
 
-    // 등록 응답 DTO
-    public record SpaceRegistrationResponse (
-            Long spaceId
-    ){}
+
 
 
 }

@@ -1,6 +1,6 @@
 package com.project.team5backend.domain.exhibition.exhibition.dto.admin.response;
 
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Status;
+import com.project.team5backend.global.entity.enums.Status;
 import lombok.Builder;
 
 public class ExhibitionAdminResDTO {

@@ -2,11 +2,11 @@ package com.project.team5backend.domain.exhibition.exhibition.entity;
 
 import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Category;
 import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Mood;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Status;
+import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Type;
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.global.converter.FacilityConverter;
-import com.project.team5backend.global.entity.Facility;
+import com.project.team5backend.global.entity.enums.Facility;
 import com.project.team5backend.global.entity.embedded.Address;
 import com.project.team5backend.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;

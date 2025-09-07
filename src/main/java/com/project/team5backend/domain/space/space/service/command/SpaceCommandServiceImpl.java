@@ -6,14 +6,16 @@ import com.project.team5backend.domain.image.converter.ImageConverter;
 import com.project.team5backend.domain.image.exception.ImageErrorCode;
 import com.project.team5backend.domain.image.exception.ImageException;
 import com.project.team5backend.domain.space.space.converter.SpaceConverter;
-import com.project.team5backend.domain.space.space.dto.request.SpaceRequest;
-import com.project.team5backend.domain.space.space.dto.response.SpaceResponse;
+import com.project.team5backend.domain.space.space.dto.request.SpaceReqDTO;
+import com.project.team5backend.domain.space.space.dto.response.SpaceResDTO;
 import com.project.team5backend.domain.space.space.entity.Space;
 import com.project.team5backend.domain.space.space.entity.SpaceLike;
 import com.project.team5backend.domain.space.space.repository.SpaceLikeRepository;
 import com.project.team5backend.domain.space.space.repository.SpaceRepository;
 
 import com.project.team5backend.domain.user.entity.User;
+import com.project.team5backend.domain.user.exception.UserErrorCode;
+import com.project.team5backend.domain.user.exception.UserException;
 import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.address.converter.AddressConverter;
 import com.project.team5backend.global.address.dto.response.AddressResDTO;
@@ -21,6 +23,7 @@ import com.project.team5backend.global.address.service.AddressService;
 import com.project.team5backend.global.entity.embedded.Address;
 import com.project.team5backend.global.util.S3Uploader;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -31,76 +34,70 @@ import java.util.List;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @Transactional
 public class SpaceCommandServiceImpl implements SpaceCommandService {
 
     private final SpaceRepository spaceRepository;
     private final SpaceLikeRepository spaceLikeRepository;
-    private final SpaceConverter spaceConverter;
     private final UserRepository userRepository;
     private final SpaceImageRepository spaceImageRepository;
     private final AddressService addressService;
     private final S3Uploader s3Uploader;
 
     @Override
-    public SpaceResponse.SpaceRegistrationResponse registerSpace(SpaceRequest.Create request, String email, List<MultipartFile> images) {
-
-
+    public SpaceResDTO.CreateSpaceResDTO createSpace(SpaceReqDTO.CreateSpaceReqDTO request, String email, List<MultipartFile> images) {
         User user = userRepository.findByEmailAndIsDeletedFalse(email)
-                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 사용자입니다."));
-
-        if (images.isEmpty()) throw new ImageException(ImageErrorCode.IMAGE_NOT_FOUND);
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
         //주소 가져오기
         AddressResDTO.AddressCreateResDTO addressResDTO = addressService.resolve(request.address());
         Address address = AddressConverter.toAddress(addressResDTO);
-        // 3. Space 엔티티 생성 (대표 이미지: 첫 번째 파일 key)
-        // 업로드 및 fileKey 획득
-        List<String> imageUrls = new ArrayList<>();
-        for (MultipartFile file : images) {
-            String url = s3Uploader.upload(file, "spaces");
-            imageUrls.add(url);
+
+        // 업로드 및 image 획득
+        List<String> imageUrls = images.stream()
+                .map(file -> s3Uploader.upload(file, "spaces"))
+                .toList();
+
+        Space space = SpaceConverter.toSpace(request, user, imageUrls.get(0), address);
+        spaceRepository.save(space);
+
+        // Space 이미지 엔티티 저장
+        for (String url : imageUrls) {
+            spaceImageRepository.save(ImageConverter.toEntitySpaceImage(space, url));
         }
-
-        Space space = spaceConverter.toSpace(request, user, imageUrls.get(0),address);
-        Space savedSpace = spaceRepository.save(space);
-
-        // 4. Space 이미지 엔티티 저장
-        for (String fileKey : imageUrls) {
-            spaceImageRepository.save(ImageConverter.toEntitySpaceImage(savedSpace, fileKey));
-        }
-        return spaceConverter.toSpaceRegistrationResponse(savedSpace);
+        return SpaceConverter.toCreateSpaceResDTO(space);
     }
 
-    @Override
-    public boolean toggleLike(Long spaceId, Long userId) {
-        // ... 기존 로직과 동일
-        Space space = spaceRepository.findById(spaceId)
-                .orElseThrow(() -> new IllegalArgumentException("해당 전시 공간이 존재하지 않습니다."));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
-        return spaceLikeRepository.findBySpaceIdAndUserId(spaceId, userId)
-                .map(existingLike -> {
-                    spaceLikeRepository.delete(existingLike);
-                    return false;
-                })
-                .orElseGet(() -> {
-                    SpaceLike like = new SpaceLike();
-                    like.setSpace(space);
-                    like.setUser(user);
-                    spaceLikeRepository.save(like);
-                    return true;
-                });
-    }
-
-    @Override
-    public void deleteSpace(Long spaceId) {
-        spaceRepository.deleteById(spaceId);
-    }
-
-    @Override
-    public void approveSpace(Long spaceId) {
-        Space space = spaceRepository.findById(spaceId)
-                .orElseThrow(() -> new IllegalArgumentException("Space not found"));
-        space.setStatus(Space.Status.APPROVED);
-    }
+//    @Override
+//    public boolean toggleLike(Long spaceId, Long userId) {
+//        // ... 기존 로직과 동일
+//        Space space = spaceRepository.findById(spaceId)
+//                .orElseThrow(() -> new IllegalArgumentException("해당 전시 공간이 존재하지 않습니다."));
+//        User user = userRepository.findById(userId)
+//                .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
+//        return spaceLikeRepository.findBySpaceIdAndUserId(spaceId, userId)
+//                .map(existingLike -> {
+//                    spaceLikeRepository.delete(existingLike);
+//                    return false;
+//                })
+//                .orElseGet(() -> {
+//                    SpaceLike like = new SpaceLike();
+//                    like.setSpace(space);
+//                    like.setUser(user);
+//                    spaceLikeRepository.save(like);
+//                    return true;
+//                });
+//    }
+//
+//    @Override
+//    public void deleteSpace(Long spaceId) {
+//        spaceRepository.deleteById(spaceId);
+//    }
+//
+//    @Override
+//    public void approveSpace(Long spaceId) {
+//        Space space = spaceRepository.findById(spaceId)
+//                .orElseThrow(() -> new IllegalArgumentException("Space not found"));
+//        space.setStatus(Space.Status.APPROVED);
+//    }
 }

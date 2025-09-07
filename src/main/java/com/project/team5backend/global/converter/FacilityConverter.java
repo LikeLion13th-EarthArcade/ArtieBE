@@ -3,7 +3,7 @@ package com.project.team5backend.global.converter;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.team5backend.global.entity.Facility;
+import com.project.team5backend.global.entity.enums.Facility;
 import jakarta.persistence.AttributeConverter;
 import jakarta.persistence.Converter;
 

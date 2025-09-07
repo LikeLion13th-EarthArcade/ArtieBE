@@ -17,24 +17,24 @@ public class AdminSpaceController {
 
     private final AdminSpaceService adminSpaceService;
 
-    @Operation(summary = "전시 공간 심사 목록 조회")
-    @GetMapping("/pending")
-    // @PreAuthorize("hasRole('ADMIN')") // 보안 설정: 관리자만 접근 가능
-    public CustomResponse<List<AdminSpaceResponse.PendingSpaceListResponse>> getPendingSpaces() {
-        List<AdminSpaceResponse.PendingSpaceListResponse> pendingSpaces = adminSpaceService.getPendingSpaces();
-        return CustomResponse.onSuccess(pendingSpaces);
-    }
-
-    @Operation(summary = "전시 공간 심사 승인 or 거절")
-    @PatchMapping("/{spaceId}/pending")
-    // @PreAuthorize("hasRole('ADMIN')") // 보안 설정: 관리자만 접근 가능
-    public CustomResponse<AdminSpaceResponse.AdminActionResponse> processSpaceApproval(
-            @PathVariable Long spaceId,
-            @RequestBody AdminSpaceRequest.AdminSpaceReq request) {
-
-        AdminSpaceResponse.AdminActionResponse response = adminSpaceService.processSpaceApproval(spaceId, request);
-
-        return CustomResponse.onSuccess(response);
-
-    }
+//    @Operation(summary = "전시 공간 심사 목록 조회")
+//    @GetMapping("/pending")
+//    // @PreAuthorize("hasRole('ADMIN')") // 보안 설정: 관리자만 접근 가능
+//    public CustomResponse<List<AdminSpaceResponse.PendingSpaceListResponse>> getPendingSpaces() {
+//        List<AdminSpaceResponse.PendingSpaceListResponse> pendingSpaces = adminSpaceService.getPendingSpaces();
+//        return CustomResponse.onSuccess(pendingSpaces);
+//    }
+//
+//    @Operation(summary = "전시 공간 심사 승인 or 거절")
+//    @PatchMapping("/{spaceId}/pending")
+//    // @PreAuthorize("hasRole('ADMIN')") // 보안 설정: 관리자만 접근 가능
+//    public CustomResponse<AdminSpaceResponse.AdminActionResponse> processSpaceApproval(
+//            @PathVariable Long spaceId,
+//            @RequestBody AdminSpaceRequest.AdminSpaceReq request) {
+//
+//        AdminSpaceResponse.AdminActionResponse response = adminSpaceService.processSpaceApproval(spaceId, request);
+//
+//        return CustomResponse.onSuccess(response);
+//
+//    }
 }

@@ -4,7 +4,7 @@ import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Catego
 import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Mood;
 import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Type;
 import com.project.team5backend.domain.exhibition.review.dto.response.ExhibitionReviewResDTO;
-import com.project.team5backend.global.entity.Facility;
+import com.project.team5backend.global.entity.enums.Facility;
 import lombok.Builder;
 
 import java.math.BigDecimal;
