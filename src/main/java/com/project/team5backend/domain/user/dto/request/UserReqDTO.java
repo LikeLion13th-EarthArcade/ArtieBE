@@ -13,5 +13,10 @@ public class UserReqDTO {
             String name
     ) {
     }
+
+    public record UserUpdateReqDTO(
+            String name
+    ) {
+    }
 }
 
