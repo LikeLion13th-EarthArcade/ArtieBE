@@ -29,7 +29,7 @@ public class GlobalExceptionHandler {
                 .status(errorCode.getHttpStatus())
                 .body(errorCode.getErrorResponse());
     }
-    // MethodArgumentNotValidException- DTO 유효성 검사 실패
+    // MethodArgumentNotValidException
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<CustomResponse<Map<String, String>>> handleMethodArgumentNotValid(MethodArgumentNotValidException ex) {
         log.warn("[ Validation Error - MethodArgumentNotValidException ]: {}", ex.getMessage());
@@ -39,9 +39,8 @@ public class GlobalExceptionHandler {
             errors.put(error.getField(), error.getDefaultMessage());
         });
 
-        BaseErrorCode errorCode = GeneralErrorCode.VALIDATION_FAILED_DTO;
-        CustomResponse<Map<String, String>> errorResponse = CustomResponse.onFailure(
-                errorCode.getCode(), errorCode.getMessage(), errors);
+        BaseErrorCode errorCode = GeneralErrorCode.VALIDATION_FAILED_DTO_FILED;
+        CustomResponse<Map<String, String>> errorResponse = CustomResponse.onFailure(errorCode.getCode(), errorCode.getMessage(), errors);
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
                 .body(errorResponse);
@@ -59,8 +58,7 @@ public class GlobalExceptionHandler {
         });
 
         BaseErrorCode errorCode = GeneralErrorCode.VALIDATION_FAILED_PARAM;
-        CustomResponse<Map<String, String>> errorResponse = CustomResponse.onFailure(
-                errorCode.getCode(), errorCode.getMessage(), errors);
+        CustomResponse<Map<String, String>> errorResponse = CustomResponse.onFailure(errorCode.getCode(), errorCode.getMessage(), errors);
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
                 .body(errorResponse);
