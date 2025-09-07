@@ -11,7 +11,11 @@ import java.util.Optional;
 
 @Repository
 public interface SpaceLikeRepository extends JpaRepository<SpaceLike, Long> {
-    Optional<SpaceLike> findBySpaceIdAndUserId(Long spaceId, Long userId);
+    boolean existsByUserIdAndSpaceId(long spaceId, long userId);
+
+    @Modifying
+    @Query("delete from SpaceLike sl where sl.user.id =:userId and sl.space.id =:spaceId")
+    void deleteByUserIdAndSpaceId(@Param("spaceId") long spaceId,@Param("userId") long userId);
 
     @Modifying
     @Query("delete from SpaceLike sl where sl.space.id =:spaceId")

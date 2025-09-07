@@ -104,8 +104,12 @@ public class Space extends BaseTimeEntity {
         this.isDeleted = true;
         markDeleted();
     }
-    public void resetCount() {
-        this.likeCount = 0;
-        this.reviewCount = 0;
+    public void increaseLikeCount() {
+        this.likeCount++;
     }
+
+    public void decreaseLikeCount() {
+        this.likeCount = Math.max(0, this.likeCount - 1);
+    }
+
 }

@@ -49,7 +49,7 @@ public class SpaceConverter {
 
     public static SpaceResDTO.DetailSpaceResDTO toDetailSpaceResDTO(Space space, List<String> imageUrls){
         return SpaceResDTO.DetailSpaceResDTO.builder()
-                .exhibitionSpaceId(space.getId())
+                .spaceId(space.getId())
                 .name(space.getName())
                 .imageUrls(imageUrls)
                 .address(

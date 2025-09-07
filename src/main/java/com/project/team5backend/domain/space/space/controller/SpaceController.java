@@ -1,5 +1,6 @@
 package com.project.team5backend.domain.space.space.controller;
 
+import com.project.team5backend.domain.exhibition.exhibition.dto.response.ExhibitionResDTO;
 import com.project.team5backend.domain.space.space.dto.request.SpaceReqDTO;
 import com.project.team5backend.domain.space.space.dto.response.SpaceResDTO;
 import com.project.team5backend.domain.space.space.service.command.SpaceCommandService;
@@ -51,11 +52,21 @@ public class SpaceController {
         return CustomResponse.onSuccess(createSpaceResDTO);
     }
 
+    @PostMapping("/{spaceId}/like")
+    @Operation(summary = "공간 좋아요", description = "좋아요 없으면 등록, 있으면 취소")
+    public CustomResponse<SpaceResDTO.LikeSpaceResDTO> likeSpace(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @PathVariable Long spaceId
+    ) {
+        return CustomResponse.onSuccess(spaceCommandService.likeSpace(spaceId, currentUser.getId()));
+    }
+
     @Operation(summary = "전시 공간 상세 조회")
     @GetMapping("/{spaceId}")
     public CustomResponse<SpaceResDTO.DetailSpaceResDTO> getSpaceDetails(@PathVariable Long spaceId) {
         return CustomResponse.onSuccess(spaceQueryService.getSpaceDetail(spaceId));
     }
+
     @Operation(summary = "전시 공간 삭제")
     @DeleteMapping("/{spaceId}")
     public CustomResponse<String> deleteSpace(
@@ -83,17 +94,4 @@ public class SpaceController {
 //                spaceQueryService.searchSpaces(startDate, endDate, district, size, type, mood, page)
 //        );
 //    }
-//    @Operation(summary = "전시 공간 좋아요 / 좋아요 취소")
-//    @PostMapping("/{spaceId}/like")
-//    public CustomResponse<Map<String, Boolean>> toggleLike(@PathVariable Long spaceId,
-//                                                           @AuthenticationPrincipal CurrentUser currentUser) {
-//        Long userId = currentUser.getId();
-//        boolean liked = spaceCommandService.toggleLike(spaceId, userId);
-//        return CustomResponse.onSuccess(Map.of("liked", liked));
-//    }
-//    @Operation(summary = "전시 공간 정보 삭제")
-//    @DeleteMapping("/{spaceId}")
-//    public CustomResponse<Void> deleteSpace(@PathVariable Long spaceId) {
-//        spaceCommandService.deleteSpace(spaceId);
-//        return CustomResponse.onSuccess(null);    }
 }

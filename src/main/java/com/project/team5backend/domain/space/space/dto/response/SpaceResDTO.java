@@ -26,7 +26,7 @@ public class SpaceResDTO {
     // 상세 조회 DTO
     @Builder
     public record DetailSpaceResDTO (
-            Long exhibitionSpaceId,
+            Long spaceId,
             String name,
             List<String> imageUrls,
             String address,
@@ -43,6 +43,12 @@ public class SpaceResDTO {
             String email,
             String websiteUrl,
             String snsUrl
+    ){}
+
+    @Builder
+    public record LikeSpaceResDTO(
+            Long spaceId,
+            String message
     ){}
 
     // 검색 결과 DTO

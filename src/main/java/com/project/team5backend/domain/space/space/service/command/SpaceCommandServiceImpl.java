@@ -1,7 +1,5 @@
 package com.project.team5backend.domain.space.space.service.command;
 
-
-import com.project.team5backend.domain.image.entity.ExhibitionImage;
 import com.project.team5backend.domain.image.entity.SpaceImage;
 import com.project.team5backend.domain.image.repository.SpaceImageRepository;
 import com.project.team5backend.domain.image.converter.ImageConverter;
@@ -10,10 +8,10 @@ import com.project.team5backend.domain.image.exception.ImageException;
 import com.project.team5backend.domain.image.service.command.ImageCommandService;
 import com.project.team5backend.domain.space.review.repository.SpaceReviewRepository;
 import com.project.team5backend.domain.space.space.converter.SpaceConverter;
+import com.project.team5backend.domain.space.space.converter.SpaceLikeConverter;
 import com.project.team5backend.domain.space.space.dto.request.SpaceReqDTO;
 import com.project.team5backend.domain.space.space.dto.response.SpaceResDTO;
 import com.project.team5backend.domain.space.space.entity.Space;
-import com.project.team5backend.domain.space.space.entity.SpaceLike;
 import com.project.team5backend.domain.space.space.exception.SpaceErrorCode;
 import com.project.team5backend.domain.space.space.exception.SpaceException;
 import com.project.team5backend.domain.space.space.repository.SpaceLikeRepository;
@@ -77,6 +75,22 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
     }
 
     @Override
+    public SpaceResDTO.LikeSpaceResDTO likeSpace(long spaceId, long userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(()-> new UserException(UserErrorCode.USER_NOT_FOUND));
+        Space space = spaceRepository.findById(spaceId)
+                .orElseThrow(()-> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
+
+        boolean alreadyLiked = spaceLikeRepository.existsByUserIdAndSpaceId(userId, spaceId);
+
+        String message = alreadyLiked
+                ? handleUnlike(userId, spaceId, space)
+                : handleLike(user, space);
+
+        return SpaceLikeConverter.toLikeSpaceResDTO(spaceId, message);
+    }
+
+    @Override
     public void deleteSpace(long spaceId, long userId) {
         Space space = spaceRepository.findByIdAndIsDeletedFalseAndStatusApproved(spaceId, Status.APPROVED)
                 .orElseThrow(() -> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
@@ -100,6 +114,17 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
             throw new ImageException(ImageErrorCode.S3_MOVE_TRASH_FAIL);
         }
     }
+    private String handleUnlike(long userId, long spaceId, Space space) {
+        spaceLikeRepository.deleteByUserIdAndSpaceId(userId, spaceId);
+        space.decreaseLikeCount();
+        return "관심목록에서 삭제되었습니다.";
+    }
+
+    private String handleLike(User user, Space space) {
+        spaceLikeRepository.save(SpaceLikeConverter.toSpaceLike(user, space));
+        space.increaseLikeCount();
+        return "관심목록에 추가되었습니다.";
+    }
 
 //    @Override
 //    public boolean toggleLike(Long spaceId, Long userId) {
@@ -120,17 +145,5 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
 //                    spaceLikeRepository.save(like);
 //                    return true;
 //                });
-//    }
-//
-//    @Override
-//    public void deleteSpace(Long spaceId) {
-//        spaceRepository.deleteById(spaceId);
-//    }
-//
-//    @Override
-//    public void approveSpace(Long spaceId) {
-//        Space space = spaceRepository.findById(spaceId)
-//                .orElseThrow(() -> new IllegalArgumentException("Space not found"));
-//        space.setStatus(Space.Status.APPROVED);
 //    }
 }

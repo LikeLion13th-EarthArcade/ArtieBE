@@ -12,6 +12,7 @@ public interface SpaceCommandService {
     SpaceResDTO.CreateSpaceResDTO createSpace(SpaceReqDTO.CreateSpaceReqDTO createSpaceReqDTO, long userId, List<MultipartFile> urls);
 
     void deleteSpace(long spaceId, long userId);
-//    boolean toggleLike(Long spaceId, Long userId);
+
+    SpaceResDTO.LikeSpaceResDTO likeSpace(long spaceId, long userId);
 //    void approveSpace(Long spaceId);
 }
