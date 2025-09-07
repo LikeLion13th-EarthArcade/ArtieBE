@@ -40,4 +40,14 @@ public class UserController {
     ) {
         return CustomResponse.onSuccess(userQueryService.getUserProfile(currentUser.getId()));
     }
+
+    @Operation(summary = "회원 정보 수정")
+    @PatchMapping("me")
+    public CustomResponse<String> updateUser(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @RequestBody UserReqDTO.UserUpdateReqDTO userUpdateReqDTO
+    ) {
+        userCommandService.updateUser(currentUser.getId(), userUpdateReqDTO);
+        return CustomResponse.onSuccess("회원 정보 수정 완료");
+    }
 }

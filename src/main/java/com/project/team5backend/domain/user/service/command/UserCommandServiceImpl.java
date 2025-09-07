@@ -13,6 +13,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import static com.project.team5backend.global.util.UpdateUtils.updateIfChanged;
+
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -30,6 +32,14 @@ public class UserCommandServiceImpl implements UserCommandService {
         } catch (DataIntegrityViolationException e) {
             throw new UserException(UserErrorCode.EMAIL_DUPLICATED);
         }
+    }
+
+    @Override
+    public void updateUser(long id, UserReqDTO.UserUpdateReqDTO userUpdateReqDTO) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+
+        updateIfChanged(userUpdateReqDTO.name(), user.getName(), user::updateName);
     }
 
     private String encodePassword(String rawPassword) {

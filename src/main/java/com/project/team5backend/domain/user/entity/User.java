@@ -27,11 +27,15 @@ public class User extends BaseEntity {
     @Column(name = "is_email_verified")
     private boolean isEmailVerified = false;
 
+    @Column(name = "role", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private Role role;
+
     public void delete() {
         this.isDeleted = true;
     }
 
-    @Column(name = "role", nullable = false)
-    @Enumerated(EnumType.STRING)
-    private Role role;
+    public void updateName(String name) {
+        this.name = name;
+    }
 }
