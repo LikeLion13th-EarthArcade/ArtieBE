@@ -10,6 +10,7 @@ import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.global.security.userdetails.CurrentUser;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -27,7 +28,7 @@ public class UserController {
     @Operation(summary = "회원 가입")
     @PostMapping()
     public CustomResponse<String> createUser(
-            @RequestBody UserReqDTO.UserCreateReqDTO userCreateReqDTO
+            @RequestBody @Valid UserReqDTO.UserCreateReqDTO userCreateReqDTO
     ) {
         userCommandService.createUser(userCreateReqDTO);
         return CustomResponse.onSuccess(HttpStatus.CREATED, "회원 가입 완료");
