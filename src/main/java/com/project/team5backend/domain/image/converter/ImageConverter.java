@@ -14,34 +14,34 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ImageConverter {
     //전시이미지 생성
-    public static ExhibitionImage toEntityExhibitionImage(Exhibition exhibition, String fileKey) {
+    public static ExhibitionImage toEntityExhibitionImage(Exhibition exhibition, String imageUrl) {
         return ExhibitionImage.builder()
-                .fileKey(fileKey)
+                .imageUrl(imageUrl)
                 .isDeleted(false)
                 .exhibition(exhibition)
                 .build();
     }
     //전시리뷰이미지 생성
-    public static ExhibitionReviewImage toEntityExhibitionReviewImage(ExhibitionReview review, String url) {
+    public static ExhibitionReviewImage toEntityExhibitionReviewImage(ExhibitionReview review, String imageUrl) {
         return ExhibitionReviewImage.builder()
-                .fileKey(url)
+                .imageUrl(imageUrl)
                 .isDeleted(false)
                 .exhibitionReview(review)
                 .build();
     }
     // Space
-    public static SpaceImage toEntitySpaceImage(Space space, String fileKey) {
+    public static SpaceImage toEntitySpaceImage(Space space, String imageUrl) {
         return SpaceImage.builder()
-                .fileKey(fileKey)
+                .imageUrl(imageUrl)
                 .isDeleted(false)
                 .space(space)
                 .build();
     }
 
     // Review
-    public static ReviewImage toEntityReviewImage(Review review, String fileKey) {
+    public static ReviewImage toEntityReviewImage(Review review, String imageUrl) {
         return ReviewImage.builder()
-                .fileKey(fileKey)
+                .imageUrl(imageUrl)
                 .isDeleted(false)
                 .review(review)
                 .build();

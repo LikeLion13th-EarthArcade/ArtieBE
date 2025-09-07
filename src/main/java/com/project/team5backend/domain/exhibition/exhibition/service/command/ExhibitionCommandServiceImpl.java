@@ -114,7 +114,7 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
         // 전시이미지 소프트 삭제
         List<ExhibitionImage> images = exhibitionImageRepository.findByExhibitionId(exhibitionId);
         images.forEach(ExhibitionImage::deleteImage);
-        List<String> keys = images.stream().map(ExhibitionImage::getFileKey).toList();
+        List<String> keys = images.stream().map(ExhibitionImage::getImageUrl).toList();
         // 3) 좋아요 하드 삭제 (벌크)
         exhibitionLikeRepository.deleteByExhibitionId(exhibitionId);
 

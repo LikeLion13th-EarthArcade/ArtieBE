@@ -89,7 +89,7 @@ public class ExhibitionReviewCommandServiceImpl implements ExhibitionReviewComma
         // 전시이미지 소프트 삭제
         List<ExhibitionReviewImage> images = exhibitionReviewImageRepository.findByExhibitionReviewId(exhibitionReviewId);
         images.forEach(ExhibitionReviewImage::deleteImage);
-        List<String> keys = images.stream().map(ExhibitionReviewImage::getFileKey).toList();
+        List<String> keys = images.stream().map(ExhibitionReviewImage::getImageUrl).toList();
 
         Exhibition exhibition = exhibitionReview.getExhibition();
         // 리뷰 평균/카운트 갱신

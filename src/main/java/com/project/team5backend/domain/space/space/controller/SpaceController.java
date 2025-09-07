@@ -25,7 +25,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/spaces")
 @RequiredArgsConstructor
-@Tag(name = "공간")
+@Tag(name = "Space")
 public class SpaceController {
 
     private final SpaceCommandService spaceCommandService;
