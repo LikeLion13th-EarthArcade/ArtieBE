@@ -49,6 +49,7 @@ public class SecurityConfig {
             "/api/v1/users",
             "/api/v1/security/reissue-cookie", // 쿠키 재발급
             "/api/v1/security/csrf",    // csrf 토큰 발급
+            "/api/v1/validations/**",
             "swagger-resources/**",
             "/swagger-ui/**",
             "/v3/api-docs/**",
