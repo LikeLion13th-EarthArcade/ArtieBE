@@ -1,14 +1,24 @@
 package com.project.team5backend.domain.space.space.repository;
 
 import com.project.team5backend.domain.space.space.entity.Space;
+import com.project.team5backend.domain.user.entity.User;
+import com.project.team5backend.global.entity.enums.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface SpaceRepository extends JpaRepository<Space, Long>,SpaceRepositoryCustom {
-//    List<Space> findByStatus(Space.Status status);
-//    List<Space> findByUserId(Long userId);
-
+    @Query("""
+        select s
+        from Space s
+        where s.id =:id
+          and s.isDeleted = false
+          and s.status =:status
+        """)
+    Optional<Space> findByIdAndIsDeletedFalseAndStatusApproved(@Param("spaceId") long spaceId,@Param("status") Status status);
 }

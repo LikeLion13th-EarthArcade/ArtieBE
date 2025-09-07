@@ -9,7 +9,7 @@ import java.util.List;
 
 
 public interface SpaceCommandService {
-    SpaceResDTO.CreateSpaceResDTO createSpace(SpaceReqDTO.CreateSpaceReqDTO createSpaceReqDTO, String email, List<MultipartFile> urls);
+    SpaceResDTO.CreateSpaceResDTO createSpace(SpaceReqDTO.CreateSpaceReqDTO createSpaceReqDTO, long userId, List<MultipartFile> urls);
 //    void deleteSpace(Long spaceId);
 //    boolean toggleLike(Long spaceId, Long userId);
 //    void approveSpace(Long spaceId);

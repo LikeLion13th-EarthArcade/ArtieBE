@@ -1,17 +1,8 @@
 package com.project.team5backend.domain.space.space.service.query;
 
 
+import com.project.team5backend.domain.space.space.dto.response.SpaceResDTO;
+
 public interface SpaceQueryService {
-//    List<SpaceResponse.SpaceSearchResponse> getApprovedSpaces();
-//    SpaceResponse.SpaceSearchPageResponse searchSpaces(
-//            LocalDate startDate,
-//            LocalDate endDate,
-//            String district,
-//            SpaceSize size,
-//            SpaceType type,
-//            SpaceMood mood,
-//            int page
-//    );
-//
-//    SpaceResponse.SpaceDetailResponse getSpaceDetails(Long spaceId);
+    SpaceResDTO.DetailSpaceResDTO getSpaceDetail(long spaceId);
 }

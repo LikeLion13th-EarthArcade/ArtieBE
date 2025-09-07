@@ -48,17 +48,16 @@ public class SpaceController {
             @RequestPart("images") List<MultipartFile> images
     ) {
         ImageUtils.validateImages(images); // 이미지 검증 (개수, null 여부)
-        SpaceResDTO.CreateSpaceResDTO createSpaceResDTO = spaceCommandService.createSpace(createSpaceReqDTO, currentUser.getEmail(), images);
+        SpaceResDTO.CreateSpaceResDTO createSpaceResDTO = spaceCommandService.createSpace(createSpaceReqDTO, currentUser.getId(), images);
         return CustomResponse.onSuccess(createSpaceResDTO);
     }
 
-//    @Operation(summary = "전시 공간 목록 조회")
-//    @GetMapping
-//    public CustomResponse<List<SpaceResponse.SpaceSearchResponse>> getSpaces() {
-//        List<SpaceResponse.SpaceSearchResponse> spaces = spaceQueryService.getApprovedSpaces();
-//        return CustomResponse.onSuccess(spaces);
-//    }
-//
+    @Operation(summary = "전시 공간 상세 조회")
+    @GetMapping("/{spaceId}")
+    public CustomResponse<SpaceResDTO.DetailSpaceResDTO> getSpaceDetails(@PathVariable Long spaceId) {
+        return CustomResponse.onSuccess(spaceQueryService.getSpaceDetail(spaceId));
+    }
+
 //    @Operation(summary = "전시 공간 검색")
 //    @GetMapping("/search")
 //    public CustomResponse<SpaceResponse.SpaceSearchPageResponse> searchSpaces(
@@ -75,12 +74,6 @@ public class SpaceController {
 //        return CustomResponse.onSuccess(
 //                spaceQueryService.searchSpaces(startDate, endDate, district, size, type, mood, page)
 //        );
-//    }
-//    @Operation(summary = "전시 공간 상세 조회")
-//    @GetMapping("/{spaceId}")
-//    public CustomResponse<SpaceResponse.SpaceDetailResponse> getSpaceDetails(@PathVariable Long spaceId) {
-//        SpaceResponse.SpaceDetailResponse spaceDetail = spaceQueryService.getSpaceDetails(spaceId);
-//        return CustomResponse.onSuccess(spaceDetail);
 //    }
 //    @Operation(summary = "전시 공간 좋아요 / 좋아요 취소")
 //    @PostMapping("/{spaceId}/like")

@@ -46,8 +46,8 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
     private final S3Uploader s3Uploader;
 
     @Override
-    public SpaceResDTO.CreateSpaceResDTO createSpace(SpaceReqDTO.CreateSpaceReqDTO request, String email, List<MultipartFile> images) {
-        User user = userRepository.findByEmailAndIsDeletedFalse(email)
+    public SpaceResDTO.CreateSpaceResDTO createSpace(SpaceReqDTO.CreateSpaceReqDTO request, long userId, List<MultipartFile> images) {
+        User user = userRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
         //주소 가져오기
         AddressResDTO.AddressCreateResDTO addressResDTO = addressService.resolve(request.address());

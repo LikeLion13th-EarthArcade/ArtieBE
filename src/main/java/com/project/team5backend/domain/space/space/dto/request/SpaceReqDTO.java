@@ -12,7 +12,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 
 
-import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -32,7 +31,7 @@ public class SpaceReqDTO {
             @Schema(description = "시설")List<Facility> facility,
             @Schema(description = "전화") String phoneNumber,
             @Schema(description = "이메일")String email,
-            @Schema(description = "공간 소개 링크")String homepageUrl,
+            @Schema(description = "공간 소개 링크")String websiteUrl,
             @Schema(description = "SNS")String snsUrl
     ){}
 

@@ -5,20 +5,14 @@ import com.project.team5backend.domain.space.space.entity.Space;
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.global.entity.embedded.Address;
 import com.project.team5backend.global.entity.enums.Status;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import com.project.team5backend.domain.space.space.dto.request.SpaceReqDTO;
 
 import java.math.BigDecimal;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class SpaceConverter {
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
-
-    // SpaceRequest.Create DTO를 Space 엔티티로 변환
     public static Space toSpace(SpaceReqDTO.CreateSpaceReqDTO request, User user, String thumbnail, Address address){
 
         return Space.builder()
@@ -29,7 +23,7 @@ public class SpaceConverter {
                 .thumbnail(thumbnail)
                 .phoneNumber(request.phoneNumber())
                 .email(request.email())
-                .homepageUrl(request.homepageUrl())
+                .websiteUrl(request.websiteUrl())
                 .snsUrl(request.snsUrl())
                 .ratingAvg(BigDecimal.ZERO)
                 .likeCount(0)
@@ -50,6 +44,34 @@ public class SpaceConverter {
         return SpaceResDTO.CreateSpaceResDTO.builder()
                 .id(space.getId())
                 .createdAt(space.getCreatedAt())
+                .build();
+    }
+
+    public static SpaceResDTO.DetailSpaceResDTO toDetailSpaceResDTO(Space space, List<String> imageUrls){
+        return SpaceResDTO.DetailSpaceResDTO.builder()
+                .exhibitionSpaceId(space.getId())
+                .name(space.getName())
+                .imageUrls(imageUrls)
+                .address(
+                        space.getAddress() != null
+                                ? String.format("%s %s",
+                                space.getAddress().getRoadAddress(),
+                                space.getAddress().getDetail() != null ? space.getAddress().getDetail() : "")
+                                : null
+                )
+                .latitude(space.getAddress().getLatitude())
+                .longitude(space.getAddress().getLongitude())
+                .openTime(space.getOpenTime())
+                .closeTime(space.getCloseTime())
+                .spaceSize(space.getSize())
+                .spacePurpose(space.getPurpose())
+                .spaceMood(space.getMood())
+                .description(space.getDescription())
+                .facility(space.getFacilities())
+                .phoneNumber(space.getPhoneNumber())
+                .email(space.getEmail())
+                .websiteUrl(space.getWebsiteUrl())
+                .snsUrl(space.getSnsUrl())
                 .build();
     }
 }

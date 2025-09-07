@@ -1,11 +1,19 @@
 package com.project.team5backend.domain.space.space.service.query;
 
 
+import com.project.team5backend.domain.image.repository.SpaceImageRepository;
 import com.project.team5backend.domain.space.space.converter.SpaceConverter;
+import com.project.team5backend.domain.space.space.dto.response.SpaceResDTO;
+import com.project.team5backend.domain.space.space.entity.Space;
+import com.project.team5backend.domain.space.space.exception.SpaceErrorCode;
+import com.project.team5backend.domain.space.space.exception.SpaceException;
 import com.project.team5backend.domain.space.space.repository.SpaceRepository;
+import com.project.team5backend.global.entity.enums.Status;
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 
 @Service
@@ -13,15 +21,18 @@ import org.springframework.stereotype.Service;
 public class SpaceQueryServiceImpl implements SpaceQueryService {
 
     private final SpaceRepository spaceRepository;
-    private final EntityManager entityManager;
-    private final SpaceConverter spaceConverter;
+    private final SpaceImageRepository spaceImageRepository;
 
-//    // 모든 전시 공간 목록 조회
-//    @Override
-//    public List<SpaceResponse.SpaceSearchResponse> getApprovedSpaces() {
-//        List<Space> approvedSpaces = spaceRepository.findByStatus(Space.Status.APPROVED);
-//        return spaceConverter.toSpaceSearchResponseList(approvedSpaces);
-//    }
+    //전시 공간 상세 조회
+    @Override
+    public SpaceResDTO.DetailSpaceResDTO getSpaceDetail(long spaceId) {
+        Space space = spaceRepository.findByIdAndIsDeletedFalseAndStatusApproved(spaceId, Status.APPROVED)
+                .orElseThrow(() -> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
+
+        List<String> imageUrls = spaceImageRepository.findImageUrlsBySpaceId(spaceId);
+
+        return SpaceConverter.toDetailSpaceResDTO(space, imageUrls);
+    }
 //
 //    //검색 조건에 맞는 전시 공간 목록 조회
 //    @Override
@@ -71,16 +82,5 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
 //                pageInfo,
 //                mapInfo
 //        );
-//    }
-//
-//
-//
-//    //전시 공간의 상세 정보 조회
-//    @Override
-//    public SpaceResponse.SpaceDetailResponse getSpaceDetails(Long spaceId) {
-//        Space space = spaceRepository.findById(spaceId)
-//                .filter(s -> s.getStatus() == Space.Status.APPROVED)
-//                .orElseThrow(() -> new IllegalArgumentException("Approved space not found"));
-//        return spaceConverter.toSpaceDetailResponse(space);
 //    }
 }

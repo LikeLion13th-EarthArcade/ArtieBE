@@ -43,7 +43,7 @@ public class Space extends BaseTimeEntity {
     @Column(nullable = false)
     private LocalTime closeTime; // 운영 종료 시간
 
-    private String homepageUrl; // 홈페이지 url
+    private String websiteUrl; // 웹사이트 url
 
     @Column(length = 20)
     private String phoneNumber; // 전화번호
