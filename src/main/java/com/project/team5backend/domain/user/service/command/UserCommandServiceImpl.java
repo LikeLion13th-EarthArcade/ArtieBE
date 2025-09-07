@@ -39,7 +39,10 @@ public class UserCommandServiceImpl implements UserCommandService {
         if (!Objects.equals(redisUtils.get(email + KEY_SCOPE_SUFFIX), SCOPE_SIGNUP)) {
             throw new UserException(UserErrorCode.SIGN_UP_EMAIL_VALIDATION_DOES_NOT_EXIST);
         }
-
+        // 비밀번호 확인 점검 (근데 이걸 굳이 백엔드가?)
+        if (!Objects.equals(userCreateReqDTO.password(), userCreateReqDTO.passwordConfirmation())) {
+            throw new UserException(UserErrorCode.WRONG_PASSWORD_CONFIRMATION);
+        }
         User user = UserConverter.toUser(userCreateReqDTO);
         try {
             userRepository.save(user);
