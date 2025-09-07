@@ -8,5 +8,5 @@ public interface UserCommandService {
 
     void updateUser(long id, UserReqDTO.UserUpdateReqDTO userUpdateReqDTO);
 
-    void withdrawalUser(long id);
+    void withdrawalUser(long id, String accessToken, String refreshToken);
 }
