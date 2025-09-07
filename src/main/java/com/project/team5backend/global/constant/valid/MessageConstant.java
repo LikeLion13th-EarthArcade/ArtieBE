@@ -7,6 +7,8 @@ import lombok.NoArgsConstructor;
 public class MessageConstant {
 
     // NOT BLANK
+    public static final String USER_BLANK_EMAIL = "이메일 누락";
+    public static final String USER_BLANK_NAME = "이름 누락";
     public static final String USER_BLANK_PASSWORD = "비밀번호 누락";
     public static final String USER_BLANK_CODE = "인증 코드 누락";
 

@@ -7,6 +7,7 @@ import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.user.exception.UserErrorCode;
 import com.project.team5backend.domain.user.exception.UserException;
 import com.project.team5backend.domain.user.repository.UserRepository;
+import com.project.team5backend.global.security.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -22,6 +23,7 @@ public class UserCommandServiceImpl implements UserCommandService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final AuthCommandService authCommandService;
+    private final JwtUtil jwtUtil;
 
     @Override
     public void createUser(UserReqDTO.UserCreateReqDTO userCreateReqDTO) {
@@ -43,11 +45,11 @@ public class UserCommandServiceImpl implements UserCommandService {
     }
 
     @Override
-    public void withdrawalUser(long id) {
+    public void withdrawalUser(long id, String accessToken, String refreshToken) {
         User user = userRepository.findById(id)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
-
         user.delete();
+        jwtUtil.saveBlackListToken(user.getEmail(), accessToken, refreshToken);
     }
 
     private String encodePassword(String rawPassword) {

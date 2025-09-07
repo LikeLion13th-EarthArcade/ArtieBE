@@ -28,9 +28,9 @@ public class CustomLogoutHandler implements LogoutHandler {
 
         String accessToken = getTokenFromCookies(request, ACCESS_COOKIE_NAME);
         String refreshToken = getTokenFromCookies(request, REFRESH_COOKIE_NAME);
-        String loginId = jwtUtil.getEmail(refreshToken);
+        String email = jwtUtil.getEmail(refreshToken);
 
-        jwtUtil.saveBlackListToken(loginId, accessToken, refreshToken);
+        jwtUtil.saveBlackListToken(email, accessToken, refreshToken);
 
         createJwtCookies(response, ACCESS_COOKIE_NAME, null, 0);
         createJwtCookies(response, REFRESH_COOKIE_NAME, null, 0);

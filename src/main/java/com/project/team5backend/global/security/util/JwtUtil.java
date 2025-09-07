@@ -84,7 +84,7 @@ public class JwtUtil {
                 .get("jti", String.class);
     }
 
-    public void saveBlackListToken(String loginId, String accessToken, String refreshToken) {
+    public void saveBlackListToken(String email, String accessToken, String refreshToken) {
         // 토큰의 jti를 가져옴
         final String accessJti = getJti(accessToken);
         final String refreshJti = getJti(refreshToken);
@@ -92,7 +92,7 @@ public class JwtUtil {
         redisUtils.save(accessJti + KEY_BLACK_LIST_SUFFIX, accessToken, getRefreshExpMs(), TimeUnit.MILLISECONDS);
         redisUtils.save(refreshJti + KEY_BLACK_LIST_SUFFIX, refreshToken, getAccessExpMs(), TimeUnit.MILLISECONDS);
         // 리프레시 정보 삭제
-        redisUtils.delete(loginId + KEY_REFRESH_SUFFIX);
+        redisUtils.delete(email + KEY_REFRESH_SUFFIX);
 
     }
 
@@ -143,7 +143,7 @@ public class JwtUtil {
 
         // Redis 에 Refresh Token 저장
         redisUtils.save(
-                // {LoginId}:refresh -> refreshToken
+                // {email}:refresh -> refreshToken
                 customUserDetails.getUsername() + KEY_REFRESH_SUFFIX,
                 refreshToken,
                 refreshExpMs,

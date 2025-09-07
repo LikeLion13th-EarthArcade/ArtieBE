@@ -56,7 +56,7 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
         //Request Body 에서 추출
         String email = requestBody.email(); //Email 추출
         String password = requestBody.password(); //password 추출
-//        log.info("[ Login Filter ]  LoginId ---> {} ", email);
+//        log.info("[ Login Filter ]  Email ---> {} ", email);
 //        log.info("[ Login Filter ]  Password ---> {} ", password);
 
         //UserNamePasswordToken 생성 (인증용 객체)
