@@ -22,6 +22,10 @@ public class UserReqDTO {
             @Pattern(regexp = USER_PASSWORD_PATTERN, message = USER_WRONG_PASSWORD)
             String password,
 
+            @NotBlank(message = USER_BLANK_PASSWORD)
+            @Pattern(regexp = USER_PASSWORD_PATTERN, message = USER_WRONG_PASSWORD)
+            String passwordConfirmation,
+
             @NotBlank(message = USER_BLANK_NAME)
             String name
     ) {
