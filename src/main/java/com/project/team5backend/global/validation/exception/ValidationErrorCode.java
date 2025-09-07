@@ -10,7 +10,8 @@ import org.springframework.http.HttpStatus;
 public enum ValidationErrorCode implements BaseErrorCode {
     // ErrorCode
     ALREADY_USED_EMAIL(HttpStatus.CONFLICT, "VALID409", "이미 사용중인 이메일입니다."),
-    CODE_COOL_DOWN(HttpStatus.BAD_GATEWAY, "MSG502_2", "잠시 후 다시 시도해주세요. 메일은 10초에 한 번만 보낼 수 있습니다."),
+    CODE_COOL_DOWN(HttpStatus.BAD_GATEWAY, "VALID502", "잠시 후 다시 시도해주세요. 메일은 10초에 한 번만 보낼 수 있습니다."),
+    VALIDATION_REQUEST_DOES_NOT_EXIST(HttpStatus.UNPROCESSABLE_ENTITY, "VALID422", "해당 이메일과 관련된 인증이 없거나 인증 코드가 유효하지 않습니다."),
     ;
 
     private final HttpStatus httpStatus;

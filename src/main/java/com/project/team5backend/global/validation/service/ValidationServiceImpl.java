@@ -62,6 +62,36 @@ public class ValidationServiceImpl implements ValidationService {
         return code;
     }
 
+    @Override
+    public void verifyCode(ValidationReqDTO.EmailCodeValidationReqDTO emailCodeValidationReqDTO) {
+        // 이메일
+        final String email = emailCodeValidationReqDTO.email();
+        // 사용자가 입력한 숫자 코드
+        final String code =  emailCodeValidationReqDTO.code();
+
+        // 레디스에 저장된 인증 코드 + 사용 스코프 ( :으로 구별되어 있음 )
+        final String value = redisUtils.get(email + KEY_CODE_SUFFIX);
+        // 없으면 인증 정보가 없는 것
+        if (value == null) {
+            throw new ValidationException(ValidationErrorCode.VALIDATION_REQUEST_DOES_NOT_EXIST);
+        }
+
+        String[] values = value.split(":");
+        final String storedCode = values[0];
+        final String scope = values[1];
+
+        // 비교
+        if (!Objects.equals(code, storedCode)) {
+            throw new ValidationException(ValidationErrorCode.VALIDATION_REQUEST_DOES_NOT_EXIST);
+        }
+        // 성공시 회원 가입을 위해 삭제
+        redisUtils.delete(email + KEY_CODE_SUFFIX);
+        redisUtils.delete(email + KEY_COOLDOWN_SUFFIX);
+
+        // 해당 스코프에서 사용할 인증이 완료되었음을 레디스에 저장
+        redisUtils.save(email + KEY_SCOPE_SUFFIX, scope, SCOPE_EXP_TIME, TimeUnit.MILLISECONDS);
+    }
+
     // 6자리 난수 생성기
     private String createVerificationCode() {
         SecureRandom random = new SecureRandom();
