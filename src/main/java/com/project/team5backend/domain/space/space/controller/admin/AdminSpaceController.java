@@ -1,4 +1,4 @@
-package com.project.team5backend.domain.space.space.controller;
+package com.project.team5backend.domain.space.space.controller.admin;
 
 
 import com.project.team5backend.domain.space.space.dto.request.AdminSpaceRequest;
@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/spaces/admin")
+@RequestMapping("/api/v1/admin/spaces")
 @RequiredArgsConstructor
 public class AdminSpaceController {
 
