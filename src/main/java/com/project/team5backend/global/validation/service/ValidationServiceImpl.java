@@ -36,10 +36,9 @@ public class ValidationServiceImpl implements ValidationService {
         final String email = emailCodeReqDTO.email();
         // 6자리 난수 코드
         final String code = createVerificationCode();
-
-        boolean isEmailAlreadyExist = userRepository.findByEmail(email).isPresent();
+        boolean isEmailAlreadyExist = userRepository.findByEmail(email).isPresent() || redisUtils.hasKey(email + KEY_CODE_SUFFIX);
         boolean isEmailVerification = Objects.equals(mailType, MailType.SIGNUP_VERIFICATION);
-        // 회원 가입 이메일 인증인데, 이미 존재하는 이메일로 인증을 한 경우
+        // 회원 가입 이메일 인증인데, 이미 존재하는 이메일이거나, 누군가 인증 확인을 받아 가입을 진행중인 이메일로 인증을 한 경우
         if (isEmailAlreadyExist && isEmailVerification) {
             throw new ValidationException(ValidationErrorCode.ALREADY_USED_EMAIL);
         }

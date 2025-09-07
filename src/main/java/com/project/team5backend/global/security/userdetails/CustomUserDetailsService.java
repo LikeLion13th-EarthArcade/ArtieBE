@@ -27,7 +27,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         log.info("[ CustomUserDetailsService ] UserId 를 이용하여 User 를 검색합니다.");
 
         // Worker 로그인
-        Optional<User> workerOpt = userRepository.findByEmail(userId);
+        Optional<User> workerOpt = userRepository.findByEmailAndIsDeletedFalse(userId);
         if (workerOpt.isPresent()) {
             User user = workerOpt.get();
             Auth auth = authRepository.findByUser((user))
