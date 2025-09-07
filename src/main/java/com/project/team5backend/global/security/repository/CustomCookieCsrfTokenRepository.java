@@ -12,6 +12,7 @@ import java.util.UUID;
 
 import static com.project.team5backend.global.constant.common.CommonConstant.CSRF_COOKIE_NAME;
 import static com.project.team5backend.global.util.CookieUtils.createCsrfCookies;
+import static com.project.team5backend.global.util.CookieUtils.deleteCsrfCookie;
 
 public class CustomCookieCsrfTokenRepository implements CsrfTokenRepository {
 
@@ -29,7 +30,7 @@ public class CustomCookieCsrfTokenRepository implements CsrfTokenRepository {
         if (response == null) return;
 
         if (csrfToken == null) {
-            // ❌ 여기서 바로 삭제하지 않음 (로그아웃 시 직접 호출로 삭제)
+            // 여기서 바로 삭제하지 않음 (로그아웃 시 직접 전용 메서드 호출로 삭제)
             return;
         }
 
@@ -49,11 +50,7 @@ public class CustomCookieCsrfTokenRepository implements CsrfTokenRepository {
         return null;
     }
 
-    /** ✅ 로그아웃/탈퇴 등에서 호출해서 삭제 */
     public void invalidateCsrfToken(HttpServletResponse response) {
-        Cookie cookie = new Cookie(CSRF_COOKIE_NAME, "");
-        cookie.setPath("/");
-        cookie.setMaxAge(0); // 즉시 삭제
-        response.addCookie(cookie);
+        deleteCsrfCookie(response);
     }
 }

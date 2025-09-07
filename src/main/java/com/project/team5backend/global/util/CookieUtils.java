@@ -7,6 +7,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.web.csrf.CsrfToken;
 
 import static com.project.team5backend.global.constant.common.CommonConstant.CSRF_COOKIE_MAX_AGE;
+import static com.project.team5backend.global.constant.common.CommonConstant.CSRF_COOKIE_NAME;
 
 @Slf4j
 public class CookieUtils {
@@ -46,7 +47,13 @@ public class CookieUtils {
         csrfCookie.setAttribute("SameSite", "Lax");
         // 쿠키 추가
         response.addCookie(csrfCookie);
+    }
 
+    public static void deleteCsrfCookie(HttpServletResponse response) {
+        Cookie csrfCookie = new Cookie(CSRF_COOKIE_NAME, null);
+        csrfCookie.setPath("/");
+        csrfCookie.setMaxAge(0);
+        response.addCookie(csrfCookie);
     }
 
 

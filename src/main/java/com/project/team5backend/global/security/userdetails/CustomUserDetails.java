@@ -17,8 +17,8 @@ public class CustomUserDetails extends CurrentUser implements UserDetails {
 //    private final String roles;
 
     // Worker 인증 객체 생성
-    public CustomUserDetails(Long id, String loginId, String password, Role role) {
-        super(id, loginId, role);
+    public CustomUserDetails(Long id, String email, String password, Role role) {
+        super(id, email, role);
         this.password = password;
     }
 
