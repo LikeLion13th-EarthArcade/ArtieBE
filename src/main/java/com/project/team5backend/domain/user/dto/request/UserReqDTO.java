@@ -28,6 +28,7 @@ public class UserReqDTO {
     }
 
     public record UserUpdateReqDTO(
+            @NotBlank(message = USER_BLANK_NAME)
             String name
     ) {
     }
