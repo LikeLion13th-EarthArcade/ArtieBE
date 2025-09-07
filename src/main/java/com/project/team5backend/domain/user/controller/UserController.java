@@ -34,7 +34,7 @@ public class UserController {
     }
 
     @Operation(summary = "회원 정보 조회")
-    @GetMapping("me")
+    @GetMapping("/me")
     public CustomResponse<UserResDTO.UserProfileResDTO> getUserProfile(
             @AuthenticationPrincipal CurrentUser currentUser
     ) {
@@ -42,12 +42,22 @@ public class UserController {
     }
 
     @Operation(summary = "회원 정보 수정")
-    @PatchMapping("me")
+    @PatchMapping("/me")
     public CustomResponse<String> updateUser(
             @AuthenticationPrincipal CurrentUser currentUser,
             @RequestBody UserReqDTO.UserUpdateReqDTO userUpdateReqDTO
     ) {
         userCommandService.updateUser(currentUser.getId(), userUpdateReqDTO);
         return CustomResponse.onSuccess("회원 정보 수정 완료");
+    }
+
+    // TODO : 회원 탈퇴시 회원과 관련된 정보를 놔둘것이냐? 삭제할것이냐? 연쇄적으로 소프트 딜리트할 것이냐?
+    @Operation(summary = "회원 탈퇴")
+    @DeleteMapping("/withdrawal")
+    public CustomResponse<String> withdrawalUser(
+            @AuthenticationPrincipal CurrentUser currentUser
+    ) {
+        userCommandService.withdrawalUser(currentUser.getId());
+        return CustomResponse.onSuccess(HttpStatus.NO_CONTENT, "회원 탈퇴 완료");
     }
 }

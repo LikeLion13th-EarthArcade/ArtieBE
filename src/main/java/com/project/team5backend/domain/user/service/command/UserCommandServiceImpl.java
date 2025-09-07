@@ -42,6 +42,14 @@ public class UserCommandServiceImpl implements UserCommandService {
         updateIfChanged(userUpdateReqDTO.name(), user.getName(), user::updateName);
     }
 
+    @Override
+    public void withdrawalUser(long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+
+        user.delete();
+    }
+
     private String encodePassword(String rawPassword) {
         return passwordEncoder.encode(rawPassword);
     }
