@@ -1,6 +1,5 @@
 package com.project.team5backend.domain.space.space.service.query;
 
-import com.project.team5backend.domain.facility.entity.enums.FacilityType;
 import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.domain.space.space.dto.response.SpaceResDTO;
 import com.project.team5backend.domain.space.space.entity.enums.SpaceMood;
