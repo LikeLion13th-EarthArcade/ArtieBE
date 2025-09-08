@@ -6,17 +6,20 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.util.DefaultUriBuilderFactory;
 
 @Configuration
 @Slf4j
-public class KakaoRestClientConfig {
+public class RestClientConfig {
 
-    @Value("${kakao.api.rest-key:}")
-    private String restKey;
-
-    @Bean
-    public RestClient kakaoRestClient(RestClient.Builder builder) {
+    @Bean(name = "kakaoRestClient")
+    public RestClient kakaoRestClient(
+            RestClient.Builder builder,
+            @Value("${kakao.api.rest-key:}") String restKey
+    ) {
         if (restKey == null || restKey.isBlank()) {
             throw new AddressException(AddressErrorCode.MISSING_ADDRESS);
         }
@@ -29,6 +32,21 @@ public class KakaoRestClientConfig {
                 .defaultHeader(org.springframework.http.HttpHeaders.AUTHORIZATION, "KakaoAK " + restKey)
                 .defaultHeader(org.springframework.http.HttpHeaders.ACCEPT, org.springframework.http.MediaType.APPLICATION_JSON_VALUE)
                 .requestFactory(factory)
+                .build();
+    }
+
+    @Bean(name = "bizNumberRestClient")
+    public RestClient bizNumberRestClient(
+            RestClient.Builder builder,
+            @Value("${biz.base-url}") String baseUrl
+    ) {
+        DefaultUriBuilderFactory factory = new DefaultUriBuilderFactory(baseUrl);
+        factory.setEncodingMode(DefaultUriBuilderFactory.EncodingMode.NONE);
+
+        return builder
+                .uriBuilderFactory(factory)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .build();
     }
 }
