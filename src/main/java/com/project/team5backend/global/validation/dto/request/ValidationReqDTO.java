@@ -5,6 +5,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
 import static com.project.team5backend.global.constant.valid.MessageConstant.*;
+import static com.project.team5backend.global.constant.valid.PatternConstant.USER_BIZ_NUMBER_PATTERN;
 import static com.project.team5backend.global.constant.valid.PatternConstant.USER_CODE_PATTERN;
 
 public class ValidationReqDTO {
@@ -24,6 +25,13 @@ public class ValidationReqDTO {
             @NotBlank(message = USER_BLANK_CODE)
             @Pattern(regexp = USER_CODE_PATTERN, message = USER_WRONG_CODE)
             String code
+    ) {
+    }
+
+    public record BizNumberValidationReqDTO(
+            @NotBlank(message = USER_BLANK_BIZ_NUMBER)
+            @Pattern(regexp = USER_BIZ_NUMBER_PATTERN, message = USER_WRONG_BIZ_NUMBER)
+            String bizNumber
     ) {
     }
 }

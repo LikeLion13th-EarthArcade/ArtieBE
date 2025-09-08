@@ -58,6 +58,11 @@ openai:
 kakao:
   api:
     rest-key: ${KAKAO_API_REST_KEY}
+
+biz:
+  base-url: https://api.odcloud.kr/api/nts-businessman/v1/
+  api-key: ${NTS_API_SERVICE_KEY}
+
 logging:
   level:
     org.springframework.security: DEBUG
