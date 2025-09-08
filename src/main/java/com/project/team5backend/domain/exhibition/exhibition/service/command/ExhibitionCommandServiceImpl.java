@@ -5,6 +5,9 @@ import com.project.team5backend.domain.exhibition.exhibition.converter.Exhibitio
 import com.project.team5backend.domain.exhibition.exhibition.dto.request.ExhibitionReqDTO;
 import com.project.team5backend.domain.exhibition.exhibition.dto.response.ExhibitionResDTO;
 import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
+import com.project.team5backend.domain.facility.entity.ExhibitionFacility;
+import com.project.team5backend.domain.facility.entity.Facility;
+import com.project.team5backend.domain.facility.repository.FacilityRepository;
 import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.domain.exhibition.exhibition.exception.ExhibitionErrorCode;
 import com.project.team5backend.domain.exhibition.exhibition.exception.ExhibitionException;
@@ -47,6 +50,7 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
     private final ExhibitionLikeRepository exhibitionLikeRepository;
     private final ExhibitionImageRepository exhibitionImageRepository;
     private final ExhibitionReviewRepository exhibitionReviewRepository;
+    private final FacilityRepository facilityRepository;
     private final ImageCommandService imageCommandService;
     private final AddressService addressService;
     private final InteractLogService interactLogService;
@@ -63,6 +67,13 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
         // 1. 전시 엔티티 먼저 저장 (썸네일은 일단 null 로)
         Exhibition exhibition = ExhibitionConverter.toEntity(user, createExhibitionReqDTO, address);
         exhibitionRepository.save(exhibition);
+
+        // 2. 시설 매핑 (문자열 → Facility 엔티티 조회 → ExhibitionFacility 생성)
+        List<Facility> facilities = facilityRepository.findByNameIn(createExhibitionReqDTO.facilities());
+        facilities.forEach(facility -> {
+            ExhibitionFacility ef = ExhibitionConverter.toCreateExhibitionFacility(exhibition, facility);
+            exhibition.getExhibitionFacilities().add(ef);
+        });
 
         if (images == null || images.isEmpty()) {
             throw new ImageException(ImageErrorCode.IMAGE_NOT_FOUND_IN_DTO);

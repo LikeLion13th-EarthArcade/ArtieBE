@@ -6,7 +6,6 @@ import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Catego
 import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Mood;
 import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Type;
 import com.project.team5backend.global.address.dto.request.AddressReqDTO;
-import com.project.team5backend.global.entity.enums.Facility;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -26,7 +25,7 @@ public class ExhibitionReqDTO {
             @NotNull Type type,
             @NotNull Mood mood,
             Integer price,
-            List<Facility> facility,
+            List<String> facilities,
             @NotNull @Valid AddressReqDTO.AddressCreateReqDTO address
     ) {}
 

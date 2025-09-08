@@ -6,7 +6,6 @@ import com.project.team5backend.domain.space.space.entity.enums.SpacePurpose;
 import com.project.team5backend.domain.space.space.entity.enums.SpaceSize;
 import com.project.team5backend.domain.space.space.entity.enums.SpaceType;
 import com.project.team5backend.global.address.dto.request.AddressReqDTO;
-import com.project.team5backend.global.entity.enums.Facility;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -28,7 +27,7 @@ public class SpaceReqDTO {
             @Schema(description = "운영 시작 시간")LocalTime openTime,
             @Schema(description = "운영 종료 시간")LocalTime closeTime,
             @Schema(description = "공간 설명")String description,
-            @Schema(description = "시설")List<Facility> facility,
+            @Schema(description = "시설")List<String> facilities,
             @Schema(description = "전화") String phoneNumber,
             @Schema(description = "이메일")String email,
             @Schema(description = "공간 소개 링크")String websiteUrl,

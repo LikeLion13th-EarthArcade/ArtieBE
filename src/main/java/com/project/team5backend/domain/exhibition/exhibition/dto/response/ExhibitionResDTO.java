@@ -4,7 +4,7 @@ import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Catego
 import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Mood;
 import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Type;
 import com.project.team5backend.domain.exhibition.review.dto.response.ExhibitionReviewResDTO;
-import com.project.team5backend.global.entity.enums.Facility;
+import com.project.team5backend.domain.facility.entity.Facility;
 import lombok.Builder;
 
 import java.math.BigDecimal;
@@ -30,7 +30,7 @@ public class ExhibitionResDTO {
             Type type,
             Mood mood,
             Integer price,
-            List<Facility> facility,
+            List<String> facilities,
             List<ExhibitionReviewResDTO.exReviewDetailResDTO> reviews
     ) {}
     @Builder
@@ -50,7 +50,7 @@ public class ExhibitionResDTO {
             Type type,
             Mood mood,
             Integer price,
-            List<Facility> facility
+            List<String> facilities
     ) {}
 
     @Builder

@@ -1,6 +1,5 @@
-package com.project.team5backend.global.entity.facility;
+package com.project.team5backend.domain.facility.entity;
 
-import com.project.team5backend.global.entity.BaseOnlyCreateTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -9,7 +8,7 @@ import lombok.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class Facility extends BaseOnlyCreateTimeEntity {
+public class Facility {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "facility_id")
     private Long id;

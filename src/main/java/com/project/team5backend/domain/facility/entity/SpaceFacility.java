@@ -1,7 +1,6 @@
-package com.project.team5backend.global.entity.facility;
+package com.project.team5backend.domain.facility.entity;
 
 import com.project.team5backend.domain.space.space.entity.Space;
-import com.project.team5backend.global.entity.BaseOnlyCreateTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,9 +9,16 @@ import lombok.*;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class SpaceFacility extends BaseOnlyCreateTimeEntity {
+public class SpaceFacility {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "space_facility_id")
     private Long id;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "space_id")
+    private Space space;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "facility_id")
+    private Facility facility;
 }

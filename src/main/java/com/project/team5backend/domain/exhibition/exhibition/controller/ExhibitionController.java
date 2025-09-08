@@ -4,7 +4,7 @@ import com.project.team5backend.domain.exhibition.exhibition.dto.request.Exhibit
 import com.project.team5backend.domain.exhibition.exhibition.dto.response.ExhibitionResDTO;
 import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Category;
 import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Mood;
-import com.project.team5backend.domain.exhibition.exhibition.repository.ExhibitionSort;
+import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.domain.exhibition.exhibition.service.command.ExhibitionCommandService;
 import com.project.team5backend.domain.exhibition.exhibition.service.query.ExhibitionQueryService;
 import com.project.team5backend.domain.image.exception.ImageErrorCode;
@@ -83,7 +83,7 @@ public class ExhibitionController {
             @RequestParam(name = "distinct", required = false) String district,
             @RequestParam(name = "mood", required = false) Mood mood,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate localDate,
-            @RequestParam(defaultValue = "POPULAR") ExhibitionSort sort,   // new | old | popular
+            @RequestParam(defaultValue = "POPULAR") Sort sort,   // new | old | popular
             @RequestParam(name = "page", defaultValue = "0") int page
     ) {
         return CustomResponse.onSuccess(exhibitionQueryService.searchExhibition(category, district, mood, localDate, sort, page));

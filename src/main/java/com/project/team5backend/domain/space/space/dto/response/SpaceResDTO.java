@@ -3,8 +3,6 @@ package com.project.team5backend.domain.space.space.dto.response;
 import com.project.team5backend.domain.space.space.entity.enums.SpaceMood;
 import com.project.team5backend.domain.space.space.entity.enums.SpacePurpose;
 import com.project.team5backend.domain.space.space.entity.enums.SpaceSize;
-import com.project.team5backend.domain.space.space.entity.enums.SpaceType;
-import com.project.team5backend.global.entity.enums.Facility;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -38,7 +36,7 @@ public class SpaceResDTO {
             SpacePurpose spacePurpose,
             SpaceMood spaceMood,
             String description,
-            List<Facility> facility,
+            List<String> facilities,
             String phoneNumber,
             String email,
             String websiteUrl,
@@ -51,21 +49,9 @@ public class SpaceResDTO {
             String message
     ){}
 
-    // 검색 결과 DTO
-    @Builder
-    public record SpaceSearchResponse (
-            Long id,
-            String name,
-            String address,
-            BigDecimal latitude,
-            BigDecimal longitude,
-            String startDate,
-            String endDate,
-            String thumbnail
-    ){}
     // 페이지 결과 DTO
-    public record SpaceSearchPageResponse(
-            List<SpaceSearchResponse> items,
+    public record SearchSpacePageResDTO(
+            List<SearchSpaceResDTO> items,
             PageInfo pageInfo,
             MapInfo mapInfo
     ) {
@@ -83,4 +69,16 @@ public class SpaceResDTO {
                 Double longitude
         ) {}
     }
+    // 검색 결과 DTO
+    @Builder
+    public record SearchSpaceResDTO (
+            Long spaceId,
+            String name,
+            String address,
+            BigDecimal latitude,
+            BigDecimal longitude,
+            LocalTime openTime,
+            LocalTime closeTime,
+            String thumbnail
+    ){}
 }

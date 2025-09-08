@@ -5,11 +5,10 @@ import com.project.team5backend.domain.space.space.entity.enums.SpacePurpose;
 import com.project.team5backend.domain.space.space.entity.enums.SpaceSize;
 import com.project.team5backend.domain.space.space.entity.enums.SpaceType;
 import com.project.team5backend.domain.user.entity.User;
-import com.project.team5backend.global.converter.FacilityConverter;
 import com.project.team5backend.global.entity.BaseTimeEntity;
-import com.project.team5backend.global.entity.enums.Facility;
 import com.project.team5backend.global.entity.embedded.Address;
 import com.project.team5backend.global.entity.enums.Status;
+import com.project.team5backend.domain.facility.entity.SpaceFacility;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -21,7 +20,6 @@ import java.util.List;
 @Entity
 @Builder
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class Space extends BaseTimeEntity {
@@ -91,10 +89,8 @@ public class Space extends BaseTimeEntity {
     @Column(nullable = false)
     private Status status; // 승인 상태
 
-    // 시설 정보를 JSON 배열로 저장
-    @Convert(converter = FacilityConverter.class)
-    @Column(name = "facilities", columnDefinition = "TEXT")
-    private List<Facility> facilities = new ArrayList<>();
+    @OneToMany(mappedBy = "space", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<SpaceFacility> spaceFacilities = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)

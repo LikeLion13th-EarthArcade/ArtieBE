@@ -4,6 +4,7 @@ import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.exhibition.exhibition.entity.QExhibition;
 import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Category;
 import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Mood;
+import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.global.entity.enums.Status;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
@@ -27,7 +28,7 @@ public class ExhibitionRepositoryImpl implements ExhibitionRepositoryCustom {
     @Override
     public Page<Exhibition> findExhibitionsWithFilters(
             Category category, String district, Mood mood, LocalDate localDate,
-            ExhibitionSort sort, Pageable pageable) {
+            Sort sort, Pageable pageable) {
 
         QExhibition exhibition = QExhibition.exhibition;
 
@@ -70,7 +71,7 @@ public class ExhibitionRepositoryImpl implements ExhibitionRepositoryCustom {
                 .fetchOne();
 
         // 정렬, 디폴트 최신순
-        OrderSpecifier<?> order = switch (sort == null ? ExhibitionSort.POPULAR : sort) {
+        OrderSpecifier<?> order = switch (sort == null ? Sort.POPULAR : sort) {
             case OLD     -> exhibition.createdAt.asc();
             case POPULAR -> new OrderSpecifier<>(Order.DESC, exhibition.reviewCount, OrderSpecifier.NullHandling.NullsLast);
             case NEW     -> exhibition.createdAt.desc();

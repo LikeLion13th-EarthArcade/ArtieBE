@@ -1,26 +1,33 @@
 package com.project.team5backend.domain.space.space.controller;
 
-import com.project.team5backend.domain.exhibition.exhibition.dto.response.ExhibitionResDTO;
+import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.domain.space.space.dto.request.SpaceReqDTO;
 import com.project.team5backend.domain.space.space.dto.response.SpaceResDTO;
+import com.project.team5backend.domain.space.space.entity.enums.SpaceMood;
+import com.project.team5backend.domain.space.space.entity.enums.SpaceSize;
+import com.project.team5backend.domain.space.space.entity.enums.SpaceType;
 import com.project.team5backend.domain.space.space.service.command.SpaceCommandService;
 import com.project.team5backend.domain.space.space.service.query.SpaceQueryService;
-import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.SwaggerBody;
 import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.global.security.userdetails.CurrentUser;
 import com.project.team5backend.global.util.ImageUtils;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Encoding;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.util.List;
 
 @RestController
@@ -65,6 +72,26 @@ public class SpaceController {
     @GetMapping("/{spaceId}")
     public CustomResponse<SpaceResDTO.DetailSpaceResDTO> getSpaceDetails(@PathVariable Long spaceId) {
         return CustomResponse.onSuccess(spaceQueryService.getSpaceDetail(spaceId));
+    }
+
+    @Operation(summary = "공간 검색", description = "공간 검색하면 한페이지에 4개의 전시와 서울 시청 중심의 위도 경도 반환")
+    @GetMapping("/search")
+    public CustomResponse<SpaceResDTO.SearchSpacePageResDTO> searchSpaces(
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate requestedStartDate,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate requestedEndDate,
+            @RequestParam(name = "distinct", required = false) String district,
+            @RequestParam(name = "size", required = false) SpaceSize size,
+            @RequestParam(name = "type", required = false) SpaceType type,
+            @RequestParam(name = "mood", required = false) SpaceMood mood,
+            @Parameter(
+                    description = "시설 목록 (예: WIFI, RESTROOM, STROLLER_RENTAL)",
+                    array = @ArraySchema(schema = @Schema(type = "string"))
+            )
+            @RequestParam(name = "facilities", required = false) List<String> facilities, // 스웨거 편의성을 위해 enum 설정
+            @RequestParam(defaultValue = "POPULAR") Sort sort,
+            @RequestParam(name = "page", defaultValue = "0") int page
+    ) {
+        return CustomResponse.onSuccess(spaceQueryService.searchSpace(requestedStartDate, requestedEndDate, district, size, type, mood, facilities, sort, page));
     }
 
     @Operation(summary = "전시 공간 삭제")

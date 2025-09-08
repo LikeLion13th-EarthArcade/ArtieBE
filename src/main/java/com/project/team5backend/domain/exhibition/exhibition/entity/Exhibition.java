@@ -5,10 +5,9 @@ import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Mood;
 import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Type;
 import com.project.team5backend.domain.user.entity.User;
-import com.project.team5backend.global.converter.FacilityConverter;
-import com.project.team5backend.global.entity.enums.Facility;
 import com.project.team5backend.global.entity.embedded.Address;
 import com.project.team5backend.global.entity.BaseTimeEntity;
+import com.project.team5backend.domain.facility.entity.ExhibitionFacility;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,6 +23,7 @@ import java.util.List;
 @AllArgsConstructor
 public class Exhibition extends BaseTimeEntity {
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "exhibition_id")
     private Long id;
 
     private String title;
@@ -75,10 +75,8 @@ public class Exhibition extends BaseTimeEntity {
     @Column(name = "is_deleted")
     private boolean isDeleted;
 
-    // 시설 정보를 JSON 배열로 저장
-    @Convert(converter = FacilityConverter.class)
-    @Column(name = "facilities", columnDefinition = "TEXT")
-    private List<Facility> facilities = new ArrayList<>();
+    @OneToMany(mappedBy = "exhibition", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ExhibitionFacility> exhibitionFacilities = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id")
