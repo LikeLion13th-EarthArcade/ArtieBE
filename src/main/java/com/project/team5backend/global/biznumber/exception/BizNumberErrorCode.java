@@ -9,9 +9,9 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum BizNumberErrorCode implements BaseErrorCode {
     // ErrorCode
-    EXTERNAL_API_ERROR(HttpStatus.BAD_GATEWAY, "국세청 API 연동 실패"),
-    EXTERNAL_API_TIMEOUT(HttpStatus.SERVICE_UNAVAILABLE, "국세청 API 응답 지연"),
-    PARSE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "국세청 API 응답 처리 실패"),
+    EXTERNAL_API_ERROR(HttpStatus.BAD_GATEWAY, "BIZ502", "국세청 API 연동 실패"),
+    EXTERNAL_API_TIMEOUT(HttpStatus.SERVICE_UNAVAILABLE, "BIZ503", "국세청 API 응답 지연"),
+    PARSE_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "BIZ500","국세청 API 응답 처리 실패"),
     ;
 
     private final HttpStatus httpStatus;
