@@ -84,7 +84,7 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
             String url = s3Uploader.upload(file, "exhibitions");
             imageUrls.add(url);
 
-            exhibitionImageRepository.save(ImageConverter.toEntityExhibitionImage(exhibition, url));
+            exhibitionImageRepository.save(ImageConverter.toExhibitionImage(exhibition, url));
         }
         exhibition.updateThumbnail(imageUrls.get(0));
         exhibitionRepository.save(exhibition);

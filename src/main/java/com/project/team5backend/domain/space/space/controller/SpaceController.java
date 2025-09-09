@@ -33,7 +33,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/spaces")
 @RequiredArgsConstructor
-@Tag(name = "Space")
+@Tag(name = "Space", description = "공간 관련 API")
 public class SpaceController {
 
     private final SpaceCommandService spaceCommandService;

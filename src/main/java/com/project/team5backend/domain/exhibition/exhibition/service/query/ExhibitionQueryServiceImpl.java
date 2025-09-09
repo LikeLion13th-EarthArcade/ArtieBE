@@ -63,7 +63,7 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
         List<ExhibitionReviewResDTO.exReviewDetailResDTO> detailReviews = reviews.stream()
                 .map(review -> {
                     // 리뷰에 연결된 이미지 fileKey 조회
-                    List<String> imageUrls = exhibitionReviewImageRepository.findImageUrlByExhibitionReviewId(review.getId());
+                    List<String> imageUrls = exhibitionReviewImageRepository.findImageUrlsByExhibitionReviewId(review.getId());
                     return ExhibitionReviewConverter.toDetailExReviewResDTO(review, imageUrls);
                 })
                 .toList();
