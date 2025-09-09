@@ -4,9 +4,9 @@ import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.exhibition.review.entity.ExhibitionReview;
 import com.project.team5backend.domain.image.entity.ExhibitionImage;
 import com.project.team5backend.domain.image.entity.ExhibitionReviewImage;
-import com.project.team5backend.domain.image.entity.ReviewImage;
+import com.project.team5backend.domain.image.entity.SpaceReviewImage;
 import com.project.team5backend.domain.image.entity.SpaceImage;
-import com.project.team5backend.domain.space.review.entity.Review;
+import com.project.team5backend.domain.space.review.entity.SpaceReview;
 import com.project.team5backend.domain.space.space.entity.Space;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -14,36 +14,36 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ImageConverter {
     //전시이미지 생성
-    public static ExhibitionImage toEntityExhibitionImage(Exhibition exhibition, String fileKey) {
+    public static ExhibitionImage toEntityExhibitionImage(Exhibition exhibition, String imageUrl) {
         return ExhibitionImage.builder()
-                .fileKey(fileKey)
+                .imageUrl(imageUrl)
                 .isDeleted(false)
                 .exhibition(exhibition)
                 .build();
     }
     //전시리뷰이미지 생성
-    public static ExhibitionReviewImage toEntityExhibitionReviewImage(ExhibitionReview review, String url) {
+    public static ExhibitionReviewImage toEntityExhibitionReviewImage(ExhibitionReview review, String imageUrl) {
         return ExhibitionReviewImage.builder()
-                .fileKey(url)
+                .imageUrl(imageUrl)
                 .isDeleted(false)
                 .exhibitionReview(review)
                 .build();
     }
     // Space
-    public static SpaceImage toEntitySpaceImage(Space space, String fileKey) {
+    public static SpaceImage toEntitySpaceImage(Space space, String imageUrl) {
         return SpaceImage.builder()
-                .fileKey(fileKey)
+                .imageUrl(imageUrl)
                 .isDeleted(false)
                 .space(space)
                 .build();
     }
 
-    // Review
-    public static ReviewImage toEntityReviewImage(Review review, String fileKey) {
-        return ReviewImage.builder()
-                .fileKey(fileKey)
+    // SpaceReview
+    public static SpaceReviewImage toEntityReviewImage(SpaceReview spaceReview, String imageUrl) {
+        return SpaceReviewImage.builder()
+                .imageUrl(imageUrl)
                 .isDeleted(false)
-                .review(review)
+                .spaceReview(spaceReview)
                 .build();
     }
 }

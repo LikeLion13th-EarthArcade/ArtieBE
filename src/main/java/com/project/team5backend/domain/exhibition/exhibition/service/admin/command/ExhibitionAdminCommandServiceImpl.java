@@ -1,7 +1,7 @@
 package com.project.team5backend.domain.exhibition.exhibition.service.admin.command;
 
 import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Status;
+import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.domain.exhibition.exhibition.exception.ExhibitionErrorCode;
 import com.project.team5backend.domain.exhibition.exhibition.exception.ExhibitionException;
 import com.project.team5backend.domain.exhibition.exhibition.repository.ExhibitionRepository;

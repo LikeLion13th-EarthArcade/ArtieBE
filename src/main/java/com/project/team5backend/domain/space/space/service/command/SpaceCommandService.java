@@ -1,16 +1,18 @@
 package com.project.team5backend.domain.space.space.service.command;
 
 
-import com.project.team5backend.domain.space.space.dto.request.SpaceRequest;
-import com.project.team5backend.domain.space.space.dto.response.SpaceResponse;
+import com.project.team5backend.domain.space.space.dto.request.SpaceReqDTO;
+import com.project.team5backend.domain.space.space.dto.response.SpaceResDTO;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 
 public interface SpaceCommandService {
-    SpaceResponse.SpaceRegistrationResponse registerSpace(SpaceRequest.Create request, String email, List<MultipartFile> urls);
-    void deleteSpace(Long spaceId);
-    boolean toggleLike(Long spaceId, Long userId);
-    void approveSpace(Long spaceId);
+    SpaceResDTO.CreateSpaceResDTO createSpace(SpaceReqDTO.CreateSpaceReqDTO createSpaceReqDTO, long userId, List<MultipartFile> urls);
+
+    void deleteSpace(long spaceId, long userId);
+
+    SpaceResDTO.LikeSpaceResDTO likeSpace(long spaceId, long userId);
+//    void approveSpace(Long spaceId);
 }

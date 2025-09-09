@@ -3,7 +3,9 @@ package com.project.team5backend.domain.exhibition.exhibition.converter;
 import com.project.team5backend.domain.exhibition.exhibition.dto.request.ExhibitionReqDTO;
 import com.project.team5backend.domain.exhibition.exhibition.dto.response.ExhibitionResDTO;
 import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Status;
+import com.project.team5backend.domain.facility.entity.ExhibitionFacility;
+import com.project.team5backend.domain.facility.entity.Facility;
+import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.domain.exhibition.review.dto.response.ExhibitionReviewResDTO;
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.global.entity.embedded.Address;
@@ -30,7 +32,6 @@ public class ExhibitionConverter {
                 .category(createReqDTO.category())
                 .type(createReqDTO.type())
                 .mood(createReqDTO.mood())
-                .facilities(createReqDTO.facility())
                 .isDeleted(false)
                 .ratingAvg(BigDecimal.ZERO)
                 .likeCount(0)
@@ -38,6 +39,13 @@ public class ExhibitionConverter {
                 .thumbnail(null)
                 .address(address)
                 .user(user)
+                .build();
+    }
+
+    public static ExhibitionFacility toCreateExhibitionFacility(Exhibition exhibition, Facility facility){
+        return ExhibitionFacility.builder()
+                .exhibition(exhibition)
+                .facility(facility)
                 .build();
     }
 
@@ -64,7 +72,11 @@ public class ExhibitionConverter {
                 .type(exhibition.getType())
                 .mood(exhibition.getMood())
                 .price(exhibition.getPrice())
-                .facility(exhibition.getFacilities())
+                .facilities(
+                        exhibition.getExhibitionFacilities().stream()
+                                .map(ef -> ef.getFacility().getName()) // Facility 엔티티의 name 사용
+                                .toList()
+                )
                 .reviews(reviews)
                 .build();
     }
@@ -88,7 +100,11 @@ public class ExhibitionConverter {
                 .type(exhibition.getType())
                 .mood(exhibition.getMood())
                 .price(exhibition.getPrice())
-                .facility(exhibition.getFacilities())
+                .facilities(
+                        exhibition.getExhibitionFacilities().stream()
+                                .map(ef -> ef.getFacility().getName()) // Facility 엔티티의 name 사용
+                                .toList()
+                )
                 .build();
     }
 

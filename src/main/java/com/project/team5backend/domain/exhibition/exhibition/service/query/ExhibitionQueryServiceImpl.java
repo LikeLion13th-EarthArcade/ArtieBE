@@ -5,12 +5,12 @@ import com.project.team5backend.domain.exhibition.exhibition.dto.response.Exhibi
 import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Category;
 import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Mood;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Status;
+import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.domain.exhibition.exhibition.exception.ExhibitionErrorCode;
 import com.project.team5backend.domain.exhibition.exhibition.exception.ExhibitionException;
 import com.project.team5backend.domain.exhibition.exhibition.repository.ExhibitionLikeRepository;
 import com.project.team5backend.domain.exhibition.exhibition.repository.ExhibitionRepository;
-import com.project.team5backend.domain.exhibition.exhibition.repository.ExhibitionSort;
+import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.domain.exhibition.review.converter.ExhibitionReviewConverter;
 import com.project.team5backend.domain.exhibition.review.dto.response.ExhibitionReviewResDTO;
 import com.project.team5backend.domain.exhibition.review.entity.ExhibitionReview;
@@ -25,7 +25,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -74,13 +73,13 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
 
     @Override
     public ExhibitionResDTO.SearchExhibitionPageResDTO searchExhibition(
-            Category category, String district, Mood mood, LocalDate localDate, ExhibitionSort sort, int page) {
+            Category category, String district, Mood mood, LocalDate localDate, Sort sort, int page) {
 
         log.info("전시 검색 - category: {}, district: {}, mood: {}, localDate: {}, sort: {}, page: {}",
                 category, district, mood, localDate, sort, page);
 
         // Pageable 생성
-        Pageable pageable = PageRequest.of(page, PAGE_SIZE, Sort.by(Sort.Direction.DESC, "createdAt"));
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt"));
 
         // 동적 쿼리로 전시 검색
         Page<Exhibition> exhibitionPage = exhibitionRepository.findExhibitionsWithFilters(

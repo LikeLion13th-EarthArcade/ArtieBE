@@ -3,7 +3,7 @@ package com.project.team5backend.domain.exhibition.exhibition.repository;
 import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Category;
 import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Mood;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Status;
+import com.project.team5backend.global.entity.enums.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

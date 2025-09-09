@@ -4,7 +4,7 @@ import com.project.team5backend.domain.exhibition.exhibition.converter.Exhibitio
 import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Category;
 import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Mood;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Status;
+import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.domain.exhibition.exhibition.repository.ExhibitionLikeRepository;
 import com.project.team5backend.domain.exhibition.exhibition.repository.ExhibitionRepository;
 import com.project.team5backend.domain.recommendation.dto.KeyScoreRow;

@@ -39,7 +39,7 @@ public class ExhibitionReview extends BaseTimeEntity {
     @OrderBy("id ASC")
     private List<ExhibitionReviewImage> exhibitionReviewImages;
 
-    public void delete() {
+    public void softDelete() {
         isDeleted = true;
     }
 }

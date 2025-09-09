@@ -1,7 +1,7 @@
 package com.project.team5backend.domain.recommendation.service;
 
 import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Status;
+import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.domain.exhibition.exhibition.repository.ExhibitionRepository;
 import com.project.team5backend.domain.recommendation.repository.ExhibitionEmbeddingRepository;
 import lombok.RequiredArgsConstructor;

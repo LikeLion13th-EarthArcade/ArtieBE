@@ -31,7 +31,7 @@ public class ExhibitionReviewQueryServiceImpl implements ExhibitionReviewQuerySe
                 .orElseThrow(()-> new ExhibitionReviewException(ExhibitionReviewErrorCode.EXHIBITION_REVIEW_NOT_FOUND));
 
         List<String> fileKeys = exhibitionReview.getExhibitionReviewImages().stream()
-                .map(ExhibitionReviewImage::getFileKey).collect(Collectors.toList());
+                .map(ExhibitionReviewImage::getImageUrl).collect(Collectors.toList());
 
         return ExhibitionReviewConverter.toDetailExReviewResDTO(exhibitionReview, fileKeys);
     }
@@ -45,7 +45,7 @@ public class ExhibitionReviewQueryServiceImpl implements ExhibitionReviewQuerySe
         return reviewPage.map(review -> {
             // 연관관계로 fileKeys 추출
             List<String> fileKeys = review.getExhibitionReviewImages().stream()
-                    .map(ExhibitionReviewImage::getFileKey)
+                    .map(ExhibitionReviewImage::getImageUrl)
                     .collect(Collectors.toList());
 
             return ExhibitionReviewConverter.toDetailExReviewResDTO(review, fileKeys);

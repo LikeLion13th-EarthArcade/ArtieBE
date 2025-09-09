@@ -7,6 +7,6 @@ import com.project.team5backend.domain.space.space.dto.response.AdminSpaceRespon
 import java.util.List;
 
 public interface AdminSpaceService {
-    List<AdminSpaceResponse.PendingSpaceListResponse> getPendingSpaces();
-    AdminSpaceResponse.AdminActionResponse processSpaceApproval(Long spaceId, AdminSpaceRequest.AdminSpaceReq request);
+//    List<AdminSpaceResponse.PendingSpaceListResponse> getPendingSpaces();
+//    AdminSpaceResponse.AdminActionResponse processSpaceApproval(Long spaceId, AdminSpaceRequest.AdminSpaceReq request);
 }

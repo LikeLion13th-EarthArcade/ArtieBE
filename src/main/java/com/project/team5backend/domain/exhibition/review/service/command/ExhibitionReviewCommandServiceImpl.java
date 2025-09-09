@@ -1,7 +1,7 @@
 package com.project.team5backend.domain.exhibition.review.service.command;
 
 import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Status;
+import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.domain.exhibition.exhibition.exception.ExhibitionErrorCode;
 import com.project.team5backend.domain.exhibition.exhibition.exception.ExhibitionException;
 import com.project.team5backend.domain.exhibition.exhibition.repository.ExhibitionRepository;
@@ -84,12 +84,12 @@ public class ExhibitionReviewCommandServiceImpl implements ExhibitionReviewComma
             throw new ExhibitionReviewException(ExhibitionReviewErrorCode.EXHIBITION_REVIEW_FORBIDDEN);
         }
 
-        exhibitionReview.delete();
+        exhibitionReview.softDelete();
 
         // 전시이미지 소프트 삭제
         List<ExhibitionReviewImage> images = exhibitionReviewImageRepository.findByExhibitionReviewId(exhibitionReviewId);
         images.forEach(ExhibitionReviewImage::deleteImage);
-        List<String> keys = images.stream().map(ExhibitionReviewImage::getFileKey).toList();
+        List<String> keys = images.stream().map(ExhibitionReviewImage::getImageUrl).toList();
 
         Exhibition exhibition = exhibitionReview.getExhibition();
         // 리뷰 평균/카운트 갱신

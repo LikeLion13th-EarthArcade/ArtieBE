@@ -1,85 +1,113 @@
 package com.project.team5backend.domain.space.space.converter;
 
-import com.project.team5backend.domain.space.space.dto.response.SpaceResponse;
+import com.project.team5backend.domain.facility.entity.Facility;
+import com.project.team5backend.domain.facility.entity.SpaceFacility;
+import com.project.team5backend.domain.space.space.dto.response.SpaceResDTO;
 import com.project.team5backend.domain.space.space.entity.Space;
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.global.entity.embedded.Address;
+import com.project.team5backend.global.entity.enums.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
-import com.project.team5backend.domain.space.space.dto.request.SpaceRequest;
+import com.project.team5backend.domain.space.space.dto.request.SpaceReqDTO;
 
-import java.time.format.DateTimeFormatter;
+import java.math.BigDecimal;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 public class SpaceConverter {
-    private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
-
-    // SpaceRequest.Create DTO를 Space 엔티티로 변환
-    public  Space toSpace(SpaceRequest.Create request, User user, String thumbnailFileKey, Address address){
+    public static Space toSpace(SpaceReqDTO.CreateSpaceReqDTO request, User user, String thumbnail, Address address){
 
         return Space.builder()
                 .name(request.name())
+                .description(request.description())
+                .openTime(request.openTime())
+                .closeTime(request.closeTime())
+                .thumbnail(thumbnail)
+                .phoneNumber(request.phoneNumber())
+                .email(request.email())
+                .websiteUrl(request.websiteUrl())
+                .snsUrl(request.snsUrl())
+                .ratingAvg(BigDecimal.ZERO)
+                .likeCount(0)
+                .reviewCount(0)
+                .totalReviewScore(0)
+                .isDeleted(false)
                 .address(address)
                 .type(request.type())
                 .size(request.size())
-                .purpose(request.purpose())
                 .mood(request.mood())
-                .description(request.description())
-                .imageUrls(List.of(thumbnailFileKey))   // ✅ request.images() 대신 사용
-                .status(Space.Status.APPROVAL_PENDING)
-                .startDate(request.startDate())
-                .endDate(request.endDate())
-                .user(user)// ✨ User 객체에서 이메일을 가져와 submittedBy 필드에 설정
+                .status(Status.PENDING)
+                .user(user)
                 .build();
     }
 
-    // Space 엔티티를 등록 응답 DTO로 변환
-    public SpaceResponse.SpaceRegistrationResponse toSpaceRegistrationResponse(Space space) {
-        return new SpaceResponse.SpaceRegistrationResponse(space.getId());
+    public static SpaceFacility toCreateSpaceFacility(Space space, Facility facility) {
+        return SpaceFacility.builder()
+                .space(space)
+                .facility(facility)
+                .build();
     }
 
-    // Space 엔티티를 검색 결과 DTO로 변환
-    public static SpaceResponse.SpaceSearchResponse toSearchSpaceResDTO(Space space) {
-        String thumbnail = null;
-        List<String> imageUrls = space.getImageUrls();
-        if (imageUrls != null && !imageUrls.isEmpty()) {
-            thumbnail = imageUrls.get(0); // 첫 번째 이미지만 썸네일
-        }
-
-        return SpaceResponse.SpaceSearchResponse.builder()
+    public static SpaceResDTO.CreateSpaceResDTO toCreateSpaceResDTO(Space space){
+        return SpaceResDTO.CreateSpaceResDTO.builder()
                 .id(space.getId())
-                .name(space.getName())
-                .thumbnail(thumbnail)
-                .startDate(space.getStartDate() != null ? space.getStartDate().toString() : null)
-                .endDate(space.getEndDate() != null ? space.getEndDate().toString() : null)
-                .address(space.getAddress() != null
-                        ? String.format("%s %s",
-                        space.getAddress().getRoadAddress(),
-                        space.getAddress().getDetail() != null ? space.getAddress().getDetail() : "")
-                        : null)
-                .latitude(space.getAddress() != null ? space.getAddress().getLatitude() : null)
-                .longitude(space.getAddress() != null ? space.getAddress().getLongitude() : null)
+                .createdAt(space.getCreatedAt())
                 .build();
     }
 
-    // ✅ 검색 결과 리스트 변환
-    public List<SpaceResponse.SpaceSearchResponse> toSpaceSearchResponseList(List<Space> spaces) {
-        return spaces.stream()
-                .map(SpaceConverter::toSearchSpaceResDTO) // 클래스 이름으로 호출
-                .collect(Collectors.toList());
+    public static SpaceResDTO.DetailSpaceResDTO toDetailSpaceResDTO(Space space, List<String> imageUrls){
+        return SpaceResDTO.DetailSpaceResDTO.builder()
+                .spaceId(space.getId())
+                .name(space.getName())
+                .imageUrls(imageUrls)
+                .address(
+                        space.getAddress() != null
+                                ? String.format("%s %s",
+                                space.getAddress().getRoadAddress(),
+                                space.getAddress().getDetail() != null ? space.getAddress().getDetail() : "")
+                                : null
+                )
+                .latitude(space.getAddress().getLatitude())
+                .longitude(space.getAddress().getLongitude())
+                .openTime(space.getOpenTime())
+                .closeTime(space.getCloseTime())
+                .spaceSize(space.getSize())
+                .spaceMood(space.getMood())
+                .description(space.getDescription())
+                .facilities(
+                        space.getSpaceFacilities().stream()
+                                .map(sf -> sf.getFacility().getName())
+                                .toList()
+                )
+                .phoneNumber(space.getPhoneNumber())
+                .email(space.getEmail())
+                .websiteUrl(space.getWebsiteUrl())
+                .snsUrl(space.getSnsUrl())
+                .build();
     }
 
-    // ✅ 페이지 + 지도 정보 DTO 변환
-    public SpaceResponse.SpaceSearchPageResponse toSearchSpacePageResDTO(
-            List<SpaceResponse.SpaceSearchResponse> items,
-            Page<?> page,
-            Double defaultLat,
-            Double defaultLng) {
+    public static SpaceResDTO.SearchSpaceResDTO toSearchSpaceResDTO(Space space){
+        return SpaceResDTO.SearchSpaceResDTO.builder()
+                .spaceId(space.getId())
+                .name(space.getName())
+                .thumbnail(space.getThumbnail())
+                .openTime(space.getOpenTime())
+                .closeTime(space.getCloseTime())
+                .address(space.getAddress().getRoadAddress() + space.getAddress().getDetail())
+                .latitude(space.getAddress().getLatitude())
+                .longitude(space.getAddress().getLongitude())
+                .build();
+    }
 
-        SpaceResponse.SpaceSearchPageResponse.PageInfo pageInfo =
-                new SpaceResponse.SpaceSearchPageResponse.PageInfo(
+    public static SpaceResDTO.SearchSpacePageResDTO toSearchSpacePageResDTO(List<SpaceResDTO.SearchSpaceResDTO> items,
+                                                                            Page<?> page,
+                                                                            Double defaultCenterLat,
+                                                                            Double defaultCenterLng) {
+
+        // PageInfo 생성
+        SpaceResDTO.SearchSpacePageResDTO.PageInfo pageInfo =
+                new SpaceResDTO.SearchSpacePageResDTO.PageInfo(
                         page.getNumber(),
                         page.getSize(),
                         page.getTotalElements(),
@@ -88,49 +116,13 @@ public class SpaceConverter {
                         page.isLast()
                 );
 
-        SpaceResponse.SpaceSearchPageResponse.MapInfo mapInfo =
-                new SpaceResponse.SpaceSearchPageResponse.MapInfo(defaultLat, defaultLng);
-
-        return new SpaceResponse.SpaceSearchPageResponse(items, pageInfo, mapInfo);
-    }
-
-
-    // Space 엔티티를 상세 조회 DTO로 변환
-    public SpaceResponse.SpaceDetailResponse toSpaceDetailResponse(Space space) {
-        String usagePeriod = null;
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy.MM.dd");
-        if (space.getStartDate() != null && space.getEndDate() != null) {
-            String startDateStr = space.getStartDate().format(formatter);
-            String endDateStr = space.getEndDate().format(formatter);
-            usagePeriod = startDateStr + " - " + endDateStr;
-        }
-        List<String> imageUrls = space.getImageUrls();
-
-        String operatingHours = space.getOperatingHours();
-        SpaceResponse.SpaceDetailResponse.SpaceOverviewDto overview =
-                new SpaceResponse.SpaceDetailResponse.SpaceOverviewDto(
-                        usagePeriod, // 사용 기간
-                        space.getAddress() != null
-                                ? String.format("%s %s",
-                                space.getAddress().getRoadAddress(),
-                                space.getAddress().getDetail() != null ? space.getAddress().getDetail() : "")
-                                : null,
-                        space.getAddress().getLatitude(),
-                        space.getAddress().getLongitude(),
-                        space.getSize() != null ? space.getSize().name() : null,
-                        space.getPurpose() != null ? space.getPurpose().name() : null,
-                        space.getMood() != null ? space.getMood().name() : null,
-                        imageUrls
+        // MapInfo 생성
+        SpaceResDTO.SearchSpacePageResDTO.MapInfo mapInfo =
+                new SpaceResDTO.SearchSpacePageResDTO.MapInfo(
+                        defaultCenterLat,
+                        defaultCenterLng
                 );
 
-        // 엔티티에 없는 필드는 null로 처리
-        SpaceResponse.SpaceDetailResponse.FacilitiesAndOptionsDto facilities = null;
-        SpaceResponse.SpaceDetailResponse.ContactDto contact = null;
-
-        return new SpaceResponse.SpaceDetailResponse(
-                overview,
-                facilities,
-                contact
-        );
+        return new SpaceResDTO.SearchSpacePageResDTO(items, pageInfo, mapInfo);
     }
 }

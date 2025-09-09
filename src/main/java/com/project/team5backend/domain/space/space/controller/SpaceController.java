@@ -1,21 +1,24 @@
 package com.project.team5backend.domain.space.space.controller;
 
-import com.project.team5backend.domain.image.exception.ImageErrorCode;
-import com.project.team5backend.domain.image.exception.ImageException;
-import com.project.team5backend.domain.space.space.dto.request.SpaceRequest;
-import com.project.team5backend.domain.space.space.dto.response.SpaceResponse;
-import com.project.team5backend.domain.space.space.entity.SpaceMood;
-import com.project.team5backend.domain.space.space.entity.SpaceSize;
-import com.project.team5backend.domain.space.space.entity.SpaceType;
+import com.project.team5backend.global.entity.enums.Sort;
+import com.project.team5backend.domain.space.space.dto.request.SpaceReqDTO;
+import com.project.team5backend.domain.space.space.dto.response.SpaceResDTO;
+import com.project.team5backend.domain.space.space.entity.enums.SpaceMood;
+import com.project.team5backend.domain.space.space.entity.enums.SpaceSize;
+import com.project.team5backend.domain.space.space.entity.enums.SpaceType;
 import com.project.team5backend.domain.space.space.service.command.SpaceCommandService;
 import com.project.team5backend.domain.space.space.service.query.SpaceQueryService;
-import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.SwaggerBody;
 import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.global.security.userdetails.CurrentUser;
+import com.project.team5backend.global.util.ImageUtils;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Encoding;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -26,16 +29,15 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/spaces")
 @RequiredArgsConstructor
+@Tag(name = "Space")
 public class SpaceController {
 
     private final SpaceCommandService spaceCommandService;
     private final SpaceQueryService spaceQueryService;
-    private final UserRepository userRepository;
 
     @SwaggerBody(content = @Content(
             encoding = {
@@ -46,60 +48,79 @@ public class SpaceController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    @Operation(summary = "전시 공간 등록", description = "로그인한 사용자가 전시 공간을 등록합니다.")
-    public CustomResponse<SpaceResponse.SpaceRegistrationResponse> registerSpace(
+    @Operation(summary = "전시 공간 등록", description = "등록시 공간 객체가 심사 대상에 포함됩니다.")
+    public CustomResponse<SpaceResDTO.CreateSpaceResDTO> registerSpace(
             @AuthenticationPrincipal CurrentUser currentUser,
-            @RequestPart("request") @Valid SpaceRequest.Create request,
-            @RequestPart("images") List<MultipartFile> images
+            @RequestPart("request") @Valid SpaceReqDTO.CreateSpaceReqDTO createSpaceReqDTO,
+            @RequestPart(value = "images", required = false) List<MultipartFile> images
     ) {
-        if (images == null || images.isEmpty()) throw new ImageException(ImageErrorCode.IMAGE_NOT_FOUND);
-        if (images.size() > 5) throw new ImageException(ImageErrorCode.IMAGE_TOO_MANY_REQUESTS);
-
-        SpaceResponse.SpaceRegistrationResponse response = spaceCommandService.registerSpace(request, currentUser.getEmail(), images);
-        return CustomResponse.onSuccess(response);
+        ImageUtils.validateImages(images); // 이미지 검증 (개수, null 여부)
+        SpaceResDTO.CreateSpaceResDTO createSpaceResDTO = spaceCommandService.createSpace(createSpaceReqDTO, currentUser.getId(), images);
+        return CustomResponse.onSuccess(createSpaceResDTO);
     }
 
-    @Operation(summary = "전시 공간 목록 조회")
-    @GetMapping
-    public CustomResponse<List<SpaceResponse.SpaceSearchResponse>> getSpaces() {
-        List<SpaceResponse.SpaceSearchResponse> spaces = spaceQueryService.getApprovedSpaces();
-        return CustomResponse.onSuccess(spaces);
+    @PostMapping("/{spaceId}/like")
+    @Operation(summary = "공간 좋아요", description = "좋아요 없으면 등록, 있으면 취소")
+    public CustomResponse<SpaceResDTO.LikeSpaceResDTO> likeSpace(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @PathVariable Long spaceId
+    ) {
+        return CustomResponse.onSuccess(spaceCommandService.likeSpace(spaceId, currentUser.getId()));
     }
 
-    @Operation(summary = "전시 공간 검색")
+    @Operation(summary = "전시 공간 상세 조회")
+    @GetMapping("/{spaceId}")
+    public CustomResponse<SpaceResDTO.DetailSpaceResDTO> getSpaceDetails(@PathVariable Long spaceId) {
+        return CustomResponse.onSuccess(spaceQueryService.getSpaceDetail(spaceId));
+    }
+
+    @Operation(summary = "공간 검색", description = "공간 검색하면 한페이지에 4개의 전시와 서울 시청 중심의 위도 경도 반환")
     @GetMapping("/search")
-    public CustomResponse<SpaceResponse.SpaceSearchPageResponse> searchSpaces(
-            @RequestParam(name = "startDate", required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-            @RequestParam(name = "endDate", required = false)
-            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-            @RequestParam(name = "district", required = false) String district,
+    public CustomResponse<SpaceResDTO.SearchSpacePageResDTO> searchSpaces(
+            @Parameter(description = "대여 시작일", example = "2025-09-12")
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate requestedStartDate,
+            @Parameter(description = "대여 종료일", example = "2025-09-13")
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate requestedEndDate,
+            @RequestParam(name = "distinct", required = false) String district,
             @RequestParam(name = "size", required = false) SpaceSize size,
             @RequestParam(name = "type", required = false) SpaceType type,
             @RequestParam(name = "mood", required = false) SpaceMood mood,
+            @Parameter(
+                    description = "시설 목록 (예: WIFI, RESTROOM, STROLLER_RENTAL)",
+                    array = @ArraySchema(schema = @Schema(type = "string"))
+            )
+            @RequestParam(name = "facilities", required = false) List<String> facilities, // 스웨거 편의성을 위해 enum 설정
+            @RequestParam(defaultValue = "POPULAR") Sort sort,
             @RequestParam(name = "page", defaultValue = "0") int page
-            ) {
-        return CustomResponse.onSuccess(
-                spaceQueryService.searchSpaces(startDate, endDate, district, size, type, mood, page)
-        );
+    ) {
+        return CustomResponse.onSuccess(spaceQueryService.searchSpace(requestedStartDate, requestedEndDate, district, size, type, mood, facilities, sort, page));
     }
-    @Operation(summary = "전시 공간 상세 조회")
-    @GetMapping("/{spaceId}")
-    public CustomResponse<SpaceResponse.SpaceDetailResponse> getSpaceDetails(@PathVariable Long spaceId) {
-        SpaceResponse.SpaceDetailResponse spaceDetail = spaceQueryService.getSpaceDetails(spaceId);
-        return CustomResponse.onSuccess(spaceDetail);
-    }
-    @Operation(summary = "전시 공간 좋아요 / 좋아요 취소")
-    @PostMapping("/{spaceId}/like")
-    public CustomResponse<Map<String, Boolean>> toggleLike(@PathVariable Long spaceId,
-                                                           @AuthenticationPrincipal CurrentUser currentUser) {
-        Long userId = currentUser.getId();
-        boolean liked = spaceCommandService.toggleLike(spaceId, userId);
-        return CustomResponse.onSuccess(Map.of("liked", liked));
-    }
-    @Operation(summary = "전시 공간 정보 삭제")
+
+    @Operation(summary = "전시 공간 삭제")
     @DeleteMapping("/{spaceId}")
-    public CustomResponse<Void> deleteSpace(@PathVariable Long spaceId) {
-        spaceCommandService.deleteSpace(spaceId);
-        return CustomResponse.onSuccess(null);    }
+    public CustomResponse<String> deleteSpace(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @PathVariable Long spaceId) {
+        spaceCommandService.deleteSpace(spaceId, currentUser.getId());
+        return CustomResponse.onSuccess("공간이 삭제되었습니다.");
+    }
+
+
+//    @Operation(summary = "전시 공간 검색")
+//    @GetMapping("/search")
+//    public CustomResponse<SpaceResponse.SpaceSearchPageResponse> searchSpaces(
+//            @RequestParam(name = "startDate", required = false)
+//            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
+//            @RequestParam(name = "endDate", required = false)
+//            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
+//            @RequestParam(name = "district", required = false) String district,
+//            @RequestParam(name = "size", required = false) SpaceSize size,
+//            @RequestParam(name = "type", required = false) SpaceType type,
+//            @RequestParam(name = "mood", required = false) SpaceMood mood,
+//            @RequestParam(name = "page", defaultValue = "0") int page
+//            ) {
+//        return CustomResponse.onSuccess(
+//                spaceQueryService.searchSpaces(startDate, endDate, district, size, type, mood, page)
+//        );
+//    }
 }

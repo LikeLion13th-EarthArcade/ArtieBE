@@ -1,4 +1,4 @@
-package com.project.team5backend.domain.space.space.entity;
+package com.project.team5backend.domain.space.space.entity.enums;
 
 public enum SpaceSize {
     SMALL,          // 1-10명
