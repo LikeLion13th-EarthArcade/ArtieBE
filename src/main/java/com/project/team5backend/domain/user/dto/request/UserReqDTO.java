@@ -7,32 +7,32 @@ import jakarta.validation.constraints.Pattern;
 import lombok.*;
 
 import static com.project.team5backend.global.constant.valid.MessageConstant.*;
-import static com.project.team5backend.global.constant.valid.PatternConstant.USER_PASSWORD_PATTERN;
+import static com.project.team5backend.global.constant.valid.PatternConstant.PASSWORD_PATTERN;
 
 @Getter @Setter
 @NoArgsConstructor
 public class UserReqDTO {
 
     public record UserCreateReqDTO(
-            @NotBlank(message = USER_BLANK_EMAIL)
+            @NotBlank(message = BLANK_EMAIL)
             @Email
             String email,
 
-            @NotBlank(message = USER_BLANK_PASSWORD)
-            @Pattern(regexp = USER_PASSWORD_PATTERN, message = USER_WRONG_PASSWORD)
+            @NotBlank(message = BLANK_PASSWORD)
+            @Pattern(regexp = PASSWORD_PATTERN, message = WRONG_PASSWORD_PATTERN)
             String password,
 
-            @NotBlank(message = USER_BLANK_PASSWORD)
-            @Pattern(regexp = USER_PASSWORD_PATTERN, message = USER_WRONG_PASSWORD)
+            @NotBlank(message = BLANK_PASSWORD)
+            @Pattern(regexp = PASSWORD_PATTERN, message = WRONG_PASSWORD_PATTERN)
             String passwordConfirmation,
 
-            @NotBlank(message = USER_BLANK_NAME)
+            @NotBlank(message = BLANK_NAME)
             String name
     ) {
     }
 
     public record UserUpdateReqDTO(
-            @NotBlank(message = USER_BLANK_NAME)
+            @NotBlank(message = BLANK_NAME)
             String name
     ) {
     }

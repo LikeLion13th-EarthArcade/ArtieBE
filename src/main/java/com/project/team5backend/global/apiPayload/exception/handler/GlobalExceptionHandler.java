@@ -15,6 +15,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -73,6 +74,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<CustomResponse<String>> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
         log.warn("[ HttpMessageNotReadableException ]: {}", ex.getMessage());
+
         BaseErrorCode errorCode = getBaseErrorCode(ex);
         CustomResponse<String> errorResponse = CustomResponse.onFailure(
                 errorCode.getCode(),
@@ -107,8 +109,17 @@ public class GlobalExceptionHandler {
             errorCode = GeneralErrorCode.INVALID_JSON_SYNTAX;
         }
         // 2) 타입/형식이 맞지 않음 (ex: string → int)
-        else if (cause instanceof InvalidFormatException) {
-            errorCode = GeneralErrorCode.INVALID_FIELD_FORMAT;
+        else if (cause instanceof InvalidFormatException e) {
+            Class<?> targetType = e.getTargetType();
+            if (targetType.equals(LocalDate.class)) {
+                errorCode = GeneralErrorCode.INVALID_LOCAL_DATE;
+            }
+            else if (targetType.isEnum()) {
+                errorCode = GeneralErrorCode.INVALID_ENUM;
+            }
+            else {
+                errorCode = GeneralErrorCode.INVALID_FIELD_FORMAT;
+            }
         }
         // 3) 필수 필드 누락 등 바인딩 실패
         else if (cause instanceof MismatchedInputException) {
