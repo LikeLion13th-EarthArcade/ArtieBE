@@ -1,4 +1,4 @@
-package com.project.team5backend.domain.space.reservation.service.query;
+package com.project.team5backend.domain.reservation.service.query;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;

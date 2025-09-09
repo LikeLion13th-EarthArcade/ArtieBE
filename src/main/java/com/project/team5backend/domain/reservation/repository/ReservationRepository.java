@@ -1,7 +1,7 @@
-package com.project.team5backend.domain.space.reservation.repository;
+package com.project.team5backend.domain.reservation.repository;
 
 
-import com.project.team5backend.domain.space.reservation.entity.Reservation;
+import com.project.team5backend.domain.reservation.entity.Reservation;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {

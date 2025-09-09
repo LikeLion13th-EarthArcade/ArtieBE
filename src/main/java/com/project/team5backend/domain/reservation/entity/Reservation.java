@@ -1,4 +1,4 @@
-package com.project.team5backend.domain.space.reservation.entity;
+package com.project.team5backend.domain.reservation.entity;
 
 
 import com.project.team5backend.domain.space.space.entity.Space;
