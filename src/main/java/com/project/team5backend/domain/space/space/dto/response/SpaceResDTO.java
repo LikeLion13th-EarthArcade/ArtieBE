@@ -1,8 +1,9 @@
 package com.project.team5backend.domain.space.space.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.project.team5backend.domain.space.space.entity.enums.SpaceMood;
-import com.project.team5backend.domain.space.space.entity.enums.SpacePurpose;
 import com.project.team5backend.domain.space.space.entity.enums.SpaceSize;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -30,10 +31,9 @@ public class SpaceResDTO {
             String address,
             BigDecimal latitude,
             BigDecimal longitude,
-            LocalTime openTime,
-            LocalTime closeTime,
+            @Schema(example = "10:00") @JsonFormat(pattern = "HH:mm") LocalTime openTime,
+            @Schema(example = "20:00") @JsonFormat(pattern = "HH:mm") LocalTime closeTime,
             SpaceSize spaceSize,
-            SpacePurpose spacePurpose,
             SpaceMood spaceMood,
             String description,
             List<String> facilities,
@@ -77,8 +77,8 @@ public class SpaceResDTO {
             String address,
             BigDecimal latitude,
             BigDecimal longitude,
-            LocalTime openTime,
-            LocalTime closeTime,
+            @JsonFormat(pattern = "HH:mm") LocalTime openTime,
+            @JsonFormat(pattern = "HH:mm") LocalTime closeTime,
             String thumbnail
     ){}
 }

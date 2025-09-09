@@ -1,10 +1,9 @@
 package com.project.team5backend.domain.space.space.service.command;
 
-import com.project.team5backend.domain.exhibition.exhibition.converter.ExhibitionConverter;
-import com.project.team5backend.domain.facility.entity.ExhibitionFacility;
 import com.project.team5backend.domain.facility.entity.Facility;
 import com.project.team5backend.domain.facility.entity.SpaceFacility;
 import com.project.team5backend.domain.facility.repository.FacilityRepository;
+import com.project.team5backend.domain.facility.repository.SpaceFacilityRepository;
 import com.project.team5backend.domain.image.entity.SpaceImage;
 import com.project.team5backend.domain.image.repository.SpaceImageRepository;
 import com.project.team5backend.domain.image.converter.ImageConverter;
@@ -53,6 +52,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
     private final SpaceImageRepository spaceImageRepository;
     private final SpaceReviewRepository spaceReviewRepository;
     private final FacilityRepository facilityRepository;
+    private final SpaceFacilityRepository spaceFacilityRepository;
     private final AddressService addressService;
     private final S3Uploader s3Uploader;
     private final ImageCommandService imageCommandService;
@@ -73,11 +73,12 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
         Space space = SpaceConverter.toSpace(request, user, imageUrls.get(0), address);
         spaceRepository.save(space);
 
-        // 2. 시설 매핑 (문자열 → Facility 엔티티 조회 → ExhibitionFacility 생성)
+        // 시설 매핑 (문자열 → Facility 엔티티 조회 → SpaceFacility 생성)
         List<Facility> facilities = facilityRepository.findByNameIn(request.facilities());
         facilities.forEach(facility -> {
             SpaceFacility sf = SpaceConverter.toCreateSpaceFacility(space, facility);
             space.getSpaceFacilities().add(sf);
+            spaceFacilityRepository.save(sf);
         });
 
         // Space 이미지 엔티티 저장

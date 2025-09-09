@@ -14,7 +14,7 @@ public interface SpaceRepository extends JpaRepository<Space, Long>,SpaceReposit
     @Query("""
         select s
         from Space s
-        where s.id =:id
+        where s.id =:spaceId
           and s.isDeleted = false
           and s.status =:status
         """)

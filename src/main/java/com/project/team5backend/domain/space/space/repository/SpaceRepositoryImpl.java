@@ -37,25 +37,13 @@ public class SpaceRepositoryImpl implements SpaceRepositoryCustom {
         QReservation reservation = QReservation.reservation;
         QSpaceFacility spaceFacility = QSpaceFacility.spaceFacility;
 
-        // 예약 기간이 겹치지 않는지
-        BooleanExpression noOverlappingReservation = JPAExpressions
-                .selectOne()
-                .from(reservation)
-                .where(
-                        reservation.space.eq(space),
-                        reservation.status.eq(Status.APPROVED),
-                        reservation.startDate.loe(requestedEndDate),   // 기존 예약 시작 <= 요청 종료
-                        reservation.endDate.goe(requestedStartDate)    // 기존 예약 종료 >= 요청 시작
-                )
-                .notExists();
-
         // 전체 개수 조회
         Long total = queryFactory
                 .select(space.count())
                 .from(space)
                 .where(
                         space.isDeleted.isFalse(),
-                        noOverlappingReservation,
+                        noOverlappingReservation(reservation, space, requestedStartDate, requestedEndDate), // 예약기간
                         districtCondition(space, district),
                         sizeCondition(space, size),
                         typeCondition(space, type),
@@ -76,7 +64,7 @@ public class SpaceRepositoryImpl implements SpaceRepositoryCustom {
                 .selectFrom(space)
                 .where(
                         space.isDeleted.isFalse(),
-                        noOverlappingReservation,
+                        noOverlappingReservation(reservation, space, requestedStartDate, requestedEndDate),
                         districtCondition(space, district),
                         sizeCondition(space, size),
                         typeCondition(space, type),
@@ -89,6 +77,27 @@ public class SpaceRepositoryImpl implements SpaceRepositoryCustom {
                 .fetch();
 
         return new PageImpl<>(content, pageable, total != null ? total : 0L);
+    }
+
+    private BooleanExpression noOverlappingReservation(
+            QReservation reservation,
+            QSpace space,
+            LocalDate requestedStartDate,
+            LocalDate requestedEndDate
+    ) {
+        if (requestedStartDate == null || requestedEndDate == null) {
+            return null; // 조건 적용하지 않음
+        }
+        return JPAExpressions
+                .selectOne()
+                .from(reservation)
+                .where(
+                        reservation.space.eq(space),
+                        reservation.status.eq(Status.APPROVED),
+                        reservation.startDate.loe(requestedEndDate),
+                        reservation.endDate.goe(requestedStartDate)
+                )
+                .notExists();
     }
 
     private BooleanExpression districtCondition(QSpace space, String district) {

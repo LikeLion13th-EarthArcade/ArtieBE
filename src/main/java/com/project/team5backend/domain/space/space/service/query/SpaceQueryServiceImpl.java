@@ -57,10 +57,6 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
         // Pageable 생성
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt"));
 
-//        //enum 리스트 -> string 형태로
-//        List<String> facilityNames = facilities.stream()
-//                .map(Enum::name)
-//                .toList();
         // 동적 쿼리로 전시 검색
         Page<Space> spacePage = spaceRepository.findSpacesWithFilters(
                 requestedStartDate, requestedEndDate, district, size, type, mood, facilities, sort, pageable);

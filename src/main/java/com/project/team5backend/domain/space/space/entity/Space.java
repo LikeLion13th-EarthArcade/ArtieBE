@@ -1,7 +1,6 @@
 package com.project.team5backend.domain.space.space.entity;
 
 import com.project.team5backend.domain.space.space.entity.enums.SpaceMood;
-import com.project.team5backend.domain.space.space.entity.enums.SpacePurpose;
 import com.project.team5backend.domain.space.space.entity.enums.SpaceSize;
 import com.project.team5backend.domain.space.space.entity.enums.SpaceType;
 import com.project.team5backend.domain.user.entity.User;
@@ -54,13 +53,10 @@ public class Space extends BaseTimeEntity {
     @Column(columnDefinition = "DECIMAL(4,2) NOT NULL DEFAULT 0")
     private BigDecimal ratingAvg;
 
-    @Column(nullable = false)
     private Integer reviewCount = 0;
 
-    @Column(nullable = false)
     private Integer likeCount = 0;
 
-    @Column(nullable = false)
     private Integer totalReviewScore = 0;
 
     @Column(nullable = false)
@@ -79,10 +75,6 @@ public class Space extends BaseTimeEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private SpacePurpose purpose; // 공간 목적
-
-    @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private SpaceMood mood;     // 공간 분위기
 
     @Enumerated(EnumType.STRING)
@@ -90,6 +82,7 @@ public class Space extends BaseTimeEntity {
     private Status status; // 승인 상태
 
     @OneToMany(mappedBy = "space", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<SpaceFacility> spaceFacilities = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
