@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/recommendations/personalized")
-@Tag(name = "ai 취향기반분석 API")
+@Tag(name = "Recommendation",description = "ai 추천 관련 API")
 public class RecommendationController {
 
     private final RecommendationService recommendationService;

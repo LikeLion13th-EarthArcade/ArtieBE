@@ -6,6 +6,7 @@ import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.BatchSize;
 
 import java.util.List;
 
@@ -35,10 +36,11 @@ public class SpaceReview extends BaseTimeEntity {
     private User user;
 
     @OneToMany(mappedBy = "spaceReview", cascade = CascadeType.ALL, orphanRemoval = true)
-    @OrderBy("id ASC")
+    @BatchSize(size = 100)
     private List<SpaceReviewImage> spaceReviewImages;
 
     public void softDelete() {
-        isDeleted = true;
+        this.isDeleted = true;
+        markDeleted();
     }
 }

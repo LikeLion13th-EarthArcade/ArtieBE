@@ -83,7 +83,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
 
         // Space 이미지 엔티티 저장
         for (String url : imageUrls) {
-            spaceImageRepository.save(ImageConverter.toEntitySpaceImage(space, url));
+            spaceImageRepository.save(ImageConverter.toSpaceImage(space, url));
         }
         return SpaceConverter.toCreateSpaceResDTO(space);
     }

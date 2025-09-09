@@ -30,7 +30,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/exhibitions")
-@Tag(name = "전시리뷰 API")
+@Tag(name = "ExhibitionReview", description = "전시 리뷰 관련 API")
 public class ExhibitionReviewController {
     private final ExhibitionReviewCommandService exReviewCommandService;
     private final ExhibitionReviewQueryService exReviewQueryService;

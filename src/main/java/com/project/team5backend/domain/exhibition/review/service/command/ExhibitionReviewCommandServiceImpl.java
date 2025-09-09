@@ -61,10 +61,9 @@ public class ExhibitionReviewCommandServiceImpl implements ExhibitionReviewComma
 
         List<ExhibitionReviewImage> reviewImages = new ArrayList<>();
         for (MultipartFile file : images) {
-            // fileKey: exhibitionReviews/{reviewId}/{UUID}.jpg
             String url = s3Uploader.upload(file, "exhibitionReviews");
             ExhibitionReviewImage reviewImage =
-                    ImageConverter.toEntityExhibitionReviewImage(exhibitionReview, url);
+                    ImageConverter.toExhibitionReviewImage(exhibitionReview, url);
             reviewImages.add(reviewImage);
         }
         exhibitionReviewImageRepository.saveAll(reviewImages);
@@ -91,10 +90,9 @@ public class ExhibitionReviewCommandServiceImpl implements ExhibitionReviewComma
         images.forEach(ExhibitionReviewImage::deleteImage);
         List<String> keys = images.stream().map(ExhibitionReviewImage::getImageUrl).toList();
 
-        Exhibition exhibition = exhibitionReview.getExhibition();
         // 리뷰 평균/카운트 갱신
         double rating = exhibitionReview.getRating();
-        exhibitionRepository.applyReviewDeleted(exhibition.getId(), rating);
+        exhibitionRepository.applyReviewDeleted(exhibitionReview.getExhibition().getId(), rating);
 
         // s3 보존 휴지통 prefix로 이동시키기
         try{
