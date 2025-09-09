@@ -4,15 +4,14 @@ import com.project.team5backend.domain.exhibition.exhibition.dto.request.Exhibit
 import com.project.team5backend.domain.exhibition.exhibition.dto.response.ExhibitionResDTO;
 import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Category;
 import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Mood;
-import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.domain.exhibition.exhibition.service.command.ExhibitionCommandService;
 import com.project.team5backend.domain.exhibition.exhibition.service.query.ExhibitionQueryService;
-import com.project.team5backend.domain.image.exception.ImageErrorCode;
-import com.project.team5backend.domain.image.exception.ImageException;
 import com.project.team5backend.global.SwaggerBody;
 import com.project.team5backend.global.apiPayload.CustomResponse;
+import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.global.security.userdetails.CurrentUser;
 import com.project.team5backend.global.security.userdetails.CustomUserDetails;
+import com.project.team5backend.global.util.ImageUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Encoding;
@@ -53,11 +52,9 @@ public class ExhibitionController {
     public CustomResponse<String> createExhibition(
             @AuthenticationPrincipal CurrentUser currentUser,
             @RequestPart("request") @Valid ExhibitionReqDTO.CreateExhibitionReqDTO request,
-            @RequestPart("images") List<MultipartFile> images
+            @RequestPart(value = "images", required = false) List<MultipartFile> images
     ) {
-        if (images == null || images.isEmpty()) throw new ImageException(ImageErrorCode.IMAGE_NOT_FOUND);
-        if (images.size() > 5) throw new ImageException(ImageErrorCode.IMAGE_TOO_MANY_REQUESTS);
-
+        ImageUtils.validateImages(images); // 이미지 검증 (개수, null 여부)
         exhibitionCommandService.createExhibition(request, currentUser.getEmail(), images);
         return CustomResponse.onSuccess("전시글 등록이 완료되었습니다. 관리자 승인 대기열에 추가합니다.");
     }

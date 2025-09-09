@@ -52,7 +52,7 @@ public class SpaceController {
     public CustomResponse<SpaceResDTO.CreateSpaceResDTO> registerSpace(
             @AuthenticationPrincipal CurrentUser currentUser,
             @RequestPart("request") @Valid SpaceReqDTO.CreateSpaceReqDTO createSpaceReqDTO,
-            @RequestPart("images") List<MultipartFile> images
+            @RequestPart(value = "images", required = false) List<MultipartFile> images
     ) {
         ImageUtils.validateImages(images); // 이미지 검증 (개수, null 여부)
         SpaceResDTO.CreateSpaceResDTO createSpaceResDTO = spaceCommandService.createSpace(createSpaceReqDTO, currentUser.getId(), images);

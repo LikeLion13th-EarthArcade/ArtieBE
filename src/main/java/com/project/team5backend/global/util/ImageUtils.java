@@ -11,7 +11,7 @@ public class ImageUtils {
 
     public static void validateImages(List<MultipartFile> images) {
         if (images == null || images.isEmpty()) {
-            throw new ImageException(ImageErrorCode.IMAGE_NOT_FOUND);
+            throw new ImageException(ImageErrorCode.IMAGE_NOT_FOUND_IN_DTO);
         }
         if (images.size() > MAX_IMAGE_COUNT) {
             throw new ImageException(ImageErrorCode.IMAGE_TOO_MANY_REQUESTS);
