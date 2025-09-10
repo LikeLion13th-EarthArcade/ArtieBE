@@ -54,8 +54,10 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         if (!(status == Status.PENDING || status == Status.BOOKER_CANCEL_REQUESTED)) {
             throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_IS_NOT_APPROVABLE);
         }
-
-        reservation.changeStatus(Status.APPROVED);
+        switch (status) {
+            case PENDING -> reservation.changeStatus(Status.APPROVED);
+            case BOOKER_CANCEL_REQUESTED ->  reservation.changeStatus(Status.CANCELED_BY_BOOKER);
+        }
 
         return ReservationConverter.toReservationStatusResDTO(reservation);
     }
@@ -71,7 +73,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         }
         switch(reservation.getStatus()) {
             case PENDING -> reservation.changeStatus(Status.REJECTED);
-            case BOOKER_CANCEL_REQUESTED -> reservation.changeStatus(Status.CANCELED_BY_BOOKER);
+            case BOOKER_CANCEL_REQUESTED -> reservation.changeStatus(Status.BOOKER_CANCEL_REJECTED);
             case APPROVED ->  reservation.changeStatus(Status.CANCELED_BY_HOST);
         }
         reservation.changeCancelReason(reservation.getCancelReason());
