@@ -2,16 +2,10 @@ package com.project.team5backend.domain.admin.exhibition.service.command;
 
 import com.project.team5backend.domain.admin.exhibition.converter.AdminExhibitionConverter;
 import com.project.team5backend.domain.admin.exhibition.dto.response.AdminExhibitionResDTO;
-import com.project.team5backend.domain.admin.space.converter.AdminSpaceConverter;
-import com.project.team5backend.domain.admin.space.dto.response.AdminSpaceResDTO;
 import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.exhibition.exhibition.exception.ExhibitionErrorCode;
 import com.project.team5backend.domain.exhibition.exhibition.exception.ExhibitionException;
 import com.project.team5backend.domain.exhibition.exhibition.repository.ExhibitionRepository;
-import com.project.team5backend.domain.space.entity.Space;
-import com.project.team5backend.domain.space.exception.SpaceErrorCode;
-import com.project.team5backend.domain.space.exception.SpaceException;
-import com.project.team5backend.domain.space.repository.SpaceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

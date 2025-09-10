@@ -3,7 +3,6 @@ package com.project.team5backend.domain.admin.exhibition.controller;
 import com.project.team5backend.domain.admin.exhibition.dto.response.AdminExhibitionResDTO;
 import com.project.team5backend.domain.admin.exhibition.service.command.AdminExhibitionCommandService;
 import com.project.team5backend.domain.admin.exhibition.service.query.AdminExhibitionQueryService;
-import com.project.team5backend.domain.admin.space.dto.response.AdminSpaceResDTO;
 import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.global.entity.enums.StatusGroup;
 import io.swagger.v3.oas.annotations.Operation;

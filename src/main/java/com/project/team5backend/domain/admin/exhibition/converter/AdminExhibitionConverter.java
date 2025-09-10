@@ -1,9 +1,7 @@
 package com.project.team5backend.domain.admin.exhibition.converter;
 
 import com.project.team5backend.domain.admin.exhibition.dto.response.AdminExhibitionResDTO;
-import com.project.team5backend.domain.admin.space.dto.response.AdminSpaceResDTO;
 import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
-import com.project.team5backend.domain.space.entity.Space;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
