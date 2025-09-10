@@ -1,5 +1,6 @@
 package com.project.team5backend.domain.reservation.dto.response;
 
+import com.project.team5backend.domain.reservation.entity.ReservationStatus;
 import com.project.team5backend.global.entity.enums.Status;
 import lombok.Builder;
 
@@ -26,7 +27,7 @@ public class ReservationResDTO {
             String phoneNumber,
             String message,
             String cancelReason,
-            Status status
+            ReservationStatus status
     ) {
     }
 }
