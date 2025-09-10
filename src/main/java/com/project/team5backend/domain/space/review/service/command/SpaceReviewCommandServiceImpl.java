@@ -13,10 +13,10 @@ import com.project.team5backend.domain.space.review.entity.SpaceReview;
 import com.project.team5backend.domain.space.review.exception.SpaceReviewErrorCode;
 import com.project.team5backend.domain.space.review.exception.SpaceReviewException;
 import com.project.team5backend.domain.space.review.repository.SpaceReviewRepository;
-import com.project.team5backend.domain.space.space.entity.Space;
-import com.project.team5backend.domain.space.space.exception.SpaceErrorCode;
-import com.project.team5backend.domain.space.space.exception.SpaceException;
-import com.project.team5backend.domain.space.space.repository.SpaceRepository;
+import com.project.team5backend.domain.space.entity.Space;
+import com.project.team5backend.domain.space.exception.SpaceErrorCode;
+import com.project.team5backend.domain.space.exception.SpaceException;
+import com.project.team5backend.domain.space.repository.SpaceRepository;
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.user.exception.UserErrorCode;
 import com.project.team5backend.domain.user.exception.UserException;
@@ -46,7 +46,7 @@ public class SpaceReviewCommandServiceImpl implements SpaceReviewCommandService 
     @Override
     public SpaceReviewResDTO.CreateSpaceReviewResDTO createSpaceReview(long spaceId, long userId, SpaceReviewReqDTO.CreateSpaceReviewReqDTO request, List<MultipartFile> images) {
         Space space = spaceRepository.findById(spaceId)
-                .orElseThrow(() -> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
+                .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 

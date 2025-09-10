@@ -17,6 +17,7 @@ public enum SecurityErrorCode implements BaseErrorCode {
 
     MISSING_CSRF_TOKEN(HttpStatus.FORBIDDEN, "CSRF403_1", "CSRF 토큰이 누락되었습니다."),
     INVALID_CSRF_TOKEN(HttpStatus.FORBIDDEN, "CSRF403_2", "CSRF 토큰이 유효하지 않습니다."),
+
     ;
 
     private final HttpStatus httpStatus;

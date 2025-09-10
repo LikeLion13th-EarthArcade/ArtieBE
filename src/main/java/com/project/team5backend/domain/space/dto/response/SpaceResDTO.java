@@ -1,0 +1,84 @@
+package com.project.team5backend.domain.space.dto.response;
+
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.project.team5backend.domain.space.entity.enums.SpaceMood;
+import com.project.team5backend.domain.space.entity.enums.SpaceSize;
+import io.swagger.v3.oas.annotations.media.Schema;
+import lombok.*;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.util.List;
+
+@Getter
+@Setter
+public class SpaceResDTO {
+
+    // 공간 등록 DTO
+    @Builder
+    public record CreateSpaceResDTO (
+            Long id,
+            LocalDateTime createdAt
+    ){}
+
+    // 상세 조회 DTO
+    @Builder
+    public record DetailSpaceResDTO (
+            Long spaceId,
+            String name,
+            List<String> imageUrls,
+            String address,
+            BigDecimal latitude,
+            BigDecimal longitude,
+            @Schema(example = "10:00") @JsonFormat(pattern = "HH:mm") LocalTime openTime,
+            @Schema(example = "20:00") @JsonFormat(pattern = "HH:mm") LocalTime closeTime,
+            SpaceSize spaceSize,
+            SpaceMood spaceMood,
+            String description,
+            List<String> facilities,
+            String phoneNumber,
+            String email,
+            String websiteUrl,
+            String snsUrl
+    ){}
+
+    @Builder
+    public record LikeSpaceResDTO(
+            Long spaceId,
+            String message
+    ){}
+
+    // 페이지 결과 DTO
+    public record SearchSpacePageResDTO(
+            List<SearchSpaceResDTO> items,
+            PageInfo pageInfo,
+            MapInfo mapInfo
+    ) {
+        public record PageInfo(
+                int number,
+                int size,
+                long totalElements,
+                int totalPages,
+                boolean first,
+                boolean last
+        ) {}
+
+        public record MapInfo(
+                Double latitude,
+                Double longitude
+        ) {}
+    }
+    // 검색 결과 DTO
+    @Builder
+    public record SearchSpaceResDTO (
+            Long spaceId,
+            String name,
+            String address,
+            BigDecimal latitude,
+            BigDecimal longitude,
+            @JsonFormat(pattern = "HH:mm") LocalTime openTime,
+            @JsonFormat(pattern = "HH:mm") LocalTime closeTime,
+            String thumbnail
+    ){}
+}

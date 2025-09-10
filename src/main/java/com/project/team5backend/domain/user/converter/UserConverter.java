@@ -16,7 +16,7 @@ public class UserConverter {
         return User.builder()
                 .email(userCreateReqDTO.email())
                 .name(userCreateReqDTO.name())
-                .role(Role.USER)
+                .role(Role.ROLE_USER)
                 .build();
     }
 
