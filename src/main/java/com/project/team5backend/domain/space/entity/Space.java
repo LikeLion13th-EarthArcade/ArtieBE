@@ -101,4 +101,12 @@ public class Space extends BaseTimeEntity {
         this.likeCount = Math.max(0, this.likeCount - 1);
     }
 
+    public void approveSpace() {
+        this.status = Status.APPROVED;
+    }
+
+    public void rejectSpace() {
+        this.status = Status.REJECTED;
+    }
+
 }

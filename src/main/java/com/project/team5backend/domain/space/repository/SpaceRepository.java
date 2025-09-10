@@ -21,6 +21,13 @@ public interface SpaceRepository extends JpaRepository<Space, Long>,SpaceReposit
         """)
     Optional<Space> findByIdAndIsDeletedFalseAndStatusApproved(@Param("spaceId") long spaceId,@Param("status") Status status);
 
+    @Query("""
+        select s
+        from Space s
+        where s.id =:spaceId
+          and s.isDeleted = false
+        """)
+    Optional<Space> findByIdAndIsDeletedFalse(@Param("spaceId") long spaceId);
 
     // 리뷰 평균/카운트 갱신
     @Modifying
@@ -44,4 +51,6 @@ public interface SpaceRepository extends JpaRepository<Space, Long>,SpaceReposit
         where s.id =:spaceId and s.reviewCount > 0
         """)
     void applySpaceReviewDeleted(@Param("spaceId") Long spaceId, @Param("rating")  double rating);
+
+
 }
