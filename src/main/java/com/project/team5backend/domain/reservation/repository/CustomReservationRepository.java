@@ -1,15 +1,16 @@
 package com.project.team5backend.domain.reservation.repository;
 
 import com.project.team5backend.domain.reservation.entity.Reservation;
-import com.project.team5backend.domain.reservation.entity.ReservationStatus;
 import com.project.team5backend.domain.user.entity.User;
-import com.project.team5backend.global.entity.enums.Status;
+import com.project.team5backend.global.entity.enums.StatusGroup;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface CustomReservationRepository {
 
-    Page<Reservation> findBySpaceOwnerWithFilters(User user, Status status, Pageable pageable);
+    Page<Reservation> findBySpaceOwnerWithFilters(User user, StatusGroup statusGroup, Pageable pageable);
 
-    Page<Reservation> findByUserWithFilters(User user, Status status, Pageable pageable);
+    Page<Reservation> findByUserWithFilters(User user, StatusGroup statusGroup, Pageable pageable);
+
+    Page<Reservation> findAllReservationWithFilters(StatusGroup statusGroup, Pageable pageable);
 }

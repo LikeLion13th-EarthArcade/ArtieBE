@@ -33,7 +33,9 @@ public class Reservation extends BaseTimeEntity {
 
     private String message;
 
-    private String cancelReason;
+    private String hostCancelReason;
+
+    private String bookerCancelReason;
 
     @Enumerated(EnumType.STRING)
     private Status status;
@@ -46,14 +48,17 @@ public class Reservation extends BaseTimeEntity {
     @JoinColumn(name = "user_id")
     private User user; // 예약자
 
-    // 예약 확정
-    public void confirm() {
-        this.status = Status.APPROVED;
+    // 변경 메서드
+    public void changeStatus(Status status) {
+        this.status = status;
     }
-    // 예약 취소
-    public void cancel(String reason) {
-        this.status = Status.REJECTED;
-        this.cancelReason = reason;
+
+    public void changeHostCancelReason(String hostCancelReason) {
+        this.hostCancelReason = hostCancelReason;
+    }
+
+    public void changeBookerCancelReason(String bookerCancelReason) {
+        this.bookerCancelReason = bookerCancelReason;
     }
 }
 

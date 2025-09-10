@@ -2,7 +2,6 @@ package com.project.team5backend.domain.reservation.repository;
 
 import com.project.team5backend.domain.reservation.entity.QReservation;
 import com.project.team5backend.domain.reservation.entity.Reservation;
-import com.project.team5backend.domain.reservation.entity.ReservationStatus;
 import com.project.team5backend.domain.space.entity.QSpace;
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.global.entity.enums.Status;
@@ -27,16 +26,13 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<Reservation> findBySpaceOwnerWithFilters(User user, Status status, Pageable pageable) {
+    public Page<Reservation> findBySpaceOwnerWithFilters(User user, StatusGroup statusGroup, Pageable pageable) {
         QReservation reservation = QReservation.reservation;
         QSpace space = QSpace.space;
 
         BooleanBuilder builder = new BooleanBuilder()
-                .and(reservation.space.user.eq(user));
-
-        if (status != null) {
-            builder.and(reservation.status.eq(status));
-        }
+                .and(reservation.space.user.eq(user))
+                .and(statusGroupCondition(statusGroup));
 
         List<Reservation> content = queryFactory
                 .selectFrom(reservation)
@@ -60,29 +56,30 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
     }
 
     @Override
-    public Page<Reservation> findByUserWithFilters(User user, Status status, Pageable pageable) {
+    public Page<Reservation> findByUserWithFilters(User user, StatusGroup statusGroup, Pageable pageable) {
         QReservation reservation = QReservation.reservation;
 
         BooleanBuilder builder = new BooleanBuilder()
-                .and(reservation.user.eq(user));
+                .and(reservation.user.eq(user))
+                .and(statusGroupCondition(statusGroup));
 
-        if (status != null) {
-            builder.and(reservation.status.eq(status));
-        }
+        List<Reservation> content = findReservations(reservation, builder, pageable);
 
-        List<Reservation> content = queryFactory
-                .selectFrom(reservation)
-                .where(builder)
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .orderBy(reservation.createdAt.desc())
-                .fetch();
+        Long total = countReservation(reservation, builder);
 
-        Long total = queryFactory
-                .select(reservation.count())
-                .from(reservation)
-                .where(builder)
-                .fetchOne();
+        return new PageImpl<>(content, pageable, total != null ? total : 0L);
+    }
+
+    @Override
+    public Page<Reservation> findAllReservationWithFilters(StatusGroup statusGroup, Pageable pageable) {
+        QReservation reservation = QReservation.reservation;
+
+        BooleanBuilder builder = new BooleanBuilder()
+                .and(statusGroupCondition(statusGroup));
+
+        List<Reservation> content = findReservations(reservation, builder, pageable);
+
+        Long total = countReservation(reservation, builder);
 
         return new PageImpl<>(content, pageable, total != null ? total : 0L);
     }
@@ -91,12 +88,38 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
         if (statusGroup == null || statusGroup == StatusGroup.ALL) {
             return null;
         }
-
         return switch (statusGroup) {
-            case PENDING -> reservation.status.eq(Status.PENDING);
-            case DONE -> reservation.status.in(Status.APPROVED, Status.REJECTED);
+            case PENDING -> reservation.status.in(
+                    Status.PENDING,
+                    Status.BOOKER_CANCEL_REQUESTED
+            );
+            case DONE -> reservation.status.in(
+                    Status.APPROVED,
+                    Status.REJECTED,
+                    Status.BOOKER_CANCEL_REJECTED,
+                    Status.CANCELED_BY_BOOKER,
+                    Status.CANCELED_BY_HOST
+            );
             default -> null;
         };
+    }
+
+    private List<Reservation> findReservations(QReservation reservation, BooleanBuilder builder, Pageable pageable) {
+        return queryFactory
+                .selectFrom(reservation)
+                .where(builder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(reservation.createdAt.desc())
+                .fetch();
+    }
+
+    private Long countReservation(QReservation reservation, BooleanBuilder builder) {
+        return queryFactory
+                .select(reservation.count())
+                .from(reservation)
+                .where(builder)
+                .fetchOne();
     }
 }
 
