@@ -43,6 +43,7 @@ public class AdminSpaceQueryServiceImpl implements AdminSpaceQueryService {
         Space space = spaceRepository.findByIdAndIsDeletedFalse(spaceId)
                 .orElseThrow(() -> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
 
+        space.approveSpace();
         return AdminSpaceConverter.toSpaceStatusUpdateResDTO(space, "해당 공간이 승인되었습니다.");
     }
 
@@ -51,6 +52,7 @@ public class AdminSpaceQueryServiceImpl implements AdminSpaceQueryService {
         Space space = spaceRepository.findByIdAndIsDeletedFalse(spaceId)
                 .orElseThrow(() -> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
 
+        space.rejectSpace();
         return AdminSpaceConverter.toSpaceStatusUpdateResDTO(space, "해당 공간이 거절되었습니다.");
     }
 
