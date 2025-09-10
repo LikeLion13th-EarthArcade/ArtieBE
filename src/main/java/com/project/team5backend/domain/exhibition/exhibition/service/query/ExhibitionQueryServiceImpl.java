@@ -3,8 +3,8 @@ package com.project.team5backend.domain.exhibition.exhibition.service.query;
 import com.project.team5backend.domain.exhibition.exhibition.converter.ExhibitionConverter;
 import com.project.team5backend.domain.exhibition.exhibition.dto.response.ExhibitionResDTO;
 import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Category;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Mood;
+import com.project.team5backend.domain.exhibition.exhibition.entity.enums.ExhibitionCategory;
+import com.project.team5backend.domain.exhibition.exhibition.entity.enums.ExhibitionMood;
 import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.domain.exhibition.exhibition.exception.ExhibitionErrorCode;
 import com.project.team5backend.domain.exhibition.exhibition.exception.ExhibitionException;
@@ -56,7 +56,7 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
         // ai 분석을 위한 로그 생성
         interactLogService.logClick(1L, exhibitionId);
         // 전시 이미지들의 fileKey만 조회
-        List<String> imageFileKeys = exhibitionImageRepository.findFileKeysByExhibitionId(exhibitionId);
+        List<String> imageFileKeys = exhibitionImageRepository.findImageUrlsByExhibitionId(exhibitionId);
 
         List<ExhibitionReview> reviews = exhibitionReviewRepository.findAllByExhibitionId(exhibition.getId());
 
@@ -73,17 +73,17 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
 
     @Override
     public ExhibitionResDTO.SearchExhibitionPageResDTO searchExhibition(
-            Category category, String district, Mood mood, LocalDate localDate, Sort sort, int page) {
+            ExhibitionCategory exhibitionCategory, String district, ExhibitionMood exhibitionMood, LocalDate localDate, Sort sort, int page) {
 
-        log.info("전시 검색 - category: {}, district: {}, mood: {}, localDate: {}, sort: {}, page: {}",
-                category, district, mood, localDate, sort, page);
+        log.info("전시 검색 - exhibitionCategory: {}, district: {}, exhibitionMood: {}, localDate: {}, sort: {}, page: {}",
+                exhibitionCategory, district, exhibitionMood, localDate, sort, page);
 
         // Pageable 생성
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt"));
 
         // 동적 쿼리로 전시 검색
         Page<Exhibition> exhibitionPage = exhibitionRepository.findExhibitionsWithFilters(
-                category, district, mood, localDate, sort, pageable);
+                exhibitionCategory, district, exhibitionMood, localDate, sort, pageable);
 
         // 검색 결과를 DTO로 변환 - Converter 사용
         List<ExhibitionResDTO.SearchExhibitionResDTO> items = exhibitionPage.getContent().stream()
@@ -130,7 +130,7 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
         }
         Exhibition upcomingEx = exhibitions.get(0);
 
-        List<String> fileKeys = exhibitionImageRepository.findFileKeysByExhibitionId(upcomingEx.getId());
+        List<String> fileKeys = exhibitionImageRepository.findImageUrlsByExhibitionId(upcomingEx.getId());
         return ExhibitionConverter.toUpcomingPopularityExhibitionResDTO(upcomingEx.getId(), upcomingEx.getTitle(), fileKeys);
     }
 

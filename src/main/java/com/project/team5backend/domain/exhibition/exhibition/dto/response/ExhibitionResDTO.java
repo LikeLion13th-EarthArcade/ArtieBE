@@ -1,10 +1,9 @@
 package com.project.team5backend.domain.exhibition.exhibition.dto.response;
 
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Category;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Mood;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Type;
+import com.project.team5backend.domain.exhibition.exhibition.entity.enums.ExhibitionCategory;
+import com.project.team5backend.domain.exhibition.exhibition.entity.enums.ExhibitionMood;
+import com.project.team5backend.domain.exhibition.exhibition.entity.enums.ExhibitionType;
 import com.project.team5backend.domain.exhibition.review.dto.response.ExhibitionReviewResDTO;
-import com.project.team5backend.domain.facility.entity.Facility;
 import lombok.Builder;
 
 import java.math.BigDecimal;
@@ -26,9 +25,9 @@ public class ExhibitionResDTO {
             String address,
             BigDecimal latitude,
             BigDecimal longitude,
-            Category category,
-            Type type,
-            Mood mood,
+            ExhibitionCategory exhibitionCategory,
+            ExhibitionType exhibitionType,
+            ExhibitionMood exhibitionMood,
             Integer price,
             List<String> facilities,
             List<ExhibitionReviewResDTO.exReviewDetailResDTO> reviews
@@ -46,9 +45,9 @@ public class ExhibitionResDTO {
             String address,
             BigDecimal latitude,
             BigDecimal longitude,
-            Category category,
-            Type type,
-            Mood mood,
+            ExhibitionCategory exhibitionCategory,
+            ExhibitionType exhibitionType,
+            ExhibitionMood exhibitionMood,
             Integer price,
             List<String> facilities
     ) {}

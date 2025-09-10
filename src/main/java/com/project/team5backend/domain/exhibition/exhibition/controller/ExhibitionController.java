@@ -2,8 +2,8 @@ package com.project.team5backend.domain.exhibition.exhibition.controller;
 
 import com.project.team5backend.domain.exhibition.exhibition.dto.request.ExhibitionReqDTO;
 import com.project.team5backend.domain.exhibition.exhibition.dto.response.ExhibitionResDTO;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Category;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Mood;
+import com.project.team5backend.domain.exhibition.exhibition.entity.enums.ExhibitionCategory;
+import com.project.team5backend.domain.exhibition.exhibition.entity.enums.ExhibitionMood;
 import com.project.team5backend.domain.exhibition.exhibition.service.command.ExhibitionCommandService;
 import com.project.team5backend.domain.exhibition.exhibition.service.query.ExhibitionQueryService;
 import com.project.team5backend.global.SwaggerBody;
@@ -76,14 +76,14 @@ public class ExhibitionController {
     @Operation(summary = "전시 검색", description = "전시 검색하면 한페이지에 4개의 전시와 서울 시청 중심의 위도 경도 반환")
     @GetMapping("/search")
     public CustomResponse<ExhibitionResDTO.SearchExhibitionPageResDTO> searchExhibitions(
-            @RequestParam(name = "category", required = false) Category category,
+            @RequestParam(name = "exhibitionCategory", required = false) ExhibitionCategory exhibitionCategory,
             @RequestParam(name = "distinct", required = false) String district,
-            @RequestParam(name = "mood", required = false) Mood mood,
+            @RequestParam(name = "exhibitionMood", required = false) ExhibitionMood exhibitionMood,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate localDate,
             @RequestParam(defaultValue = "POPULAR") Sort sort,   // new | old | popular
             @RequestParam(name = "page", defaultValue = "0") int page
     ) {
-        return CustomResponse.onSuccess(exhibitionQueryService.searchExhibition(category, district, mood, localDate, sort, page));
+        return CustomResponse.onSuccess(exhibitionQueryService.searchExhibition(exhibitionCategory, district, exhibitionMood, localDate, sort, page));
     }
 
     @Operation(summary = "지금 뜨는 전시회", description = "현재 진행중인 전시중에서 reviewCount가 가장 높은 전시 반환")

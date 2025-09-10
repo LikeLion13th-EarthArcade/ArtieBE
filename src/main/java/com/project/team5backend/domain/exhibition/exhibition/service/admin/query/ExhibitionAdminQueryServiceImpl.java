@@ -40,7 +40,7 @@ public class ExhibitionAdminQueryServiceImpl implements ExhibitionAdminQueryServ
     public ExhibitionResDTO.DetailPendingExhibitionResDTO getDetailPendingExhibition(Long exhibitionId){
         Exhibition exhibition = exhibitionRepository.findById(exhibitionId)
                 .orElseThrow(()-> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
-        List<String> imageFileKeys = exhibitionImageRepository.findFileKeysByExhibitionId(exhibitionId);
+        List<String> imageFileKeys = exhibitionImageRepository.findImageUrlsByExhibitionId(exhibitionId);
         return ExhibitionConverter.toDetailPendingExhibitionResDTO(exhibition, imageFileKeys);
     }
 }

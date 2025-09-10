@@ -79,15 +79,15 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
 //            LocalDate endDate,
 //            String district,
 //            SpaceSize size,
-//            SpaceType type,
-//            SpaceMood mood,
+//            SpaceType exhibitionType,
+//            SpaceMood exhibitionMood,
 //            int page
 //    ) {
 //        Pageable pageable = PageRequest.of(page, 10, Sort.by("id").ascending()); // ✅ id 기준 오름차순 고정
 //
 //        // Page<Space> 조회
 //        Page<Space> spaces = spaceRepository.findSpacesWithFilters(
-//                startDate, endDate, district, size, type, mood, pageable
+//                startDate, endDate, district, size, exhibitionType, exhibitionMood, pageable
 //        );
 //
 //        // DTO 변환 (static 메서드 사용)

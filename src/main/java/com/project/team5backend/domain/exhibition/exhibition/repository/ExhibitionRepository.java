@@ -1,8 +1,8 @@
 package com.project.team5backend.domain.exhibition.exhibition.repository;
 
 import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Category;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Mood;
+import com.project.team5backend.domain.exhibition.exhibition.entity.enums.ExhibitionCategory;
+import com.project.team5backend.domain.exhibition.exhibition.entity.enums.ExhibitionMood;
 import com.project.team5backend.global.entity.enums.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +24,14 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
         and e.status =:status
     """)
     Optional<Exhibition> findByIdAndIsDeletedFalseAndStatusApprove(@Param("exhibitionId") Long exhibitionId, @Param("status") Status status);
+
+    @Query("""
+        select e from Exhibition e
+        where e.id = :exhibitionId
+        and e.isDeleted = false
+    """)
+    Optional<Exhibition> findByIdAndIsDeletedFalse(@Param("exhibitionId") Long exhibitionId);
+
     //삭제되지않았고, 승인되고, 진행중인 전시
     @Query("""
         select e from Exhibition e
@@ -109,22 +117,4 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
         where e.id =:exhibitionId and e.status =:status and e.isDeleted = false
         """)
     Optional<Exhibition> findPendingExhibition(Long exhibitionId, @Param("status") Status status);
-
-    // 삭제 x, 승인 o, 진행중이고, 리뷰수와 토탈리뷰점수를 더한 값이 높은 순으로 나열
-    @Query("""
-        SELECT e FROM Exhibition e
-        WHERE e.isDeleted = false
-          AND e.status = :status
-          AND e.startDate <= :today AND e.endDate >= :today
-          AND (e.category = :category OR e.mood = :mood)
-        ORDER BY (e.reviewCount + e.totalReviewScore) DESC
-        """)
-    List<Exhibition> recommendByKeywords(
-            @Param("category") Category category,
-            @Param("mood") Mood mood,
-            @Param("status") Status status,
-            @Param("today") LocalDate today,
-            org.springframework.data.domain.Pageable pageable
-    );
-    List<Exhibition> findByUserId(Long userId);
 }

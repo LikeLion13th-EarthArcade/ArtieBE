@@ -2,8 +2,8 @@ package com.project.team5backend.domain.exhibition.exhibition.repository;
 
 import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.exhibition.exhibition.entity.QExhibition;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Category;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Mood;
+import com.project.team5backend.domain.exhibition.exhibition.entity.enums.ExhibitionCategory;
+import com.project.team5backend.domain.exhibition.exhibition.entity.enums.ExhibitionMood;
 import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.global.entity.enums.Status;
 import com.querydsl.core.BooleanBuilder;
@@ -27,7 +27,7 @@ public class ExhibitionRepositoryImpl implements ExhibitionRepositoryCustom {
 
     @Override
     public Page<Exhibition> findExhibitionsWithFilters(
-            Category category, String district, Mood mood, LocalDate localDate,
+            ExhibitionCategory exhibitionCategory, String district, ExhibitionMood exhibitionMood, LocalDate localDate,
             Sort sort, Pageable pageable) {
 
         QExhibition exhibition = QExhibition.exhibition;
@@ -49,8 +49,8 @@ public class ExhibitionRepositoryImpl implements ExhibitionRepositoryCustom {
         }
 
         // 카테고리 필터
-        if (category != null) {
-            builder.and(exhibition.category.eq(category));
+        if (exhibitionCategory != null) {
+            builder.and(exhibition.category.eq(exhibitionCategory));
         }
 
         // 지역 필터 (Address 엔티티의 roadAddress 필드 사용)
@@ -59,8 +59,8 @@ public class ExhibitionRepositoryImpl implements ExhibitionRepositoryCustom {
         }
 
         // 분위기 필터
-        if (mood != null) {
-            builder.and(exhibition.mood.eq(mood));
+        if (exhibitionMood != null) {
+            builder.and(exhibition.mood.eq(exhibitionMood));
         }
 
         // 전체 개수 조회 (fetchCount 대신 fetch().size() 사용 - 최신 QueryDSL 버전 호환)

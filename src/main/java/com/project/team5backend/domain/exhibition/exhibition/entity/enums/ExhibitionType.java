@@ -1,5 +1,5 @@
 package com.project.team5backend.domain.exhibition.exhibition.entity.enums;
 
-public enum Type {
+public enum ExhibitionType {
     PERSON, GROUP
 }

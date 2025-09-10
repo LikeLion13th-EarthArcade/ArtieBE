@@ -17,12 +17,12 @@ public interface ExhibitionInteractLogRepository extends JpaRepository<Exhibitio
     long countSince(@Param("userId") Long userId, @Param("since") LocalDateTime since);
 
     @Query(value = """
-        SELECT e.category AS keyName,
+        SELECT e.exhibitionCategory AS keyName,
                CAST(SUM(CASE l.action_type WHEN 'LIKE' THEN 1.6 WHEN 'CLICK' THEN 1.0 ELSE 1.0 END) AS DOUBLE) AS score
         FROM exhibition_interact_log l
         JOIN exhibition e ON e.id = l.exhibition_id
         WHERE l.user_id = :userId AND l.created_at >= :since
-        GROUP BY e.category
+        GROUP BY e.exhibitionCategory
         ORDER BY
             SUM(CASE l.action_type WHEN 'LIKE' THEN 1.6 WHEN 'CLICK' THEN 1.0 ELSE 1.0 END) DESC,                 -- 1순위: 가중치 합
             MAX(l.created_at) DESC,     -- 2순위: 가장 최근 상호작용
@@ -32,12 +32,12 @@ public interface ExhibitionInteractLogRepository extends JpaRepository<Exhibitio
     KeyScoreRow topCategory(@Param("userId") Long userId, @Param("since") LocalDateTime since);
 
     @Query(value = """
-        SELECT e.mood AS keyName,
+        SELECT e.exhibitionMood AS keyName,
                CAST(SUM(CASE l.action_type WHEN 'LIKE' THEN 1.6 WHEN 'CLICK' THEN 1.0 ELSE 1.0 END) AS DOUBLE) AS score
         FROM exhibition_interact_log l
         JOIN exhibition e ON e.id = l.exhibition_id
         WHERE l.user_id = :userId AND l.created_at >= :since
-        GROUP BY e.mood
+        GROUP BY e.exhibitionMood
         ORDER BY
             SUM(CASE l.action_type WHEN 'LIKE' THEN 1.6 WHEN 'CLICK' THEN 1.0 ELSE 1.0 END) DESC,                 -- 1순위: 가중치 합
             MAX(l.created_at) DESC,     -- 2순위: 가장 최근 상호작용

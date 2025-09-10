@@ -115,12 +115,12 @@ public class SpaceController {
 //            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
 //            @RequestParam(name = "district", required = false) String district,
 //            @RequestParam(name = "size", required = false) SpaceSize size,
-//            @RequestParam(name = "type", required = false) SpaceType type,
-//            @RequestParam(name = "mood", required = false) SpaceMood mood,
+//            @RequestParam(name = "exhibitionType", required = false) SpaceType exhibitionType,
+//            @RequestParam(name = "exhibitionMood", required = false) SpaceMood exhibitionMood,
 //            @RequestParam(name = "page", defaultValue = "0") int page
 //            ) {
 //        return CustomResponse.onSuccess(
-//                spaceQueryService.searchSpaces(startDate, endDate, district, size, type, mood, page)
+//                spaceQueryService.searchSpaces(startDate, endDate, district, size, exhibitionType, exhibitionMood, page)
 //        );
 //    }
 }

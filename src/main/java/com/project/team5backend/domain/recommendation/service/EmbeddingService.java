@@ -23,8 +23,8 @@ public class EmbeddingService {
         // 승인된 것만 생성하도록 호출부에서 보장
         String input = String.join("\n",
                 "title: " + ns(e.getTitle()),
-                "category: " + ns(String.valueOf(e.getCategory())),
-                "mood: " + ns(String.valueOf(e.getMood())),
+                "exhibitionCategory: " + ns(String.valueOf(e.getExhibitionCategory())),
+                "exhibitionMood: " + ns(String.valueOf(e.getExhibitionMood())),
                 "location: " + ns(e.getAddress().getRoadAddress()),      // ← venue 대신 location
                 "description: " + ns(e.getDescription()) // ← summary 대신 description
         );
