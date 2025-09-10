@@ -1,4 +1,4 @@
-package com.project.team5backend.domain.space.reservation.entity;
+package com.project.team5backend.domain.reservation.entity;
 
 
 import com.project.team5backend.domain.space.space.entity.Space;
@@ -12,10 +12,10 @@ import java.time.LocalDate;
 
 @Entity
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @Builder
+@Table(name = "reservation")
 public class Reservation extends BaseTimeEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -36,7 +36,7 @@ public class Reservation extends BaseTimeEntity {
     private String cancelReason;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private ReservationStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "space_id")
@@ -48,11 +48,11 @@ public class Reservation extends BaseTimeEntity {
 
     // 예약 확정
     public void confirm() {
-        this.status = Status.APPROVED;
+        this.status = ReservationStatus.CONFIRMED;
     }
     // 예약 취소
     public void cancel(String reason) {
-        this.status = Status.REJECTED;
+        this.status = ReservationStatus.CANCELLED;
         this.cancelReason = reason;
     }
 }

@@ -2,7 +2,8 @@ package com.project.team5backend.domain.space.space.repository;
 
 import com.project.team5backend.domain.facility.entity.QFacility;
 import com.project.team5backend.domain.facility.entity.QSpaceFacility;
-import com.project.team5backend.domain.space.reservation.entity.QReservation;
+import com.project.team5backend.domain.reservation.entity.QReservation;
+import com.project.team5backend.domain.reservation.entity.ReservationStatus;
 import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.domain.space.space.entity.*;
 import com.project.team5backend.domain.space.space.entity.enums.SpaceMood;
@@ -93,7 +94,7 @@ public class SpaceRepositoryImpl implements SpaceRepositoryCustom {
                 .from(reservation)
                 .where(
                         reservation.space.eq(space),
-                        reservation.status.eq(Status.APPROVED),
+                        reservation.status.eq(ReservationStatus.CONFIRMED),
                         reservation.startDate.loe(requestedEndDate),
                         reservation.endDate.goe(requestedStartDate)
                 )

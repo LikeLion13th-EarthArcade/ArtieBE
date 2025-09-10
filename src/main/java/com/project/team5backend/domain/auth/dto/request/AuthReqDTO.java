@@ -3,8 +3,8 @@ package com.project.team5backend.domain.auth.dto.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
-import static com.project.team5backend.global.constant.valid.MessageConstant.USER_WRONG_PASSWORD;
-import static com.project.team5backend.global.constant.valid.PatternConstant.USER_PASSWORD_PATTERN;
+import static com.project.team5backend.global.constant.valid.MessageConstant.WRONG_PASSWORD_PATTERN;
+import static com.project.team5backend.global.constant.valid.PatternConstant.PASSWORD_PATTERN;
 
 public class AuthReqDTO {
 
@@ -16,15 +16,15 @@ public class AuthReqDTO {
 
     public record AuthPasswordChangeReqDTO(
             @NotBlank
-            @Pattern(regexp = USER_PASSWORD_PATTERN, message = USER_WRONG_PASSWORD)
+            @Pattern(regexp = PASSWORD_PATTERN, message = WRONG_PASSWORD_PATTERN)
             String currentPassword,
 
             @NotBlank
-            @Pattern(regexp = USER_PASSWORD_PATTERN, message = USER_WRONG_PASSWORD)
+            @Pattern(regexp = PASSWORD_PATTERN, message = WRONG_PASSWORD_PATTERN)
             String newPassword,
 
             @NotBlank
-            @Pattern(regexp = USER_PASSWORD_PATTERN, message = USER_WRONG_PASSWORD)
+            @Pattern(regexp = PASSWORD_PATTERN, message = WRONG_PASSWORD_PATTERN)
             String newPasswordConfirmation
     ) {
     }
