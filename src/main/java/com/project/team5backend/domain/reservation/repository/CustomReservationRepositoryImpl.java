@@ -80,6 +80,30 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
         return new PageImpl<>(content, pageable, total != null ? total : 0L);
     }
 
+    @Override
+    public Page<Reservation> findAllReservationWithFilters(StatusGroup statusGroup, Pageable pageable) {
+        QReservation reservation = QReservation.reservation;
+
+        BooleanBuilder builder = new BooleanBuilder()
+                .and(statusGroupCondition(statusGroup));
+
+        List<Reservation> content = queryFactory
+                .selectFrom(reservation)
+                .where(builder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(reservation.createdAt.desc())
+                .fetch();
+
+        Long total = queryFactory
+                .select(reservation.count())
+                .from(reservation)
+                .where(builder)
+                .fetchOne();
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0L);
+    }
+
     private BooleanExpression statusGroupCondition(StatusGroup statusGroup) {
         if (statusGroup == null || statusGroup == StatusGroup.ALL) {
             return null;
@@ -98,6 +122,16 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
             );
             default -> null;
         };
+    }
+
+    private List<Reservation> getContent(QReservation reservation, BooleanBuilder builder, Pageable pageable) {
+        return queryFactory
+                .selectFrom(reservation)
+                .where(builder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(reservation.createdAt.desc())
+                .fetch();
     }
 }
 

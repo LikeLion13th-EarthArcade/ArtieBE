@@ -11,4 +11,6 @@ public interface CustomReservationRepository {
     Page<Reservation> findBySpaceOwnerWithFilters(User user, StatusGroup statusGroup, Pageable pageable);
 
     Page<Reservation> findByUserWithFilters(User user, StatusGroup statusGroup, Pageable pageable);
+
+    Page<Reservation> findAllReservationWithFilters(StatusGroup statusGroup, Pageable pageable);
 }
