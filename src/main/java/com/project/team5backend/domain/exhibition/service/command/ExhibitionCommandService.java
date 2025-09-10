@@ -8,9 +8,9 @@ import java.util.List;
 
 public interface ExhibitionCommandService {
 
-    void createExhibition(ExhibitionReqDTO.CreateExhibitionReqDTO createExhibitionReqDTO, String email, List<MultipartFile> images);
+    void createExhibition(ExhibitionReqDTO.CreateExhibitionReqDTO createExhibitionReqDTO, Long userId, List<MultipartFile> images);
 
     ExhibitionResDTO.LikeExhibitionResDTO likeExhibition(Long exhibitionId, String email);
 
-    void deleteExhibition(Long id, String email);
+    void deleteExhibition(Long exhibitionId, String email);
 }

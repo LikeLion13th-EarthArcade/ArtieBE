@@ -55,7 +55,7 @@ public class ExhibitionController {
             @RequestPart(value = "images", required = false) List<MultipartFile> images
     ) {
         ImageUtils.validateImages(images); // 이미지 검증 (개수, null 여부)
-        exhibitionCommandService.createExhibition(request, currentUser.getEmail(), images);
+        exhibitionCommandService.createExhibition(request, currentUser.getId(), images);
         return CustomResponse.onSuccess("전시글 등록이 완료되었습니다. 관리자 승인 대기열에 추가합니다.");
     }
     @PostMapping("/{exhibitionId}/like")

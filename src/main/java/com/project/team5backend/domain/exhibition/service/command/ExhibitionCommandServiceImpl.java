@@ -57,8 +57,8 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
     private final S3Uploader s3Uploader;
 
     @Override
-    public void createExhibition(ExhibitionReqDTO.CreateExhibitionReqDTO createExhibitionReqDTO, String email, List<MultipartFile> images) {
-        User user = userRepository.findByEmail(email)
+    public void createExhibition(ExhibitionReqDTO.CreateExhibitionReqDTO createExhibitionReqDTO, Long userId, List<MultipartFile> images) {
+        User user = userRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new CustomException(GeneralErrorCode.NOT_FOUND_404));
 
         AddressResDTO.AddressCreateResDTO addressResDTO = addressService.resolve(createExhibitionReqDTO.address());

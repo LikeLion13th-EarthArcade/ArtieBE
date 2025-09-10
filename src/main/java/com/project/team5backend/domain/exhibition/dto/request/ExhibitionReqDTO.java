@@ -16,27 +16,47 @@ import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
+import static com.project.team5backend.global.constant.valid.MessageConstant.*;
+
 public class ExhibitionReqDTO {
     public record CreateExhibitionReqDTO (
-            @NotBlank String title,
+            @NotBlank(message = BLANK_EXHIBITION_TITLE)
+            String title,
+
             String description,
-            @NotNull LocalDate startDate,
-            @NotNull LocalDate endDate,
-            @Schema(description = "운영 시작 시간",  example = "10:00") @JsonFormat(pattern = "HH:mm") LocalTime openTime,
-            @Schema(description = "운영 종료 시간",  example = "20:00") @JsonFormat(pattern = "HH:mm") LocalTime closeTime,
+
+            @NotNull(message = BLANK_EXHIBITION_START_DATE)
+            LocalDate startDate,
+
+            @NotNull(message = BLANK_EXHIBITION_END_DATE)
+            LocalDate endDate,
+
+            @Schema(description = "운영 시작 시간", example = "10:00")
+            @JsonFormat(pattern = "HH:mm")
+            @NotNull(message = BLANK_EXHIBITION_OPEN_TIME)
+            LocalTime openTime,
+
+            @Schema(description = "운영 종료 시간", example = "20:00")
+            @JsonFormat(pattern = "HH:mm")
+            @NotNull(message = BLANK_EXHIBITION_CLOSE_TIME)
+            LocalTime closeTime,
+
             String websiteUrl,
-            @NotNull ExhibitionCategory exhibitionCategory,
-            @NotNull ExhibitionType exhibitionType,
-            @NotNull ExhibitionMood exhibitionMood,
+
+            @NotNull(message = BLANK_EXHIBITION_CATEGORY)
+            ExhibitionCategory exhibitionCategory,
+
+            @NotNull(message = BLANK_EXHIBITION_TYPE)
+            ExhibitionType exhibitionType,
+
+            @NotNull(message = BLANK_EXHIBITION_MOOD)
+            ExhibitionMood exhibitionMood,
+
             Integer price,
             List<String> facilities,
-            @NotNull @Valid AddressReqDTO.AddressCreateReqDTO address
-    ) {}
 
-    public record SearchExhibitionReqDTO (
-            ExhibitionCategory exhibitionCategory,
-            String distinct,
-            ExhibitionMood exhibitionMood,
-            LocalDate localDate
-    ){}
+            @NotNull(message = BLANK_EXHIBITION_ADDRESS)
+            @Valid
+            AddressReqDTO.AddressCreateReqDTO address
+    ) {}
 }
