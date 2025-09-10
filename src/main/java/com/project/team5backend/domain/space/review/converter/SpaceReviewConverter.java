@@ -3,9 +3,8 @@ package com.project.team5backend.domain.space.review.converter;
 import com.project.team5backend.domain.space.review.dto.request.SpaceReviewReqDTO;
 import com.project.team5backend.domain.space.review.dto.response.SpaceReviewResDTO;
 import com.project.team5backend.domain.space.review.entity.SpaceReview;
-import com.project.team5backend.domain.space.space.entity.Space;
+import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.user.entity.User;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
 import java.util.List;

@@ -1,7 +1,7 @@
 package com.project.team5backend.domain.space.review.entity;
 
 import com.project.team5backend.domain.image.entity.SpaceReviewImage;
-import com.project.team5backend.domain.space.space.entity.Space;
+import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;

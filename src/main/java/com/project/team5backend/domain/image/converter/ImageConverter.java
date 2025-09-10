@@ -7,7 +7,7 @@ import com.project.team5backend.domain.image.entity.ExhibitionReviewImage;
 import com.project.team5backend.domain.image.entity.SpaceReviewImage;
 import com.project.team5backend.domain.image.entity.SpaceImage;
 import com.project.team5backend.domain.space.review.entity.SpaceReview;
-import com.project.team5backend.domain.space.space.entity.Space;
+import com.project.team5backend.domain.space.entity.Space;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
