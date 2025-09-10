@@ -47,7 +47,7 @@ public class Reservation extends BaseTimeEntity {
     private User user; // 예약자
 
     // 예약 확정
-    public void confirm() {
+    public void approve() {
         this.status = Status.APPROVED;
     }
     // 예약 취소

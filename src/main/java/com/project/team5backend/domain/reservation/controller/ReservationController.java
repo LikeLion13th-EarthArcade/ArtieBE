@@ -15,6 +15,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
@@ -34,7 +35,7 @@ public class ReservationController {
             @AuthenticationPrincipal CurrentUser currentUser,
             @RequestBody @Valid ReservationReqDTO.ReservationCreateReqDTO reservationCreateReqDTO
     ) {
-        return CustomResponse.onSuccess(reservationCommandService.createReservation(spaceId, currentUser.getId(), reservationCreateReqDTO));
+        return CustomResponse.onSuccess(HttpStatus.CREATED, reservationCommandService.createReservation(spaceId, currentUser.getId(), reservationCreateReqDTO));
     }
 
     @Operation(summary = "예약 단일 조회")
@@ -80,6 +81,15 @@ public class ReservationController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         return CustomResponse.onSuccess(PageResponse.of(reservationQueryService.getMyReservationList(currentUser.getId(), statusGroup, pageable)));
+    }
+
+    @Operation(summary = "예약 확정 (호스트 전용)", description = "PENDING 상태의 예약을 호스트가 수락하여 APPROVED 상태로 전환")
+    @PostMapping("reservations/{reservationId}/approved")
+    public CustomResponse<ReservationResDTO.ReservationStatusResDTO> approveReservation(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @PathVariable long reservationId
+    ) {
+        return CustomResponse.onSuccess(reservationCommandService.approveReservation(currentUser.getId(), reservationId));
     }
 }
 

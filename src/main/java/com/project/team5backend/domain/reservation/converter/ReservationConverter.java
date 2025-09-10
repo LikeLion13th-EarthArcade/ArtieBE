@@ -48,4 +48,12 @@ public class ReservationConverter {
                 .status(reservation.getStatus())
                 .build();
     }
+
+    public static ReservationResDTO.ReservationStatusResDTO toReservationStatusResDTO(Reservation reservation) {
+        return ReservationResDTO.ReservationStatusResDTO.builder()
+                .spaceId(reservation.getSpace().getId())
+                .reservationId(reservation.getId())
+                .status(reservation.getStatus())
+                .build();
+    }
 }

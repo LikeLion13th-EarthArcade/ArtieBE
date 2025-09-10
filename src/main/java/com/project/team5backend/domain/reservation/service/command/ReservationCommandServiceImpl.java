@@ -4,6 +4,8 @@ import com.project.team5backend.domain.reservation.converter.ReservationConverte
 import com.project.team5backend.domain.reservation.dto.request.ReservationReqDTO;
 import com.project.team5backend.domain.reservation.dto.response.ReservationResDTO;
 import com.project.team5backend.domain.reservation.entity.Reservation;
+import com.project.team5backend.domain.reservation.exception.ReservationErrorCode;
+import com.project.team5backend.domain.reservation.exception.ReservationException;
 import com.project.team5backend.domain.reservation.repository.ReservationRepository;
 import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.space.exception.SpaceErrorCode;
@@ -16,6 +18,8 @@ import com.project.team5backend.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.Objects;
 
 @Service
 @RequiredArgsConstructor
@@ -37,6 +41,23 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         reservationRepository.save(reservation);
 
         return ReservationConverter.toReservationCreateResDTO(reservation);
+    }
+
+    @Override
+    public ReservationResDTO.ReservationStatusResDTO approveReservation(long userId, long reservationId) {
+        User user =  userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+
+        Reservation reservation = reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+
+        if (!Objects.equals(reservation.getUser(), user)) {
+            throw new ReservationException(ReservationErrorCode.RESERVATION_ACCESS_DENIED);
+        }
+
+        reservation.approve();
+
+        return ReservationConverter.toReservationStatusResDTO(reservation);
     }
 }
 

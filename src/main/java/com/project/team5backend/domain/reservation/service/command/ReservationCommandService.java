@@ -7,4 +7,6 @@ import com.project.team5backend.domain.reservation.dto.response.ReservationResDT
 public interface ReservationCommandService {
 
     ReservationResDTO.ReservationCreateResDTO createReservation(long spaceId, long userId, ReservationReqDTO.ReservationCreateReqDTO reservationCreateReqDTO);
+
+    ReservationResDTO.ReservationStatusResDTO approveReservation(long userId, long reservationId);
 }

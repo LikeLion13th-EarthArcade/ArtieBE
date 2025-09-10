@@ -29,4 +29,12 @@ public class ReservationResDTO {
             Status status
     ) {
     }
+
+    @Builder
+    public record ReservationStatusResDTO(
+            long spaceId,
+            long reservationId,
+            Status status
+    ) {
+    }
 }
