@@ -8,4 +8,5 @@ public interface ReservationQueryService {
 
     ReservationResDTO.ReservationDetailResDTO getReservationDetail(long userId, long reservationId);
 
+    Page<ReservationResDTO.ReservationDetailResDTO> getReservationListForSpaceOwner(long userId, Pageable pageable);
 }

@@ -43,6 +43,16 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         return ReservationConverter.toReservationDetailResDTO(reservation);
     }
 
+    @Override
+    public Page<ReservationResDTO.ReservationDetailResDTO> getReservationListForSpaceOwner(long userId, Pageable pageable) {
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+
+        Page<Reservation> reservationPage = reservationRepository.findBySpaceOwner(user, pageable);
+
+        return reservationPage.map(ReservationConverter::toReservationDetailResDTO);
+    }
 }
 
 

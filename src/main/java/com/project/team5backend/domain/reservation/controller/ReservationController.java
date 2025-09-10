@@ -6,6 +6,7 @@ import com.project.team5backend.domain.reservation.service.command.ReservationCo
 import com.project.team5backend.domain.reservation.service.query.ReservationQueryService;
 import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.global.security.userdetails.CurrentUser;
+import com.project.team5backend.global.util.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
@@ -45,6 +46,16 @@ public class ReservationController {
         return CustomResponse.onSuccess(reservationQueryService.getReservationDetail(currentUser.getId(), reservationId));
     }
 
+    @Operation(summary = "예약 목록 조회 (호스트 전용)", description = "내가 등록한 공간에 대한 예약 목록 조회")
+    @GetMapping("/reservations/host")
+    public CustomResponse<PageResponse<ReservationResDTO.ReservationDetailResDTO>> getReservationList(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        return CustomResponse.onSuccess(PageResponse.of(reservationQueryService.getReservationListForSpaceOwner(currentUser.getId(), pageable)));
+    }
 }
 
 
