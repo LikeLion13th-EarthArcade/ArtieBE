@@ -1,6 +1,5 @@
 package com.project.team5backend.domain.reservation.dto.response;
 
-import com.project.team5backend.domain.reservation.entity.ReservationStatus;
 import com.project.team5backend.global.entity.enums.Status;
 import lombok.Builder;
 

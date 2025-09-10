@@ -3,7 +3,6 @@ package com.project.team5backend.domain.reservation.service.query;
 import com.project.team5backend.domain.reservation.converter.ReservationConverter;
 import com.project.team5backend.domain.reservation.dto.response.ReservationResDTO;
 import com.project.team5backend.domain.reservation.entity.Reservation;
-import com.project.team5backend.domain.reservation.entity.ReservationStatus;
 import com.project.team5backend.domain.reservation.exception.ReservationErrorCode;
 import com.project.team5backend.domain.reservation.exception.ReservationException;
 import com.project.team5backend.domain.reservation.repository.CustomReservationRepository;
@@ -13,7 +12,7 @@ import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.user.exception.UserErrorCode;
 import com.project.team5backend.domain.user.exception.UserException;
 import com.project.team5backend.domain.user.repository.UserRepository;
-import com.project.team5backend.global.entity.enums.Status;
+import com.project.team5backend.global.entity.enums.StatusGroup;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -48,22 +47,22 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     }
 
     @Override
-    public Page<ReservationResDTO.ReservationDetailResDTO> getReservationListForSpaceOwner(long userId, Status status, Pageable pageable) {
+    public Page<ReservationResDTO.ReservationDetailResDTO> getReservationListForSpaceOwner(long userId, StatusGroup statusGroup, Pageable pageable) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
-        Page<Reservation> reservationPage = customReservationRepository.findBySpaceOwnerWithFilters(user, status, pageable);
+        Page<Reservation> reservationPage = customReservationRepository.findBySpaceOwnerWithFilters(user, statusGroup, pageable);
 
         return reservationPage.map(ReservationConverter::toReservationDetailResDTO);
     }
 
     @Override
-    public Page<ReservationResDTO.ReservationDetailResDTO> getMyReservationList(long userId, Status status, Pageable pageable) {
+    public Page<ReservationResDTO.ReservationDetailResDTO> getMyReservationList(long userId, StatusGroup statusGroup, Pageable pageable) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
-        Page<Reservation> reservationPage = customReservationRepository.findByUserWithFilters(user, status, pageable);
+        Page<Reservation> reservationPage = customReservationRepository.findByUserWithFilters(user, statusGroup, pageable);
 
         return reservationPage.map(ReservationConverter::toReservationDetailResDTO);
     }
