@@ -11,4 +11,6 @@ public interface ReservationCommandService {
     ReservationResDTO.ReservationStatusResDTO approveRequest(long userId, long reservationId);
 
     ReservationResDTO.ReservationStatusResDTO rejectRequest(long userId, long reservationId, ReservationReqDTO.ReservationRejectReqDTO reservationRejectReqDTO);
+
+    ReservationResDTO.ReservationStatusResDTO requestCancellation(long userId, long reservationId, ReservationReqDTO.ReservationCancellationReqDTO reservationCancellationReqDTO);
 }

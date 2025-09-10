@@ -5,6 +5,8 @@ public enum Status {
     APPROVED,   // 호스트의 예약 확정                   & 관리자의 전시/공간 승인
     REJECTED,   // 거절
 
+    CANCELED, // PENDING 상태에서 예약자의 취소
+
     BOOKER_CANCEL_REQUESTED, // 예약자의 취소 요청
     CANCELED_BY_BOOKER,    // 예약자의 요청으로 취소 완료
     BOOKER_CANCEL_REJECTED, // 예약자의 취소 요청 거절

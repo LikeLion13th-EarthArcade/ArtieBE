@@ -33,7 +33,9 @@ public class Reservation extends BaseTimeEntity {
 
     private String message;
 
-    private String cancelReason;
+    private String hostCancelReason;
+
+    private String bookerCancelReason;
 
     @Enumerated(EnumType.STRING)
     private Status status;
@@ -51,8 +53,12 @@ public class Reservation extends BaseTimeEntity {
         this.status = status;
     }
 
-    public void changeCancelReason(String cancelReason) {
-        this.cancelReason = cancelReason;
+    public void changeHostCancelReason(String hostCancelReason) {
+        this.hostCancelReason = hostCancelReason;
+    }
+
+    public void changeBookerCancelReason(String bookerCancelReason) {
+        this.bookerCancelReason = bookerCancelReason;
     }
 }
 

@@ -25,7 +25,8 @@ public class ReservationResDTO {
             String email,
             String phoneNumber,
             String message,
-            String cancelReason,
+            String hostCancelReason,
+            String bookerCancelReason,
             Status status
     ) {
     }

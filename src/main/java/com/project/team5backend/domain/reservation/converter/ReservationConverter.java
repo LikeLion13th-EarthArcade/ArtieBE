@@ -44,7 +44,8 @@ public class ReservationConverter {
                 .email(reservation.getEmail())
                 .phoneNumber(reservation.getPhoneNumber())
                 .message(reservation.getMessage())
-                .cancelReason(reservation.getCancelReason())
+                .hostCancelReason(reservation.getHostCancelReason())
+                .bookerCancelReason(reservation.getBookerCancelReason())
                 .status(reservation.getStatus())
                 .build();
     }

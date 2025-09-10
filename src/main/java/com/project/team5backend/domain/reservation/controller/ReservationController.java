@@ -103,6 +103,16 @@ public class ReservationController {
     ) {
         return CustomResponse.onSuccess(reservationCommandService.rejectRequest(currentUser.getId(), reservationId, reservationRejectReqDTO));
     }
+
+    @Operation(summary = "예약 취소 요청 (예약자 전용)", description = "PENDING인 경우에는 CANCELED APPROVE인 경우에는 BOOKER_CANCEL_REQUESTED")
+    @PostMapping("/reservations/{reservationId}/booker/cancel-request")
+    public CustomResponse<ReservationResDTO.ReservationStatusResDTO> requestCancellation(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @PathVariable long reservationId,
+            @RequestBody @Valid ReservationReqDTO.ReservationCancellationReqDTO reservationCancellationReqDTO
+    ) {
+        return CustomResponse.onSuccess(reservationCommandService.requestCancellation(currentUser.getId(), reservationId, reservationCancellationReqDTO));
+    }
 }
 
 

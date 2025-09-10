@@ -76,7 +76,25 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
             case BOOKER_CANCEL_REQUESTED -> reservation.changeStatus(Status.BOOKER_CANCEL_REJECTED);
             case APPROVED ->  reservation.changeStatus(Status.CANCELED_BY_HOST);
         }
-        reservation.changeCancelReason(reservation.getCancelReason());
+        reservation.changeHostCancelReason(reservation.getHostCancelReason());
+
+        return ReservationConverter.toReservationStatusResDTO(reservation);
+    }
+
+    @Override
+    public ReservationResDTO.ReservationStatusResDTO requestCancellation(long userId, long reservationId, ReservationReqDTO.ReservationCancellationReqDTO reservationCancellationReqDTO) {
+        Reservation reservation = validateReservation(userId, reservationId);
+
+        Status status = reservation.getStatus();
+
+        if (!(status == Status.PENDING || status == Status.APPROVED)) {
+            throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_IS_NOT_CANCELLABLE);
+        }
+        switch (status) {
+            case PENDING -> reservation.changeStatus(Status.CANCELED);
+            case APPROVED -> reservation.changeStatus(Status.BOOKER_CANCEL_REQUESTED);
+        }
+        reservation.changeHostCancelReason(reservationCancellationReqDTO.bookerCancelReason());
 
         return ReservationConverter.toReservationStatusResDTO(reservation);
     }
