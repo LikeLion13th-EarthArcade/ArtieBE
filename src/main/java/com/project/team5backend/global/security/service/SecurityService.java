@@ -1,11 +1,15 @@
 package com.project.team5backend.global.security.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.global.apiPayload.exception.CustomException;
 import com.project.team5backend.global.security.exception.SecurityErrorCode;
 import com.project.team5backend.global.security.util.JwtUtil;
 import com.project.team5backend.global.util.RedisUtils;
+import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;
@@ -30,12 +34,15 @@ public class SecurityService {
 
         // refresh token의 유효성 검사
         log.info("[ reissueCookie ] refresh token의 유효성을 검사합니다.");
-        jwtUtil.validateToken(refreshToken);
-
-        // redis 에 해당 refresh token이 존재하는지 검사
-        if (!Objects.equals(redisUtils.get(jwtUtil.getEmail(refreshToken) + KEY_REFRESH_SUFFIX), refreshToken)) {
-            // 서버에 리프레시 토큰이 없음 -> 재 로그인 안내
-            throw new CustomException(SecurityErrorCode.REQUIRED_RE_LOGIN);
+        try {
+            jwtUtil.validateToken(refreshToken);
+            // redis 에 해당 refresh token이 존재하는지 검사
+            if (!Objects.equals(redisUtils.get(jwtUtil.getEmail(refreshToken) + KEY_REFRESH_SUFFIX), refreshToken)) {
+                // 서버에 리프레시 토큰이 없음 -> 재 로그인 안내
+                throw new CustomException(SecurityErrorCode.REQUIRED_RE_LOGIN);
+            }
+        } catch (ExpiredJwtException e) {
+            throw new CustomException(SecurityErrorCode.EXPIRED_REFRESH_TOKEN);
         }
 
         // access token 재발급
