@@ -15,6 +15,7 @@ public class MessageConstant {
     public static final String BLANK_RESERVATION_START_DATE = "예약 시작 시간 누락";
     public static final String BLANK_RESERVATION_END_DATE = "예약 종료 시간 누락";
     public static final String BLANK_PHONE_NUMBER = "전화 번호 누락";
+    public static final String BLANK_RESERVATION_CANCEL_REASON = "취소 사유 누락";
 
 
     // PATTERN EXCEPTION

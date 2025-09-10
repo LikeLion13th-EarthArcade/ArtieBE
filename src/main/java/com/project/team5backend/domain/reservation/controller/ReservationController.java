@@ -99,7 +99,7 @@ public class ReservationController {
     public CustomResponse<ReservationResDTO.ReservationStatusResDTO> rejectRequest(
             @AuthenticationPrincipal CurrentUser currentUser,
             @PathVariable long reservationId,
-            @RequestBody ReservationReqDTO.ReservationRejectReqDTO reservationRejectReqDTO
+            @RequestBody @Valid ReservationReqDTO.ReservationRejectReqDTO reservationRejectReqDTO
     ) {
         return CustomResponse.onSuccess(reservationCommandService.rejectRequest(currentUser.getId(), reservationId, reservationRejectReqDTO));
     }

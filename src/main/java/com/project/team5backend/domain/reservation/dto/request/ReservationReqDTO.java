@@ -35,6 +35,7 @@ public class ReservationReqDTO {
     }
 
     public record ReservationRejectReqDTO(
+            @NotBlank(message = BLANK_RESERVATION_CANCEL_REASON)
             String cancelReason
     ) {
     }
