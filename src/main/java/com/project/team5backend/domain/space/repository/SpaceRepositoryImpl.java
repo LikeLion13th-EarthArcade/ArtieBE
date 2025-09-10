@@ -1,16 +1,15 @@
-package com.project.team5backend.domain.space.repository;
+package com.project.team5backend.domain.space.space.repository;
 
 import com.project.team5backend.domain.facility.entity.QFacility;
 import com.project.team5backend.domain.facility.entity.QSpaceFacility;
-import com.project.team5backend.domain.space.entity.QSpace;
-import com.project.team5backend.domain.space.entity.Space;
-import com.project.team5backend.domain.space.reservation.entity.QReservation;
+import com.project.team5backend.domain.reservation.entity.QReservation;
+import com.project.team5backend.domain.reservation.entity.ReservationStatus;
 import com.project.team5backend.global.entity.enums.Sort;
-import com.project.team5backend.domain.space.entity.enums.SpaceMood;
-import com.project.team5backend.domain.space.entity.enums.SpaceSize;
-import com.project.team5backend.domain.space.entity.enums.SpaceType;
+import com.project.team5backend.domain.space.space.entity.*;
+import com.project.team5backend.domain.space.space.entity.enums.SpaceMood;
+import com.project.team5backend.domain.space.space.entity.enums.SpaceSize;
+import com.project.team5backend.domain.space.space.entity.enums.SpaceType;
 import com.project.team5backend.global.entity.enums.Status;
-import com.project.team5backend.global.entity.enums.StatusGroup;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
@@ -22,7 +21,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -82,27 +80,6 @@ public class SpaceRepositoryImpl implements SpaceRepositoryCustom {
         return new PageImpl<>(content, pageable, total != null ? total : 0L);
     }
 
-    @Override
-    public Page<Space> findAdminSpacesByStatus(StatusGroup status, Pageable pageable){
-        QSpace space = QSpace.space;
-
-        Long total = queryFactory
-                .select(space.count())
-                .from(space)
-                .where(statusCondition(space, status))
-                .fetchOne();
-
-        List<Space> content = queryFactory
-                .selectFrom(space)
-                .where(statusCondition(space, status))
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-
-        return new PageImpl<>(content, pageable, total != null ? total : 0L);
-    }
-
-
     private BooleanExpression noOverlappingReservation(
             QReservation reservation,
             QSpace space,
@@ -117,7 +94,7 @@ public class SpaceRepositoryImpl implements SpaceRepositoryCustom {
                 .from(reservation)
                 .where(
                         reservation.space.eq(space),
-                        reservation.status.eq(Status.APPROVED),
+                        reservation.status.eq(ReservationStatus.CONFIRMED),
                         reservation.startDate.loe(requestedEndDate),
                         reservation.endDate.goe(requestedStartDate)
                 )
@@ -157,14 +134,5 @@ public class SpaceRepositoryImpl implements SpaceRepositoryCustom {
                         .groupBy(spaceFacility.space.id)
                         .having(spaceFacility.count().eq((long) facilities.size()))
         );
-    }
-
-    private BooleanExpression statusCondition(QSpace space, StatusGroup status) {
-        LocalDateTime sevenDaysAgo = LocalDate.now().minusDays(7).atStartOfDay();
-        return switch (status) {
-            case ALL -> space.createdAt.goe(sevenDaysAgo);
-            case PENDING -> space.status.eq(Status.PENDING).and(space.createdAt.goe(sevenDaysAgo));
-            case DONE -> space.status.in(Status.APPROVED, Status.REJECTED).and(space.createdAt.goe(sevenDaysAgo));
-        };
     }
 }

@@ -23,10 +23,13 @@ public enum GeneralErrorCode implements BaseErrorCode {
 
     VALIDATION_FAILED_DTO_FILED(HttpStatus.BAD_REQUEST, "VALID400_1", "잘못된 필드 입력입니다."),
 
-    INVALID_JSON_SYNTAX(HttpStatus.BAD_REQUEST, "HTTP400_1", "요청 본문의 JSON 문법이 잘못되었습니다"),
-    INVALID_FIELD_FORMAT(HttpStatus.BAD_REQUEST, "HTTP400_2","필드 값의 형식이 올바르지 않습니다."),
-    INVALID_INPUT(HttpStatus.BAD_REQUEST, "HTTP400_3","요청 본문의 형식이 올바르지 않습니다."),
-    BAD_REQUEST_BODY(HttpStatus.BAD_REQUEST, "HTTP400_4", "요청 본문을 읽을 수 없습니다."),
+    INVALID_JSON_SYNTAX(HttpStatus.BAD_REQUEST, "HTTP400_1", "요청 본문의 JSON 문법이 잘못됨 / e : JsonParseException"),
+    INVALID_FIELD_FORMAT(HttpStatus.BAD_REQUEST, "HTTP400_2","필드 값의 형식이 올바르지 않음 / e : InvalidFormatException"),
+    INVALID_INPUT(HttpStatus.BAD_REQUEST, "HTTP400_3","요청 본문의 형식이 올바르지 않음 / e : MismatchedInputException"),
+    BAD_REQUEST_BODY(HttpStatus.BAD_REQUEST, "HTTP400_4", "요청 본문을 읽을 수 없음 JSON 작성 오류일 가능성이 높을겁니다 아마도요 (정의되지 않은 400)"),
+
+    INVALID_LOCAL_DATE(HttpStatus.BAD_REQUEST, "LOCAL_DATE400", "YYYY-MM-DD 형식의 유효한 날짜만 허용"),
+    INVALID_ENUM(HttpStatus.BAD_REQUEST, "ENUM400", "ENUM 입력 오류"),
     ;
 
     // 필요한 필드값 선언

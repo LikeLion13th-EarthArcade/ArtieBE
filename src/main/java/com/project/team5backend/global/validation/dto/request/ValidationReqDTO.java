@@ -5,32 +5,32 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
 import static com.project.team5backend.global.constant.valid.MessageConstant.*;
-import static com.project.team5backend.global.constant.valid.PatternConstant.USER_BIZ_NUMBER_PATTERN;
-import static com.project.team5backend.global.constant.valid.PatternConstant.USER_CODE_PATTERN;
+import static com.project.team5backend.global.constant.valid.PatternConstant.BIZ_NUMBER_PATTERN;
+import static com.project.team5backend.global.constant.valid.PatternConstant.VALIDATION_CODE_PATTERN;
 
 public class ValidationReqDTO {
 
     public record EmailCodeReqDTO(
-            @NotBlank(message = USER_BLANK_EMAIL)
+            @NotBlank(message = BLANK_EMAIL)
             @Email
             String email
     ) {
     }
 
     public record EmailCodeValidationReqDTO(
-            @NotBlank(message = USER_BLANK_EMAIL)
+            @NotBlank(message = BLANK_EMAIL)
             @Email
             String email,
 
-            @NotBlank(message = USER_BLANK_CODE)
-            @Pattern(regexp = USER_CODE_PATTERN, message = USER_WRONG_CODE)
+            @NotBlank(message = BLANK_VALIDATION_CODE)
+            @Pattern(regexp = VALIDATION_CODE_PATTERN, message = WRONG_VALIDATION_CODE_PATTERN)
             String code
     ) {
     }
 
     public record BizNumberValidationReqDTO(
-            @NotBlank(message = USER_BLANK_BIZ_NUMBER)
-            @Pattern(regexp = USER_BIZ_NUMBER_PATTERN, message = USER_WRONG_BIZ_NUMBER)
+            @NotBlank(message = BLANK_BIZ_NUMBER)
+            @Pattern(regexp = BIZ_NUMBER_PATTERN, message = WRONG_BIZ_NUMBER_PATTERN)
             String bizNumber
     ) {
     }
