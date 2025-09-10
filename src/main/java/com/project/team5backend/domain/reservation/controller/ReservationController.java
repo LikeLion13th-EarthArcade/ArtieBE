@@ -46,15 +46,19 @@ public class ReservationController {
         return CustomResponse.onSuccess(reservationQueryService.getReservationDetail(currentUser.getId(), reservationId));
     }
 
-    @Operation(summary = "예약 목록 조회 (호스트 전용)", description = "내가 등록한 공간에 대한 예약 목록 조회")
+    @Operation(summary = "예약 목록 조회 (호스트 전용)",
+            description = "내가 등록한 공간에 대한 예약 목록 조회 <br>" +
+                    "status의 경우에는 입력하지 않으면 전체 목록이 나온다. <br>" +
+                    "PENDING : 호스트 승인 대기, CONFIRMED : 호스트 승인 완료, CANCELED : 취소된 예약, DONE : 만료된 과거 예약 기록")
     @GetMapping("/reservations/host")
     public CustomResponse<PageResponse<ReservationResDTO.ReservationDetailResDTO>> getReservationList(
             @AuthenticationPrincipal CurrentUser currentUser,
+            @RequestParam(required = false) ReservationStatus status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        return CustomResponse.onSuccess(PageResponse.of(reservationQueryService.getReservationListForSpaceOwner(currentUser.getId(), pageable)));
+        return CustomResponse.onSuccess(PageResponse.of(reservationQueryService.getReservationListForSpaceOwner(currentUser.getId(), status, pageable)));
     }
 }
 
