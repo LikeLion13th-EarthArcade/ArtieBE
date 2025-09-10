@@ -33,4 +33,19 @@ public class ReservationConverter {
                 .endDate(reservation.getEndDate())
                 .build();
     }
+
+    public static ReservationResDTO.ReservationDetailResDTO toReservationDetailResDTO(Reservation reservation) {
+        return ReservationResDTO.ReservationDetailResDTO.builder()
+                .spaceId(reservation.getSpace().getId())
+                .reservationId(reservation.getId())
+                .startDate(reservation.getStartDate())
+                .endDate(reservation.getEndDate())
+                .name(reservation.getName())
+                .email(reservation.getEmail())
+                .phoneNumber(reservation.getPhoneNumber())
+                .message(reservation.getMessage())
+                .cancelReason(reservation.getCancelReason())
+                .status(reservation.getStatus())
+                .build();
+    }
 }
