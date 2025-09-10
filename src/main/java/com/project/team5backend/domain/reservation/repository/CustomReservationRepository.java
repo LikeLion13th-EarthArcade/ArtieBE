@@ -10,4 +10,6 @@ import org.springframework.data.domain.Pageable;
 public interface CustomReservationRepository {
 
     Page<Reservation> findBySpaceOwnerWithFilters(User user, ReservationStatus status, Pageable pageable);
+
+    Page<Reservation> findByUserWithFilters(User user, ReservationStatus status, Pageable pageable);
 }

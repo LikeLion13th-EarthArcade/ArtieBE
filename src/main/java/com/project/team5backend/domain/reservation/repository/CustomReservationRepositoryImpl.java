@@ -54,5 +54,33 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
 
         return new PageImpl<>(content, pageable, total != null ? total : 0L);
     }
+
+    @Override
+    public Page<Reservation> findByUserWithFilters(User user, ReservationStatus status, Pageable pageable) {
+        QReservation reservation = QReservation.reservation;
+
+        BooleanBuilder builder = new BooleanBuilder()
+                .and(reservation.user.eq(user));
+
+        if (status != null) {
+            builder.and(reservation.status.eq(status));
+        }
+
+        List<Reservation> content = queryFactory
+                .selectFrom(reservation)
+                .where(builder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(reservation.createdAt.desc())
+                .fetch();
+
+        Long total = queryFactory
+                .select(reservation.count())
+                .from(reservation)
+                .where(builder)
+                .fetchOne();
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0L);
+    }
 }
 

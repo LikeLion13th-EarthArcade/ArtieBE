@@ -2,9 +2,11 @@ package com.project.team5backend.domain.reservation.controller;
 
 import com.project.team5backend.domain.reservation.dto.request.ReservationReqDTO;
 import com.project.team5backend.domain.reservation.dto.response.ReservationResDTO;
+import com.project.team5backend.domain.reservation.entity.ReservationStatus;
 import com.project.team5backend.domain.reservation.service.command.ReservationCommandService;
 import com.project.team5backend.domain.reservation.service.query.ReservationQueryService;
 import com.project.team5backend.global.apiPayload.CustomResponse;
+import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.global.security.userdetails.CurrentUser;
 import com.project.team5backend.global.util.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -59,6 +61,18 @@ public class ReservationController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         return CustomResponse.onSuccess(PageResponse.of(reservationQueryService.getReservationListForSpaceOwner(currentUser.getId(), status, pageable)));
+    }
+
+    @Operation(summary = "예약 목록 조회 (예약자 전용)", description = "내가 예약한 목록 조회")
+    @GetMapping("/reservations/my")
+    public CustomResponse<PageResponse<ReservationResDTO.ReservationDetailResDTO>> getMyReservationList(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @RequestParam(required = false) ReservationStatus status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        return CustomResponse.onSuccess(PageResponse.of(reservationQueryService.getMyReservationList(currentUser.getId(), status, pageable)));
     }
 }
 

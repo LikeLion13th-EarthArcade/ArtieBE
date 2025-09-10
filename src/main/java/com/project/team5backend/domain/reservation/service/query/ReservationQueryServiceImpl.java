@@ -13,7 +13,6 @@ import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.user.exception.UserErrorCode;
 import com.project.team5backend.domain.user.exception.UserException;
 import com.project.team5backend.domain.user.repository.UserRepository;
-import com.project.team5backend.global.entity.enums.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -54,6 +53,16 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
         Page<Reservation> reservationPage = customReservationRepository.findBySpaceOwnerWithFilters(user, status, pageable);
+
+        return reservationPage.map(ReservationConverter::toReservationDetailResDTO);
+    }
+
+    @Override
+    public Page<ReservationResDTO.ReservationDetailResDTO> getMyReservationList(long userId, ReservationStatus status, Pageable pageable) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+
+        Page<Reservation> reservationPage = customReservationRepository.findByUserWithFilters(user, status, pageable);
 
         return reservationPage.map(ReservationConverter::toReservationDetailResDTO);
     }
