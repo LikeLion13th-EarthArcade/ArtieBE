@@ -46,7 +46,7 @@ public class SpaceReviewCommandServiceImpl implements SpaceReviewCommandService 
     @Override
     public SpaceReviewResDTO.CreateSpaceReviewResDTO createSpaceReview(long spaceId, long userId, SpaceReviewReqDTO.CreateSpaceReviewReqDTO request, List<MultipartFile> images) {
         Space space = spaceRepository.findById(spaceId)
-                .orElseThrow(() -> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
+                .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 

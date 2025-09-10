@@ -93,7 +93,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
         User user = userRepository.findById(userId)
                 .orElseThrow(()-> new UserException(UserErrorCode.USER_NOT_FOUND));
         Space space = spaceRepository.findById(spaceId)
-                .orElseThrow(()-> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
+                .orElseThrow(()-> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
 
         boolean alreadyLiked = spaceLikeRepository.existsByUserIdAndSpaceId(userId, spaceId);
 
@@ -107,7 +107,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
     @Override
     public void deleteSpace(long spaceId, long userId) {
         Space space = spaceRepository.findByIdAndIsDeletedFalseAndStatusApproved(spaceId, Status.APPROVED)
-                .orElseThrow(() -> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
+                .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
 
         space.softDelete();
 

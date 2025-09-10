@@ -2,7 +2,6 @@ package com.project.team5backend.domain.admin.space.service.query;
 
 import com.project.team5backend.domain.admin.space.converter.AdminSpaceConverter;
 import com.project.team5backend.domain.admin.space.dto.response.AdminSpaceResDTO;
-import com.project.team5backend.domain.image.converter.ImageConverter;
 import com.project.team5backend.domain.image.repository.SpaceImageRepository;
 import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.space.exception.SpaceErrorCode;

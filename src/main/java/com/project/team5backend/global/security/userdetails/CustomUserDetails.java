@@ -31,7 +31,7 @@ public class CustomUserDetails extends CurrentUser implements UserDetails {
     // 권한을 불변 컬렉션으로 반환 (우리의 서비스는 단일 권한이라고 가정 (관리자 페이지 있으면 관리자 권한 추가))
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(new SimpleGrantedAuthority("ROLE_" + super.getRole().name()));
+        return List.of(new SimpleGrantedAuthority(super.getRole().name()));
     }
 
     @Override
