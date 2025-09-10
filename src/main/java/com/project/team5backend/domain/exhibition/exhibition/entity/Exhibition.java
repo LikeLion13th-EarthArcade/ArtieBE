@@ -78,6 +78,7 @@ public class Exhibition extends BaseTimeEntity {
     private boolean isDeleted;
 
     @OneToMany(mappedBy = "exhibition", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<ExhibitionFacility> exhibitionFacilities = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
