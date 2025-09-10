@@ -1,8 +1,8 @@
 package com.project.team5backend.domain.exhibition.exhibition.repository;
 
 import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Category;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Mood;
+import com.project.team5backend.domain.exhibition.exhibition.entity.enums.ExhibitionCategory;
+import com.project.team5backend.domain.exhibition.exhibition.entity.enums.ExhibitionMood;
 import com.project.team5backend.global.entity.enums.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,6 +24,14 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
         and e.status =:status
     """)
     Optional<Exhibition> findByIdAndIsDeletedFalseAndStatusApprove(@Param("exhibitionId") Long exhibitionId, @Param("status") Status status);
+
+    @Query("""
+        select e from Exhibition e
+        where e.id = :exhibitionId
+        and e.isDeleted = false
+    """)
+    Optional<Exhibition> findByIdAndIsDeletedFalse(@Param("exhibitionId") Long exhibitionId);
+
     //삭제되지않았고, 승인되고, 진행중인 전시
     @Query("""
         select e from Exhibition e
@@ -61,7 +69,7 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
       SELECT e.*,
             ROW_NUMBER() OVER (
              PARTITION BY e.district
-             ORDER BY e.rating_count DESC, e.updated_at DESC, e.id DESC
+             ORDER BY e.rating_count DESC, e.updated_at DESC, e.exhibition_id DESC
            ) rn
       FROM exhibition e
      WHERE e.is_deleted = false
@@ -71,7 +79,7 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
     )
     SELECT * FROM ranked
     WHERE rn = 1
-    ORDER BY rating_count DESC, updated_at DESC, id DESC
+    ORDER BY rating_count DESC, updated_at DESC, exhibition_id DESC
     """, nativeQuery = true)
     List<Exhibition> findTopByDistrict(@Param("current") LocalDate current, Pageable pageable, @Param("status") Status status);
 
@@ -116,15 +124,14 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
         WHERE e.isDeleted = false
           AND e.status = :status
           AND e.startDate <= :today AND e.endDate >= :today
-          AND (e.category = :category OR e.mood = :mood)
+          AND (e.exhibitionCategory = :exhibitionCategory OR e.exhibitionMood = :exhibitionMood)
         ORDER BY (e.reviewCount + e.totalReviewScore) DESC
         """)
     List<Exhibition> recommendByKeywords(
-            @Param("category") Category category,
-            @Param("mood") Mood mood,
+            @Param("exhibitionCategory") ExhibitionCategory exhibitionCategory,
+            @Param("exhibitionMood") ExhibitionMood exhibitionMood,
             @Param("status") Status status,
             @Param("today") LocalDate today,
             org.springframework.data.domain.Pageable pageable
     );
-    List<Exhibition> findByUserId(Long userId);
 }

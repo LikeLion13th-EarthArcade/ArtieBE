@@ -1,8 +1,8 @@
 package com.project.team5backend.domain.recommendation.dto.response;
 
 import com.project.team5backend.domain.exhibition.exhibition.dto.response.ExhibitionResDTO;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Category;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Mood;
+import com.project.team5backend.domain.exhibition.exhibition.entity.enums.ExhibitionCategory;
+import com.project.team5backend.domain.exhibition.exhibition.entity.enums.ExhibitionMood;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -25,8 +25,8 @@ public class RecommendResDTO {
             Boolean isLiked
     ) {}
     public record PersonalizedDetailResDTO(
-            Category topCategory,
-            Mood topMood,
+            ExhibitionCategory topExhibitionCategory,
+            ExhibitionMood topExhibitionMood,
             List<ExhibitionResDTO.ExhibitionCardResDTO> items
     ) {}
 }

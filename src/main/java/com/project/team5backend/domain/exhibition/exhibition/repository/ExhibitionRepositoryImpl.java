@@ -2,13 +2,17 @@ package com.project.team5backend.domain.exhibition.exhibition.repository;
 
 import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.exhibition.exhibition.entity.QExhibition;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Category;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Mood;
+import com.project.team5backend.domain.exhibition.exhibition.entity.enums.ExhibitionCategory;
+import com.project.team5backend.domain.exhibition.exhibition.entity.enums.ExhibitionMood;
+import com.project.team5backend.domain.space.entity.QSpace;
+import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.global.entity.enums.Status;
+import com.project.team5backend.global.entity.enums.StatusGroup;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -27,7 +32,7 @@ public class ExhibitionRepositoryImpl implements ExhibitionRepositoryCustom {
 
     @Override
     public Page<Exhibition> findExhibitionsWithFilters(
-            Category category, String district, Mood mood, LocalDate localDate,
+            ExhibitionCategory exhibitionCategory, String district, ExhibitionMood exhibitionMood, LocalDate localDate,
             Sort sort, Pageable pageable) {
 
         QExhibition exhibition = QExhibition.exhibition;
@@ -49,8 +54,8 @@ public class ExhibitionRepositoryImpl implements ExhibitionRepositoryCustom {
         }
 
         // 카테고리 필터
-        if (category != null) {
-            builder.and(exhibition.category.eq(category));
+        if (exhibitionCategory != null) {
+            builder.and(exhibition.exhibitionCategory.eq(exhibitionCategory));
         }
 
         // 지역 필터 (Address 엔티티의 roadAddress 필드 사용)
@@ -59,8 +64,8 @@ public class ExhibitionRepositoryImpl implements ExhibitionRepositoryCustom {
         }
 
         // 분위기 필터
-        if (mood != null) {
-            builder.and(exhibition.mood.eq(mood));
+        if (exhibitionMood != null) {
+            builder.and(exhibition.exhibitionMood.eq(exhibitionMood));
         }
 
         // 전체 개수 조회 (fetchCount 대신 fetch().size() 사용 - 최신 QueryDSL 버전 호환)
@@ -115,5 +120,34 @@ public class ExhibitionRepositoryImpl implements ExhibitionRepositoryCustom {
                 )
                 .limit(limit)
                 .fetch();
+    }
+
+    @Override
+    public Page<Exhibition> findAdminExhibitionsByStatus(StatusGroup status, Pageable pageable){
+        QExhibition exhibition = QExhibition.exhibition;
+
+        Long total = queryFactory
+                .select(exhibition.count())
+                .from(exhibition)
+                .where(statusCondition(exhibition, status))
+                .fetchOne();
+
+        List<Exhibition> content = queryFactory
+                .selectFrom(exhibition)
+                .where(statusCondition(exhibition, status))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0L);
+    }
+
+    private BooleanExpression statusCondition(QExhibition exhibition, StatusGroup status) {
+        LocalDateTime sevenDaysAgo = LocalDate.now().minusDays(7).atStartOfDay();
+        return switch (status) {
+            case ALL -> exhibition.createdAt.goe(sevenDaysAgo);
+            case PENDING -> exhibition.status.eq(Status.PENDING).and(exhibition.createdAt.goe(sevenDaysAgo));
+            case DONE -> exhibition.status.in(Status.APPROVED, Status.REJECTED).and(exhibition.createdAt.goe(sevenDaysAgo));
+        };
     }
 }

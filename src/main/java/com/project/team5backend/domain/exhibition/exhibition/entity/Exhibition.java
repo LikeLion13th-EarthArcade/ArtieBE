@@ -1,9 +1,9 @@
 package com.project.team5backend.domain.exhibition.exhibition.entity;
 
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Category;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Mood;
+import com.project.team5backend.domain.exhibition.exhibition.entity.enums.ExhibitionCategory;
+import com.project.team5backend.domain.exhibition.exhibition.entity.enums.ExhibitionMood;
+import com.project.team5backend.domain.exhibition.exhibition.entity.enums.ExhibitionType;
 import com.project.team5backend.global.entity.enums.Status;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Type;
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.global.entity.embedded.Address;
 import com.project.team5backend.global.entity.BaseTimeEntity;
@@ -13,6 +13,7 @@ import lombok.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,21 +39,22 @@ public class Exhibition extends BaseTimeEntity {
 
     private LocalDate endDate;
 
-    @Column(name = "opening_time")
-    private String openingTime;
+    @Column(nullable = false)
+    private LocalTime openTime; // 운영 시작 시간
+    @Column(nullable = false)
+    private LocalTime closeTime; // 운영 종료 시간
 
-    @Column(name = "homepage_url")
-    private String homepageUrl;
+    private String websiteUrl;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "category")
-    private Category category;
+    private ExhibitionCategory exhibitionCategory;
 
     @Enumerated(EnumType.STRING)
-    private Type type;
+    private ExhibitionType exhibitionType;
 
     @Enumerated(EnumType.STRING)
-    private Mood mood;
+    private ExhibitionMood exhibitionMood;
 
     @Enumerated(EnumType.STRING)
     private Status status;
@@ -76,6 +78,7 @@ public class Exhibition extends BaseTimeEntity {
     private boolean isDeleted;
 
     @OneToMany(mappedBy = "exhibition", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Builder.Default
     private List<ExhibitionFacility> exhibitionFacilities = new ArrayList<>();
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -109,5 +112,13 @@ public class Exhibition extends BaseTimeEntity {
 
     public void updateThumbnail(String thumbnail) {
         this.thumbnail = thumbnail;
+    }
+
+    public void approveExhibition() {
+        this.status = Status.APPROVED;
+    }
+
+    public void rejectExhibition() {
+        this.status = Status.REJECTED;
     }
 }

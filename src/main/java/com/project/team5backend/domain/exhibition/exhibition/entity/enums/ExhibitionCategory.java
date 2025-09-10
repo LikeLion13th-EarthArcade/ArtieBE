@@ -1,6 +1,6 @@
 package com.project.team5backend.domain.exhibition.exhibition.entity.enums;
 
-public enum Category {
+public enum ExhibitionCategory {
     PAINTING, // 회화
     SCULPTURE_INSTALLATION, // 조각 설치
     CRAFT_DESIGN, // 공예 디자인

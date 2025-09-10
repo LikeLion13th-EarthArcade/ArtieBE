@@ -29,30 +29,12 @@ public class AdminSpaceQueryServiceImpl implements AdminSpaceQueryService {
     private static final int PAGE_SIZE = 10;
 
     @Override
-    public Page<AdminSpaceResDTO.SpaceSummaryResDTO> getSpaceList(StatusGroup status, int page){
+    public Page<AdminSpaceResDTO.SpaceSummaryResDTO> getSummarySpaceList(StatusGroup status, int page){
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt"));
 
         Page<Space> spacePage = spaceRepository.findAdminSpacesByStatus(status, pageable);
 
         return spacePage.map(AdminSpaceConverter::toSpaceSummaryResDTO);
-    }
-
-    @Override
-    public AdminSpaceResDTO.SpaceStatusUpdateResDTO approveSpace(long spaceId){
-        Space space = spaceRepository.findByIdAndIsDeletedFalse(spaceId)
-                .orElseThrow(() -> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
-
-        space.approveSpace();
-        return AdminSpaceConverter.toSpaceStatusUpdateResDTO(space, "해당 공간이 승인되었습니다.");
-    }
-
-    @Override
-    public AdminSpaceResDTO.SpaceStatusUpdateResDTO rejectSpace(long spaceId){
-        Space space = spaceRepository.findByIdAndIsDeletedFalse(spaceId)
-                .orElseThrow(() -> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
-
-        space.rejectSpace();
-        return AdminSpaceConverter.toSpaceStatusUpdateResDTO(space, "해당 공간이 거절되었습니다.");
     }
 
     @Override

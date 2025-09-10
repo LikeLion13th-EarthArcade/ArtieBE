@@ -2,8 +2,8 @@ package com.project.team5backend.domain.recommendation.service;
 
 import com.project.team5backend.domain.exhibition.exhibition.converter.ExhibitionConverter;
 import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Category;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Mood;
+import com.project.team5backend.domain.exhibition.exhibition.entity.enums.ExhibitionCategory;
+import com.project.team5backend.domain.exhibition.exhibition.entity.enums.ExhibitionMood;
 import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.domain.exhibition.exhibition.repository.ExhibitionLikeRepository;
 import com.project.team5backend.domain.exhibition.exhibition.repository.ExhibitionRepository;
@@ -36,7 +36,7 @@ public class RecommendationService {
     private static final int LIMIT = 4;
     private static final int WINDOW_DAYS = 90;
 
-    private record Keys(Category cat, Mood mood, boolean eligible) {}
+    private record Keys(ExhibitionCategory cat, ExhibitionMood exhibitionMood, boolean eligible) {}
 
     private Keys computeKeys(Long userId){
         if (userId == null) return new Keys(null,null,false);
@@ -47,9 +47,9 @@ public class RecommendationService {
         KeyScoreRow mRow = logRepo.topMood(userId, since);
         if (cRow == null && mRow == null) return new Keys(null,null,false);
 
-        Category cat = (cRow != null) ? Category.valueOf(cRow.getKeyName()) : null;
-        Mood mood = (mRow != null) ? Mood.valueOf(mRow.getKeyName()) : null;
-        return new Keys(cat, mood, true);
+        ExhibitionCategory cat = (cRow != null) ? ExhibitionCategory.valueOf(cRow.getKeyName()) : null;
+        ExhibitionMood exhibitionMood = (mRow != null) ? ExhibitionMood.valueOf(mRow.getKeyName()) : null;
+        return new Keys(cat, exhibitionMood, true);
     }
 
     // 홈 요약(프리뷰 1개)
@@ -69,8 +69,8 @@ public class RecommendationService {
                 e.getTitle(),
                 e.getDescription(),
                 e.getThumbnail(),
-                String.valueOf(e.getCategory()),
-                String.valueOf(e.getMood()),
+                String.valueOf(e.getExhibitionCategory()),
+                String.valueOf(e.getExhibitionMood()),
                 e.getAddress().getRoadAddress(),
                 e.getStartDate(),
                 e.getEndDate(),
@@ -103,7 +103,7 @@ public class RecommendationService {
 
         return new RecommendResDTO.PersonalizedDetailResDTO(
                 k.cat(),
-                k.mood(),
+                k.exhibitionMood(),
                 items
         );
     }
@@ -113,7 +113,7 @@ public class RecommendationService {
         var today = LocalDate.now();
         // 후보는 넉넉히 (최소 100~200) 뽑아야 리랭킹이 작동합니다.
         var candidates = exhibitionRepo.recommendByKeywords(
-                k.cat(), k.mood(), Status.APPROVED, today, PageRequest.of(0, 200)
+                k.cat(), k.exhibitionMood(), Status.APPROVED, today, PageRequest.of(0, 200)
         );
         if (candidates.isEmpty()) return List.of();
 
@@ -123,11 +123,11 @@ public class RecommendationService {
         if (userVec == null) {
             // 유저 벡터 없으면 기본 정렬로 후처리만 적용
             List<Exhibition> sortedByDefault = candidates; // 이미 repo가 정렬해 주는 경우
-            if (k.cat() != null && k.mood() != null) {
+            if (k.cat() != null && k.exhibitionMood() != null) {
                 return Reranker.enforceAtLeastNAndMatches(
                         sortedByDefault, topK, 2,
-                        Exhibition::getId, Exhibition::getCategory, Exhibition::getMood,
-                        k.cat(), k.mood()
+                        Exhibition::getId, Exhibition::getExhibitionCategory, Exhibition::getExhibitionMood,
+                        k.cat(), k.exhibitionMood()
                 );
             }
             return sortedByDefault.stream().limit(topK).toList();
@@ -165,12 +165,12 @@ public class RecommendationService {
                 .map(Map.Entry::getKey)
                 .toList();
 
-        // 2) 리랭킹 적용: 4개 중 ≥2개는 (topCategory AND topMood)
-        if (k.cat() != null && k.mood() != null) {
+        // 2) 리랭킹 적용: 4개 중 ≥2개는 (topExhibitionCategory AND topExhibitionMood)
+        if (k.cat() != null && k.exhibitionMood() != null) {
             return Reranker.enforceAtLeastNAndMatches(
                     sortedByScoreDesc, topK, 2,
-                    Exhibition::getId, Exhibition::getCategory, Exhibition::getMood,
-                    k.cat(), k.mood()
+                    Exhibition::getId, Exhibition::getExhibitionCategory, Exhibition::getExhibitionMood,
+                    k.cat(), k.exhibitionMood()
             );
         }
 
