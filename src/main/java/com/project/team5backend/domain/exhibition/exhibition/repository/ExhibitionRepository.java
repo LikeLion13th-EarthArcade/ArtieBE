@@ -1,5 +1,7 @@
 package com.project.team5backend.domain.exhibition.exhibition.repository;
 
+import com.project.team5backend.domain.admin.dashboard.dto.response.AdminDashboardResDTO;
+import com.project.team5backend.domain.admin.dashboard.dto.response.ExhibitionSummaryResDTO;
 import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.exhibition.exhibition.entity.enums.ExhibitionCategory;
 import com.project.team5backend.domain.exhibition.exhibition.entity.enums.ExhibitionMood;
@@ -134,4 +136,19 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
             @Param("today") LocalDate today,
             org.springframework.data.domain.Pageable pageable
     );
+
+    @Query("select count(e) from Exhibition e where e.status = :status")
+    long findPendingExhibitionsCountByStatus(@Param("status") Status status);
+
+    @Query("""
+    select new com.project.team5backend.domain.admin.dashboard.dto.response.ExhibitionSummaryResDTO(
+        e.title, u.name, e.address.district, e.createdAt
+    )
+    from Exhibition e
+    join e.user u
+    where e.status = :status
+    order by e.createdAt desc
+    """)
+    List<ExhibitionSummaryResDTO> findTop3ByStatus(@Param("status") Status status);
 }
+

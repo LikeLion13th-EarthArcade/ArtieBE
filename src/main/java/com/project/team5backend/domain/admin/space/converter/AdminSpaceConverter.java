@@ -2,12 +2,10 @@ package com.project.team5backend.domain.admin.space.converter;
 
 import com.project.team5backend.domain.admin.space.dto.response.AdminSpaceResDTO;
 import com.project.team5backend.domain.space.entity.Space;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@NoArgsConstructor(access = AccessLevel.PROTECTED)
+
 public class AdminSpaceConverter {
     public static AdminSpaceResDTO.SpaceSummaryResDTO toSpaceSummaryResDTO(Space space){
         return AdminSpaceResDTO.SpaceSummaryResDTO.builder()

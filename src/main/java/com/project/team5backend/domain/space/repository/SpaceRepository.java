@@ -1,5 +1,6 @@
 package com.project.team5backend.domain.space.repository;
 
+import com.project.team5backend.domain.admin.dashboard.dto.response.SpaceSummaryResDTO;
 import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.global.entity.enums.Status;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -8,6 +9,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -52,5 +54,17 @@ public interface SpaceRepository extends JpaRepository<Space, Long>,SpaceReposit
         """)
     void applySpaceReviewDeleted(@Param("spaceId") Long spaceId, @Param("rating")  double rating);
 
+    @Query("select count(s) from Space s where s.status = :status")
+    long findPendingSpacesCountByStatus(@Param("status") Status status);
 
+    @Query("""
+    select new com.project.team5backend.domain.admin.dashboard.dto.response.SpaceSummaryResDTO(
+        s.name, u.name, s.address.district, s.createdAt
+    )
+    from Space s
+    join s.user u
+    where s.status = :status
+    order by s.createdAt desc
+    """)
+    List<SpaceSummaryResDTO> findTop3ByStatus(@Param("status") Status status);
 }
