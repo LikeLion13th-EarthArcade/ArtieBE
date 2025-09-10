@@ -15,6 +15,7 @@ import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.user.exception.UserErrorCode;
 import com.project.team5backend.domain.user.exception.UserException;
 import com.project.team5backend.domain.user.repository.UserRepository;
+import com.project.team5backend.global.entity.enums.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -44,7 +45,42 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     }
 
     @Override
-    public ReservationResDTO.ReservationStatusResDTO approveReservation(long userId, long reservationId) {
+    public ReservationResDTO.ReservationStatusResDTO approveRequest(long userId, long reservationId) {
+
+        Reservation reservation = validateReservation(userId, reservationId);
+
+        Status status = reservation.getStatus();
+
+        if (!(status == Status.PENDING || status == Status.BOOKER_CANCEL_REQUESTED)) {
+            throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_IS_NOT_APPROVABLE);
+        }
+
+        reservation.changeStatus(Status.APPROVED);
+
+        return ReservationConverter.toReservationStatusResDTO(reservation);
+    }
+
+    @Override
+    public ReservationResDTO.ReservationStatusResDTO rejectRequest(long userId, long reservationId, ReservationReqDTO.ReservationRejectReqDTO reservationRejectReqDTO) {
+        Reservation reservation = validateReservation(userId, reservationId);
+
+        Status status = reservation.getStatus();
+
+        if (!(status == Status.PENDING || status == Status.BOOKER_CANCEL_REQUESTED || status == Status.APPROVED)) {
+            throw new ReservationException(ReservationErrorCode.RESERVATION_STATUS_IS_NOT_REJECTABLE);
+        }
+        switch(reservation.getStatus()) {
+            case PENDING -> reservation.changeStatus(Status.REJECTED);
+            case BOOKER_CANCEL_REQUESTED -> reservation.changeStatus(Status.CANCELED_BY_BOOKER);
+            case APPROVED ->  reservation.changeStatus(Status.CANCELED_BY_HOST);
+        }
+        reservation.changeCancelReason(reservation.getCancelReason());
+
+        return ReservationConverter.toReservationStatusResDTO(reservation);
+    }
+
+    private Reservation validateReservation(long userId, long reservationId) {
+
         User user =  userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
@@ -55,9 +91,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
             throw new ReservationException(ReservationErrorCode.RESERVATION_ACCESS_DENIED);
         }
 
-        reservation.approve();
-
-        return ReservationConverter.toReservationStatusResDTO(reservation);
+        return reservation;
     }
 }
 

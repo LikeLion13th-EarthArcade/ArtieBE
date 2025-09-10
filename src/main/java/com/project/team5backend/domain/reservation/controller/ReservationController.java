@@ -83,13 +83,25 @@ public class ReservationController {
         return CustomResponse.onSuccess(PageResponse.of(reservationQueryService.getMyReservationList(currentUser.getId(), statusGroup, pageable)));
     }
 
-    @Operation(summary = "예약 확정 (호스트 전용)", description = "PENDING 상태의 예약을 호스트가 수락하여 APPROVED 상태로 전환")
-    @PostMapping("reservations/{reservationId}/host/approved")
-    public CustomResponse<ReservationResDTO.ReservationStatusResDTO> approveReservation(
+    @Operation(summary = "예약자의 요청 수락 (호스트 전용)",
+            description = "PENDING 상태의 예약을 호스트가 수락하여 APPROVED 상태로 전환 <br>" +
+            "또는 BOOKER_CANCEL_REQUESTED 상태를 수락해 예약을 취소해 줌")
+    @PostMapping("/reservations/{reservationId}/host/approval")
+    public CustomResponse<ReservationResDTO.ReservationStatusResDTO> approveRequest(
             @AuthenticationPrincipal CurrentUser currentUser,
             @PathVariable long reservationId
     ) {
-        return CustomResponse.onSuccess(reservationCommandService.approveReservation(currentUser.getId(), reservationId));
+        return CustomResponse.onSuccess(reservationCommandService.approveRequest(currentUser.getId(), reservationId));
+    }
+
+    @Operation(summary = "예약자의 요청 거절 (호스트 전용)", description = "PENDING 또는 APPROVE 상태의 예약을 취소하거나 BOOKER_CANCEL_REQUESTED를 거절할 수 있다")
+    @PostMapping("/reservations/{reservationId}/host/rejection")
+    public CustomResponse<ReservationResDTO.ReservationStatusResDTO> rejectRequest(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @PathVariable long reservationId,
+            @RequestBody ReservationReqDTO.ReservationRejectReqDTO reservationRejectReqDTO
+    ) {
+        return CustomResponse.onSuccess(reservationCommandService.rejectRequest(currentUser.getId(), reservationId, reservationRejectReqDTO));
     }
 }
 

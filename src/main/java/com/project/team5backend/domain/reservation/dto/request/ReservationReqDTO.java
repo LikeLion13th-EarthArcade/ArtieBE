@@ -33,4 +33,9 @@ public class ReservationReqDTO {
             String message
     ) {
     }
+
+    public record ReservationRejectReqDTO(
+            String cancelReason
+    ) {
+    }
 }

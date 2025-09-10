@@ -8,5 +8,7 @@ public interface ReservationCommandService {
 
     ReservationResDTO.ReservationCreateResDTO createReservation(long spaceId, long userId, ReservationReqDTO.ReservationCreateReqDTO reservationCreateReqDTO);
 
-    ReservationResDTO.ReservationStatusResDTO approveReservation(long userId, long reservationId);
+    ReservationResDTO.ReservationStatusResDTO approveRequest(long userId, long reservationId);
+
+    ReservationResDTO.ReservationStatusResDTO rejectRequest(long userId, long reservationId, ReservationReqDTO.ReservationRejectReqDTO reservationRejectReqDTO);
 }

@@ -46,14 +46,13 @@ public class Reservation extends BaseTimeEntity {
     @JoinColumn(name = "user_id")
     private User user; // 예약자
 
-    // 예약 확정
-    public void approve() {
-        this.status = Status.APPROVED;
+    // 변경 메서드
+    public void changeStatus(Status status) {
+        this.status = status;
     }
-    // 예약 취소
-    public void cancel(String reason) {
-        this.status = Status.REJECTED;
-        this.cancelReason = reason;
+
+    public void changeCancelReason(String cancelReason) {
+        this.cancelReason = cancelReason;
     }
 }
 
