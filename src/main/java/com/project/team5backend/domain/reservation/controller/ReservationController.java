@@ -84,7 +84,7 @@ public class ReservationController {
     }
 
     @Operation(summary = "예약 확정 (호스트 전용)", description = "PENDING 상태의 예약을 호스트가 수락하여 APPROVED 상태로 전환")
-    @PostMapping("reservations/{reservationId}/approved")
+    @PostMapping("reservations/{reservationId}/host/approved")
     public CustomResponse<ReservationResDTO.ReservationStatusResDTO> approveReservation(
             @AuthenticationPrincipal CurrentUser currentUser,
             @PathVariable long reservationId
