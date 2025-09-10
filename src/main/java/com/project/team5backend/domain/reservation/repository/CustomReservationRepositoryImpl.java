@@ -63,19 +63,9 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
                 .and(reservation.user.eq(user))
                 .and(statusGroupCondition(statusGroup));
 
-        List<Reservation> content = queryFactory
-                .selectFrom(reservation)
-                .where(builder)
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .orderBy(reservation.createdAt.desc())
-                .fetch();
+        List<Reservation> content = findReservations(reservation, builder, pageable);
 
-        Long total = queryFactory
-                .select(reservation.count())
-                .from(reservation)
-                .where(builder)
-                .fetchOne();
+        Long total = countReservation(reservation, builder);
 
         return new PageImpl<>(content, pageable, total != null ? total : 0L);
     }
@@ -87,19 +77,9 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
         BooleanBuilder builder = new BooleanBuilder()
                 .and(statusGroupCondition(statusGroup));
 
-        List<Reservation> content = queryFactory
-                .selectFrom(reservation)
-                .where(builder)
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .orderBy(reservation.createdAt.desc())
-                .fetch();
+        List<Reservation> content = findReservations(reservation, builder, pageable);
 
-        Long total = queryFactory
-                .select(reservation.count())
-                .from(reservation)
-                .where(builder)
-                .fetchOne();
+        Long total = countReservation(reservation, builder);
 
         return new PageImpl<>(content, pageable, total != null ? total : 0L);
     }
@@ -124,7 +104,7 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
         };
     }
 
-    private List<Reservation> getContent(QReservation reservation, BooleanBuilder builder, Pageable pageable) {
+    private List<Reservation> findReservations(QReservation reservation, BooleanBuilder builder, Pageable pageable) {
         return queryFactory
                 .selectFrom(reservation)
                 .where(builder)
@@ -132,6 +112,14 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
                 .limit(pageable.getPageSize())
                 .orderBy(reservation.createdAt.desc())
                 .fetch();
+    }
+
+    private Long countReservation(QReservation reservation, BooleanBuilder builder) {
+        return queryFactory
+                .select(reservation.count())
+                .from(reservation)
+                .where(builder)
+                .fetchOne();
     }
 }
 
