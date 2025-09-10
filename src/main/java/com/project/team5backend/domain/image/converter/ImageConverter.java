@@ -1,6 +1,6 @@
 package com.project.team5backend.domain.image.converter;
 
-import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
+import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.exhibition.review.entity.ExhibitionReview;
 import com.project.team5backend.domain.image.entity.ExhibitionImage;
 import com.project.team5backend.domain.image.entity.ExhibitionReviewImage;

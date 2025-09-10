@@ -1,7 +1,7 @@
 package com.project.team5backend.domain.admin.exhibition.converter;
 
 import com.project.team5backend.domain.admin.exhibition.dto.response.AdminExhibitionResDTO;
-import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
+import com.project.team5backend.domain.exhibition.entity.Exhibition;
 
 import java.util.List;
 

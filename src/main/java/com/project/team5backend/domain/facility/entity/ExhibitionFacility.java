@@ -1,6 +1,6 @@
 package com.project.team5backend.domain.facility.entity;
 
-import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
+import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import jakarta.persistence.*;
 import lombok.*;
 

@@ -2,10 +2,10 @@ package com.project.team5backend.domain.admin.exhibition.service.command;
 
 import com.project.team5backend.domain.admin.exhibition.converter.AdminExhibitionConverter;
 import com.project.team5backend.domain.admin.exhibition.dto.response.AdminExhibitionResDTO;
-import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
-import com.project.team5backend.domain.exhibition.exhibition.exception.ExhibitionErrorCode;
-import com.project.team5backend.domain.exhibition.exhibition.exception.ExhibitionException;
-import com.project.team5backend.domain.exhibition.exhibition.repository.ExhibitionRepository;
+import com.project.team5backend.domain.exhibition.entity.Exhibition;
+import com.project.team5backend.domain.exhibition.exception.ExhibitionErrorCode;
+import com.project.team5backend.domain.exhibition.exception.ExhibitionException;
+import com.project.team5backend.domain.exhibition.repository.ExhibitionRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

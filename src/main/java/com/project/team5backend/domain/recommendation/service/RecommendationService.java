@@ -1,12 +1,12 @@
 package com.project.team5backend.domain.recommendation.service;
 
-import com.project.team5backend.domain.exhibition.exhibition.converter.ExhibitionConverter;
-import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.ExhibitionCategory;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.ExhibitionMood;
+import com.project.team5backend.domain.exhibition.converter.ExhibitionConverter;
+import com.project.team5backend.domain.exhibition.entity.Exhibition;
+import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionCategory;
+import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionMood;
 import com.project.team5backend.global.entity.enums.Status;
-import com.project.team5backend.domain.exhibition.exhibition.repository.ExhibitionLikeRepository;
-import com.project.team5backend.domain.exhibition.exhibition.repository.ExhibitionRepository;
+import com.project.team5backend.domain.exhibition.repository.ExhibitionLikeRepository;
+import com.project.team5backend.domain.exhibition.repository.ExhibitionRepository;
 import com.project.team5backend.domain.recommendation.dto.KeyScoreRow;
 import com.project.team5backend.domain.recommendation.dto.response.RecommendResDTO;
 import com.project.team5backend.domain.recommendation.entity.ExhibitionEmbedding;
