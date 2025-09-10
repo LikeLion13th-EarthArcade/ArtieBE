@@ -14,7 +14,7 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
 
     @Query("SELECT r " +
             "FROM Reservation r " +
-            "WHERE r.space.user = :user ")
+            "WHERE r.space.user = :user AND r.status = 'PENDING'")
     Page<Reservation> findBySpaceOwner(
             @Param("user") User user,
             Pageable pageable
