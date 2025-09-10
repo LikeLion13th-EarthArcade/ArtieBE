@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.team5backend.domain.auth.dto.request.AuthReqDTO;
 import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.global.apiPayload.exception.CustomException;
-import com.project.team5backend.global.security.dto.JwtDTO;
 import com.project.team5backend.global.security.exception.SecurityErrorCode;
 import com.project.team5backend.global.security.repository.CustomCookieCsrfTokenRepository;
 import com.project.team5backend.global.security.userdetails.CustomUserDetails;
@@ -98,16 +97,8 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
         CsrfToken csrfToken = customCookieCsrfTokenRepository.generateToken(request);
         customCookieCsrfTokenRepository.saveToken(csrfToken, request, response);
 
-
-        //Client 에게 줄 Response 를 Build
-        JwtDTO jwtDTO = JwtDTO.builder()
-                .message("쿠키에 저장되었습니다.")
-                .accessToken(accessToken) //access token 생성
-                .refreshToken(refreshToken) //refresh token 생성
-                .build();
-
         // CustomResponse 사용하여 응답 통일
-        CustomResponse<JwtDTO> responseBody = CustomResponse.onSuccess(jwtDTO);
+        CustomResponse<String> responseBody = CustomResponse.onSuccess("쿠키에 저장되었습니다.");
 
         //JSON 변환
         ObjectMapper objectMapper = new ObjectMapper();
@@ -150,7 +141,7 @@ public class CustomLoginFilter extends UsernamePasswordAuthenticationFilter {
         }
 
         // CustomResponse 사용하여 응답 통일
-        CustomResponse<JwtDTO> responseBody = CustomResponse.onFailure(errorCode, errorMessage);
+        CustomResponse<Object> responseBody = CustomResponse.onFailure(errorCode, errorMessage);
 
         ObjectMapper objectMapper = new ObjectMapper();
         response.setStatus(Integer.parseInt(errorCode)); // HTTP 상태 코드 설정
