@@ -3,10 +3,12 @@ package com.project.team5backend.domain.reservation.repository;
 import com.project.team5backend.domain.reservation.entity.QReservation;
 import com.project.team5backend.domain.reservation.entity.Reservation;
 import com.project.team5backend.domain.reservation.entity.ReservationStatus;
-import com.project.team5backend.domain.space.space.entity.QSpace;
+import com.project.team5backend.domain.space.entity.QSpace;
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.global.entity.enums.Status;
+import com.project.team5backend.global.entity.enums.StatusGroup;
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -16,6 +18,8 @@ import org.springframework.stereotype.Repository;
 
 import java.util.List;
 
+import static com.project.team5backend.domain.reservation.entity.QReservation.reservation;
+
 @Repository
 @RequiredArgsConstructor
 public class CustomReservationRepositoryImpl implements CustomReservationRepository{
@@ -23,7 +27,7 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<Reservation> findBySpaceOwnerWithFilters(User user, ReservationStatus status, Pageable pageable) {
+    public Page<Reservation> findBySpaceOwnerWithFilters(User user, Status status, Pageable pageable) {
         QReservation reservation = QReservation.reservation;
         QSpace space = QSpace.space;
 
@@ -56,7 +60,7 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
     }
 
     @Override
-    public Page<Reservation> findByUserWithFilters(User user, ReservationStatus status, Pageable pageable) {
+    public Page<Reservation> findByUserWithFilters(User user, Status status, Pageable pageable) {
         QReservation reservation = QReservation.reservation;
 
         BooleanBuilder builder = new BooleanBuilder()
@@ -81,6 +85,18 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
                 .fetchOne();
 
         return new PageImpl<>(content, pageable, total != null ? total : 0L);
+    }
+
+    private BooleanExpression statusGroupCondition(StatusGroup statusGroup) {
+        if (statusGroup == null || statusGroup == StatusGroup.ALL) {
+            return null;
+        }
+
+        return switch (statusGroup) {
+            case PENDING -> reservation.status.eq(Status.PENDING);
+            case DONE -> reservation.status.in(Status.APPROVED, Status.REJECTED);
+            default -> null;
+        };
     }
 }
 

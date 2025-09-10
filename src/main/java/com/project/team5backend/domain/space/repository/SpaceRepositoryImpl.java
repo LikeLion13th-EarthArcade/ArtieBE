@@ -1,14 +1,14 @@
-package com.project.team5backend.domain.space.space.repository;
+package com.project.team5backend.domain.space.repository;
 
 import com.project.team5backend.domain.facility.entity.QFacility;
 import com.project.team5backend.domain.facility.entity.QSpaceFacility;
 import com.project.team5backend.domain.reservation.entity.QReservation;
 import com.project.team5backend.domain.reservation.entity.ReservationStatus;
 import com.project.team5backend.global.entity.enums.Sort;
-import com.project.team5backend.domain.space.space.entity.*;
-import com.project.team5backend.domain.space.space.entity.enums.SpaceMood;
-import com.project.team5backend.domain.space.space.entity.enums.SpaceSize;
-import com.project.team5backend.domain.space.space.entity.enums.SpaceType;
+import com.project.team5backend.domain.space.entity.*;
+import com.project.team5backend.domain.space.entity.enums.SpaceMood;
+import com.project.team5backend.domain.space.entity.enums.SpaceSize;
+import com.project.team5backend.domain.space.entity.enums.SpaceType;
 import com.project.team5backend.global.entity.enums.Status;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -94,7 +94,7 @@ public class SpaceRepositoryImpl implements SpaceRepositoryCustom {
                 .from(reservation)
                 .where(
                         reservation.space.eq(space),
-                        reservation.status.eq(ReservationStatus.CONFIRMED),
+                        reservation.status.eq(Status.APPROVED),
                         reservation.startDate.loe(requestedEndDate),
                         reservation.endDate.goe(requestedStartDate)
                 )

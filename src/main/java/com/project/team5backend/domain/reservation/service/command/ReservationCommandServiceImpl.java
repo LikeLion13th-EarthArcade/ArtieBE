@@ -5,10 +5,10 @@ import com.project.team5backend.domain.reservation.dto.request.ReservationReqDTO
 import com.project.team5backend.domain.reservation.dto.response.ReservationResDTO;
 import com.project.team5backend.domain.reservation.entity.Reservation;
 import com.project.team5backend.domain.reservation.repository.ReservationRepository;
-import com.project.team5backend.domain.space.space.entity.Space;
-import com.project.team5backend.domain.space.space.exception.SpaceErrorCode;
-import com.project.team5backend.domain.space.space.exception.SpaceException;
-import com.project.team5backend.domain.space.space.repository.SpaceRepository;
+import com.project.team5backend.domain.space.entity.Space;
+import com.project.team5backend.domain.space.exception.SpaceErrorCode;
+import com.project.team5backend.domain.space.exception.SpaceException;
+import com.project.team5backend.domain.space.repository.SpaceRepository;
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.user.exception.UserErrorCode;
 import com.project.team5backend.domain.user.exception.UserException;

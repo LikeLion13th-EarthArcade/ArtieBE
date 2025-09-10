@@ -36,7 +36,7 @@ public class Reservation extends BaseTimeEntity {
     private String cancelReason;
 
     @Enumerated(EnumType.STRING)
-    private ReservationStatus status;
+    private Status status;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "space_id")
@@ -48,11 +48,11 @@ public class Reservation extends BaseTimeEntity {
 
     // 예약 확정
     public void confirm() {
-        this.status = ReservationStatus.CONFIRMED;
+        this.status = Status.APPROVED;
     }
     // 예약 취소
     public void cancel(String reason) {
-        this.status = ReservationStatus.CANCELLED;
+        this.status = Status.REJECTED;
         this.cancelReason = reason;
     }
 }

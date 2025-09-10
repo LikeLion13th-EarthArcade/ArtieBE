@@ -13,6 +13,7 @@ import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.user.exception.UserErrorCode;
 import com.project.team5backend.domain.user.exception.UserException;
 import com.project.team5backend.domain.user.repository.UserRepository;
+import com.project.team5backend.global.entity.enums.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -39,7 +40,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
                 .orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
 
         // 관리자가 아니거나, 해당 예약의 주인이 아니면 예외
-        if (!Objects.equals(user, reservation.getUser()) || Objects.equals(user.getRole(), Role.ADMIN)) {
+        if (!Objects.equals(user, reservation.getUser()) || Objects.equals(user.getRole(), Role.ROLE_ADMIN)) {
             throw new ReservationException(ReservationErrorCode.RESERVATION_ACCESS_DENIED);
         }
 
@@ -47,7 +48,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     }
 
     @Override
-    public Page<ReservationResDTO.ReservationDetailResDTO> getReservationListForSpaceOwner(long userId, ReservationStatus status, Pageable pageable) {
+    public Page<ReservationResDTO.ReservationDetailResDTO> getReservationListForSpaceOwner(long userId, Status status, Pageable pageable) {
 
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
@@ -58,7 +59,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     }
 
     @Override
-    public Page<ReservationResDTO.ReservationDetailResDTO> getMyReservationList(long userId, ReservationStatus status, Pageable pageable) {
+    public Page<ReservationResDTO.ReservationDetailResDTO> getMyReservationList(long userId, Status status, Pageable pageable) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 

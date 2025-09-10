@@ -55,7 +55,7 @@ public class ReservationController {
     @GetMapping("/reservations/host")
     public CustomResponse<PageResponse<ReservationResDTO.ReservationDetailResDTO>> getReservationList(
             @AuthenticationPrincipal CurrentUser currentUser,
-            @RequestParam(required = false) ReservationStatus status,
+            @RequestParam(required = false) Status status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
@@ -67,7 +67,7 @@ public class ReservationController {
     @GetMapping("/reservations/my")
     public CustomResponse<PageResponse<ReservationResDTO.ReservationDetailResDTO>> getMyReservationList(
             @AuthenticationPrincipal CurrentUser currentUser,
-            @RequestParam(required = false) ReservationStatus status,
+            @RequestParam(required = false) Status status,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
