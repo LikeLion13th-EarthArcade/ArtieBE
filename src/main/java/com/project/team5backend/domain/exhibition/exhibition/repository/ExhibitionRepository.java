@@ -69,7 +69,7 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
       SELECT e.*,
             ROW_NUMBER() OVER (
              PARTITION BY e.district
-             ORDER BY e.rating_count DESC, e.updated_at DESC, e.id DESC
+             ORDER BY e.rating_count DESC, e.updated_at DESC, e.exhibition_id DESC
            ) rn
       FROM exhibition e
      WHERE e.is_deleted = false
@@ -79,7 +79,7 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
     )
     SELECT * FROM ranked
     WHERE rn = 1
-    ORDER BY rating_count DESC, updated_at DESC, id DESC
+    ORDER BY rating_count DESC, updated_at DESC, exhibition_id DESC
     """, nativeQuery = true)
     List<Exhibition> findTopByDistrict(@Param("current") LocalDate current, Pageable pageable, @Param("status") Status status);
 
@@ -117,4 +117,21 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
         where e.id =:exhibitionId and e.status =:status and e.isDeleted = false
         """)
     Optional<Exhibition> findPendingExhibition(Long exhibitionId, @Param("status") Status status);
+
+    // 삭제 x, 승인 o, 진행중이고, 리뷰수와 토탈리뷰점수를 더한 값이 높은 순으로 나열
+    @Query("""
+        SELECT e FROM Exhibition e
+        WHERE e.isDeleted = false
+          AND e.status = :status
+          AND e.startDate <= :today AND e.endDate >= :today
+          AND (e.exhibitionCategory = :exhibitionCategory OR e.exhibitionMood = :exhibitionMood)
+        ORDER BY (e.reviewCount + e.totalReviewScore) DESC
+        """)
+    List<Exhibition> recommendByKeywords(
+            @Param("exhibitionCategory") ExhibitionCategory exhibitionCategory,
+            @Param("exhibitionMood") ExhibitionMood exhibitionMood,
+            @Param("status") Status status,
+            @Param("today") LocalDate today,
+            org.springframework.data.domain.Pageable pageable
+    );
 }
