@@ -10,7 +10,7 @@ public interface ExhibitionCommandService {
 
     ExhibitionResDTO.ExhibitionCreateResDTO createExhibition(ExhibitionReqDTO.ExhibitionCreateReqDTO exhibitionCreateReqDTO, Long userId, List<MultipartFile> images);
 
-    ExhibitionResDTO.LikeExhibitionResDTO likeExhibition(Long exhibitionId, String email);
+    ExhibitionResDTO.ExhibitionLikeResDTO likeExhibition(Long exhibitionId, Long userId);
 
     void deleteExhibition(Long exhibitionId, String email);
 }

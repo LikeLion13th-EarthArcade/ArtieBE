@@ -21,8 +21,11 @@ import com.project.team5backend.domain.image.repository.ExhibitionImageRepositor
 import com.project.team5backend.domain.image.service.command.ImageCommandService;
 import com.project.team5backend.domain.recommendation.service.InteractLogService;
 import com.project.team5backend.domain.user.entity.User;
+import com.project.team5backend.domain.user.exception.UserErrorCode;
+import com.project.team5backend.domain.user.exception.UserException;
 import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.address.converter.AddressConverter;
+import com.project.team5backend.global.address.dto.request.AddressReqDTO;
 import com.project.team5backend.global.address.dto.response.AddressResDTO;
 import com.project.team5backend.global.address.service.AddressService;
 import com.project.team5backend.global.apiPayload.code.GeneralErrorCode;
@@ -82,7 +85,6 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
             exhibition.getExhibitionFacilities().add(ef);
         });
 
-        // Space 이미지 엔티티 저장
         for (String url : imageUrls) {
             exhibitionImageRepository.save(ImageConverter.toExhibitionImage(exhibition, url));
         }
@@ -91,26 +93,15 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
     }
 
     @Override
-    public ExhibitionResDTO.LikeExhibitionResDTO likeExhibition(Long exhibitionId, String email) {
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(()-> new CustomException(GeneralErrorCode.NOT_FOUND_404));
+    public ExhibitionResDTO.ExhibitionLikeResDTO likeExhibition(Long exhibitionId, Long userId) {
+        User user = userRepository.findByIdAndIsDeletedFalse(userId)
+                .orElseThrow(()-> new UserException(UserErrorCode.USER_NOT_FOUND));
 
-        Exhibition exhibition = exhibitionRepository.findById(exhibitionId)
-                .orElseThrow(()-> new CustomException(GeneralErrorCode.NOT_FOUND_404));
+        Exhibition exhibition = exhibitionRepository.findByIdAndIsDeletedFalse(exhibitionId)
+                .orElseThrow(()-> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
 
-        if (exhibitionLikeRepository.existsByUserIdAndExhibitionId(user.getId(), exhibition.getId())) {
-            //좋아요 취소
-            exhibitionLikeRepository.deleteByUserIdAndExhibitionId(user.getId(), exhibitionId);
-            exhibition.decreaseLikeCount();
-            return ExhibitionLikeConverter.toLikeExhibitionResDTO(exhibitionId, "관심목록에서 삭제되었습니다.");
-        }else {
-            //좋아요 등록
-            exhibitionLikeRepository.save(ExhibitionLikeConverter.toEntity(user, exhibition));
-            exhibition.increaseLikeCount();
-
-            interactLogService.logLike(user.getId(), exhibitionId);
-            return ExhibitionLikeConverter.toLikeExhibitionResDTO(exhibitionId, "관심목록에 추가되었습니다.");
-        }
+        boolean alreadyLiked = exhibitionLikeRepository.existsByUserIdAndExhibitionId(user.getId(), exhibitionId);
+        return alreadyLiked ? cancelLike(user, exhibition) : addLike(user, exhibition);
     }
 
     @Override
@@ -141,5 +132,17 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
         } catch (ImageException e) {
             throw new ImageException(ImageErrorCode.S3_MOVE_TRASH_FAIL);
         }
+    }
+    private ExhibitionResDTO.ExhibitionLikeResDTO cancelLike(User user, Exhibition exhibition) {
+        exhibitionLikeRepository.deleteByUserIdAndExhibitionId(user.getId(), exhibition.getId());
+        exhibition.decreaseLikeCount();
+        return ExhibitionLikeConverter.toExhibitionLikeResDTO(exhibition.getId(), "관심목록에서 삭제되었습니다.");
+    }
+
+    private ExhibitionResDTO.ExhibitionLikeResDTO addLike(User user, Exhibition exhibition) {
+        exhibitionLikeRepository.save(ExhibitionLikeConverter.toEntity(user, exhibition));
+        exhibition.increaseLikeCount();
+        interactLogService.logLike(user.getId(), exhibition.getId());
+        return ExhibitionLikeConverter.toExhibitionLikeResDTO(exhibition.getId(), "관심목록에 추가되었습니다.");
     }
 }

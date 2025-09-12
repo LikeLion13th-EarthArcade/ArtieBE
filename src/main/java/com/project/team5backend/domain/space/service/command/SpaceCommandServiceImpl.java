@@ -1,5 +1,8 @@
 package com.project.team5backend.domain.space.service.command;
 
+import com.project.team5backend.domain.exhibition.converter.ExhibitionLikeConverter;
+import com.project.team5backend.domain.exhibition.dto.response.ExhibitionResDTO;
+import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.facility.entity.Facility;
 import com.project.team5backend.domain.facility.entity.SpaceFacility;
 import com.project.team5backend.domain.facility.repository.FacilityRepository;
@@ -10,6 +13,7 @@ import com.project.team5backend.domain.image.converter.ImageConverter;
 import com.project.team5backend.domain.image.exception.ImageErrorCode;
 import com.project.team5backend.domain.image.exception.ImageException;
 import com.project.team5backend.domain.image.service.command.ImageCommandService;
+import com.project.team5backend.domain.recommendation.service.InteractLogService;
 import com.project.team5backend.domain.space.review.repository.SpaceReviewRepository;
 import com.project.team5backend.domain.space.converter.SpaceConverter;
 import com.project.team5backend.domain.space.converter.SpaceLikeConverter;
@@ -54,6 +58,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
     private final SpaceReviewRepository spaceReviewRepository;
     private final FacilityRepository facilityRepository;
     private final SpaceFacilityRepository spaceFacilityRepository;
+    private final InteractLogService interactLogService;
     private final AddressService addressService;
     private final S3Uploader s3Uploader;
     private final ImageCommandService imageCommandService;
@@ -98,13 +103,8 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
         Space space = spaceRepository.findById(spaceId)
                 .orElseThrow(()-> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
 
-        boolean alreadyLiked = spaceLikeRepository.existsByUserIdAndSpaceId(userId, spaceId);
-
-        String message = alreadyLiked
-                ? handleUnlike(userId, spaceId, space)
-                : handleLike(user, space);
-
-        return SpaceLikeConverter.toLikeSpaceResDTO(spaceId, message);
+        boolean alreadyLiked = spaceLikeRepository.existsByUserIdAndSpaceId(user.getId(), spaceId);
+        return alreadyLiked ? cancelLike(user, space) : addLike(user, space);
     }
 
     @Override
@@ -131,36 +131,17 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
             throw new ImageException(ImageErrorCode.S3_MOVE_TRASH_FAIL);
         }
     }
-    private String handleUnlike(long userId, long spaceId, Space space) {
-        spaceLikeRepository.deleteByUserIdAndSpaceId(userId, spaceId);
+
+    private SpaceResDTO.LikeSpaceResDTO cancelLike(User user, Space space) {
+        spaceLikeRepository.deleteByUserIdAndSpaceId(user.getId(), space.getId());
         space.decreaseLikeCount();
-        return "관심목록에서 삭제되었습니다.";
+        return SpaceLikeConverter.toLikeSpaceResDTO(space.getId(), "관심목록에서 삭제되었습니다.");
     }
 
-    private String handleLike(User user, Space space) {
+    private SpaceResDTO.LikeSpaceResDTO addLike(User user, Space space) {
         spaceLikeRepository.save(SpaceLikeConverter.toSpaceLike(user, space));
         space.increaseLikeCount();
-        return "관심목록에 추가되었습니다.";
+        interactLogService.logLike(user.getId(), space.getId());
+        return SpaceLikeConverter.toLikeSpaceResDTO(space.getId(), "관심목록에 추가되었습니다.");
     }
-
-//    @Override
-//    public boolean toggleLike(Long spaceId, Long userId) {
-//        // ... 기존 로직과 동일
-//        Space space = spaceRepository.findById(spaceId)
-//                .orElseThrow(() -> new IllegalArgumentException("해당 전시 공간이 존재하지 않습니다."));
-//        User user = userRepository.findById(userId)
-//                .orElseThrow(() -> new IllegalArgumentException("사용자가 존재하지 않습니다."));
-//        return spaceLikeRepository.findBySpaceIdAndUserId(spaceId, userId)
-//                .map(existingLike -> {
-//                    spaceLikeRepository.softDelete(existingLike);
-//                    return false;
-//                })
-//                .orElseGet(() -> {
-//                    SpaceLike like = new SpaceLike();
-//                    like.setSpace(space);
-//                    like.setUser(user);
-//                    spaceLikeRepository.save(like);
-//                    return true;
-//                });
-//    }
 }

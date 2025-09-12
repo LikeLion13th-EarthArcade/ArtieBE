@@ -63,7 +63,7 @@ public class ExhibitionResDTO {
     ) {}
 
     @Builder
-    public record LikeExhibitionResDTO (
+    public record ExhibitionLikeResDTO(
             Long exhibitionId,
             String message
     ){}

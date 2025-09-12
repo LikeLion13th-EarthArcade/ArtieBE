@@ -17,8 +17,8 @@ public class ExhibitionLikeConverter {
                 .build();
     }
 
-    public static ExhibitionResDTO.LikeExhibitionResDTO toLikeExhibitionResDTO(Long exhibitionId, String message) {
-        return ExhibitionResDTO.LikeExhibitionResDTO.builder()
+    public static ExhibitionResDTO.ExhibitionLikeResDTO toExhibitionLikeResDTO(Long exhibitionId, String message) {
+        return ExhibitionResDTO.ExhibitionLikeResDTO.builder()
                 .exhibitionId(exhibitionId)
                 .message(message)
                 .build();

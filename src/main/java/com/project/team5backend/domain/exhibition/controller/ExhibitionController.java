@@ -11,7 +11,6 @@ import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.global.security.userdetails.CurrentUser;
 import com.project.team5backend.global.security.userdetails.CustomUserDetails;
-import com.project.team5backend.global.util.ImageUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Encoding;
@@ -59,11 +58,11 @@ public class ExhibitionController {
 
     @PostMapping("/{exhibitionId}/like")
     @Operation(summary = "전시 좋아요", description = "좋아요 없으면 등록, 있으면 취소")
-    public CustomResponse<ExhibitionResDTO.LikeExhibitionResDTO> likeExhibition(
+    public CustomResponse<ExhibitionResDTO.ExhibitionLikeResDTO> likeExhibition(
             @AuthenticationPrincipal CurrentUser currentUser,
             @PathVariable Long exhibitionId
     ) {
-        return CustomResponse.onSuccess(exhibitionCommandService.likeExhibition(exhibitionId, currentUser.getEmail()));
+        return CustomResponse.onSuccess(exhibitionCommandService.likeExhibition(exhibitionId, currentUser.getId()));
     }
 
     @GetMapping("/{exhibitionId}")
