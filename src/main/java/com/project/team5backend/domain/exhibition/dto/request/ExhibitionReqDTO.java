@@ -52,7 +52,9 @@ public class ExhibitionReqDTO {
             @NotNull(message = BLANK_EXHIBITION_MOOD)
             ExhibitionMood exhibitionMood,
 
+            @NotNull(message = BLANK_EXHIBITION_PRICE)
             Integer price,
+
             List<String> facilities,
 
             @NotNull(message = BLANK_EXHIBITION_ADDRESS)

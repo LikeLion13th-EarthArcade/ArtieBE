@@ -26,6 +26,7 @@ public class MessageConstant {
     public static final String BLANK_EXHIBITION_TYPE = "전시 유형 누락";
     public static final String BLANK_EXHIBITION_MOOD = "전시 분위기 누락";
     public static final String BLANK_EXHIBITION_ADDRESS = "전시 장소 누락";
+    public static final String BLANK_EXHIBITION_PRICE = "전시 가격 누락";
 
 
 
