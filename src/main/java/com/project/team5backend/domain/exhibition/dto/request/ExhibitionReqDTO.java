@@ -19,7 +19,7 @@ import java.util.List;
 import static com.project.team5backend.global.constant.valid.MessageConstant.*;
 
 public class ExhibitionReqDTO {
-    public record CreateExhibitionReqDTO (
+    public record ExhibitionCreateReqDTO(
             @NotBlank(message = BLANK_EXHIBITION_TITLE)
             String title,
 

@@ -5,15 +5,14 @@ import com.project.team5backend.domain.exhibition.converter.ExhibitionLikeConver
 import com.project.team5backend.domain.exhibition.dto.request.ExhibitionReqDTO;
 import com.project.team5backend.domain.exhibition.dto.response.ExhibitionResDTO;
 import com.project.team5backend.domain.exhibition.entity.Exhibition;
-import com.project.team5backend.domain.facility.entity.ExhibitionFacility;
-import com.project.team5backend.domain.facility.entity.Facility;
-import com.project.team5backend.domain.facility.repository.FacilityRepository;
-import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.domain.exhibition.exception.ExhibitionErrorCode;
 import com.project.team5backend.domain.exhibition.exception.ExhibitionException;
 import com.project.team5backend.domain.exhibition.repository.ExhibitionLikeRepository;
 import com.project.team5backend.domain.exhibition.repository.ExhibitionRepository;
 import com.project.team5backend.domain.exhibition.review.repository.ExhibitionReviewRepository;
+import com.project.team5backend.domain.facility.entity.ExhibitionFacility;
+import com.project.team5backend.domain.facility.entity.Facility;
+import com.project.team5backend.domain.facility.repository.FacilityRepository;
 import com.project.team5backend.domain.image.converter.ImageConverter;
 import com.project.team5backend.domain.image.entity.ExhibitionImage;
 import com.project.team5backend.domain.image.exception.ImageErrorCode;
@@ -29,6 +28,8 @@ import com.project.team5backend.global.address.service.AddressService;
 import com.project.team5backend.global.apiPayload.code.GeneralErrorCode;
 import com.project.team5backend.global.apiPayload.exception.CustomException;
 import com.project.team5backend.global.entity.embedded.Address;
+import com.project.team5backend.global.entity.enums.Status;
+import com.project.team5backend.global.util.ImageUtils;
 import com.project.team5backend.global.util.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,7 +37,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -57,37 +57,37 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
     private final S3Uploader s3Uploader;
 
     @Override
-    public void createExhibition(ExhibitionReqDTO.CreateExhibitionReqDTO createExhibitionReqDTO, Long userId, List<MultipartFile> images) {
+    public ExhibitionResDTO.ExhibitionCreateResDTO createExhibition(ExhibitionReqDTO.ExhibitionCreateReqDTO exhibitionCreateReqDTO, Long userId, List<MultipartFile> images) {
+        ImageUtils.validateImages(images); // 이미지 검증 (개수, null 여부)
+
         User user = userRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new CustomException(GeneralErrorCode.NOT_FOUND_404));
-
-        AddressResDTO.AddressCreateResDTO addressResDTO = addressService.resolve(createExhibitionReqDTO.address());
+        // 주소 변환
+        AddressResDTO.AddressCreateResDTO addressResDTO = addressService.resolve(exhibitionCreateReqDTO.address());
         Address address = AddressConverter.toAddress(addressResDTO);
 
-        // 1. 전시 엔티티 먼저 저장 (썸네일은 일단 null 로)
-        Exhibition exhibition = ExhibitionConverter.toEntity(user, createExhibitionReqDTO, address);
+        // 업로드 및 image 획득
+        List<String> imageUrls = images.stream()
+                .map(file -> s3Uploader.upload(file, "exhibitions"))
+                .toList();
+
+        // 전시 엔티티 먼저 저장
+        Exhibition exhibition = ExhibitionConverter.toEntity(exhibitionCreateReqDTO, user, imageUrls.get(0),address);
         exhibitionRepository.save(exhibition);
 
-        // 2. 시설 매핑 (문자열 → Facility 엔티티 조회 → ExhibitionFacility 생성)
-        List<Facility> facilities = facilityRepository.findByNameIn(createExhibitionReqDTO.facilities());
+        // 시설 매핑 (문자열 → Facility 엔티티 조회 → ExhibitionFacility 생성)
+        List<Facility> facilities = facilityRepository.findByNameIn(exhibitionCreateReqDTO.facilities());
         facilities.forEach(facility -> {
             ExhibitionFacility ef = ExhibitionConverter.toCreateExhibitionFacility(exhibition, facility);
             exhibition.getExhibitionFacilities().add(ef);
         });
 
-        if (images == null || images.isEmpty()) {
-            throw new ImageException(ImageErrorCode.IMAGE_NOT_FOUND_IN_DTO);
-        }
-
-        List<String> imageUrls = new ArrayList<>();
-        for (MultipartFile file : images) {
-            String url = s3Uploader.upload(file, "exhibitions");
-            imageUrls.add(url);
-
+        // Space 이미지 엔티티 저장
+        for (String url : imageUrls) {
             exhibitionImageRepository.save(ImageConverter.toExhibitionImage(exhibition, url));
         }
-        exhibition.updateThumbnail(imageUrls.get(0));
-        exhibitionRepository.save(exhibition);
+
+        return ExhibitionConverter.toExhibitionCreateResDTO(exhibition.getId(), exhibition.getCreatedAt());
     }
 
     @Override

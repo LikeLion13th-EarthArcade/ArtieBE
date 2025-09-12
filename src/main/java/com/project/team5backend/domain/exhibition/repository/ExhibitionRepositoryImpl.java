@@ -1,7 +1,7 @@
 package com.project.team5backend.domain.exhibition.repository;
 
 import com.project.team5backend.domain.exhibition.entity.Exhibition;
-import com.project.team5backend.domain.exhibition.exhibition.entity.QExhibition;
+import com.project.team5backend.domain.exhibition.entity.QExhibition;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionCategory;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionMood;
 import com.project.team5backend.global.entity.enums.Sort;

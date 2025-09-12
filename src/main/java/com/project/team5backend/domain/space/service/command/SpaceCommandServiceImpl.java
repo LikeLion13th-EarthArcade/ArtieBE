@@ -30,6 +30,7 @@ import com.project.team5backend.global.address.dto.response.AddressResDTO;
 import com.project.team5backend.global.address.service.AddressService;
 import com.project.team5backend.global.entity.embedded.Address;
 import com.project.team5backend.global.entity.enums.Status;
+import com.project.team5backend.global.util.ImageUtils;
 import com.project.team5backend.global.util.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -59,6 +60,9 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
 
     @Override
     public SpaceResDTO.CreateSpaceResDTO createSpace(SpaceReqDTO.CreateSpaceReqDTO request, long userId, List<MultipartFile> images) {
+
+        ImageUtils.validateImages(images); // 이미지 검증 (개수, null 여부)
+
         User user = userRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
         //주소 가져오기
@@ -78,7 +82,6 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
         facilities.forEach(facility -> {
             SpaceFacility sf = SpaceConverter.toCreateSpaceFacility(space, facility);
             space.getSpaceFacilities().add(sf);
-            spaceFacilityRepository.save(sf);
         });
 
         // Space 이미지 엔티티 저장

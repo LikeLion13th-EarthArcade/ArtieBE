@@ -102,18 +102,6 @@ public class Exhibition extends BaseTimeEntity {
         this.reviewCount = 0;
     }
 
-    public void approveStatus() {
-        this.status = Status.APPROVED;
-    }
-
-    public void rejectStatus() {
-        this.status = Status.REJECTED;
-    }
-
-    public void updateThumbnail(String thumbnail) {
-        this.thumbnail = thumbnail;
-    }
-
     public void approveExhibition() {
         this.status = Status.APPROVED;
     }

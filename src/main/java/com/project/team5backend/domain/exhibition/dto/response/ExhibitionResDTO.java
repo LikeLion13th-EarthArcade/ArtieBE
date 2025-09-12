@@ -8,10 +8,17 @@ import lombok.Builder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
 public class ExhibitionResDTO {
+
+    @Builder
+    public record ExhibitionCreateResDTO(
+            Long exhibitionId,
+            LocalDateTime createdAt
+    ){}
 
     @Builder
     public record DetailExhibitionResDTO (

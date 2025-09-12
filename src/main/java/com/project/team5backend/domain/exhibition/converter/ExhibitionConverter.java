@@ -14,12 +14,13 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ExhibitionConverter {
 
-    public static Exhibition toEntity(User user, ExhibitionReqDTO.CreateExhibitionReqDTO createReqDTO, Address address) {
+    public static Exhibition toEntity(ExhibitionReqDTO.ExhibitionCreateReqDTO createReqDTO, User user, String imageUrls, Address address) {
         return Exhibition.builder()
                 .title(createReqDTO.title())
                 .description(createReqDTO.description())
@@ -37,9 +38,16 @@ public class ExhibitionConverter {
                 .ratingAvg(BigDecimal.ZERO)
                 .likeCount(0)
                 .reviewCount(0)
-                .thumbnail(null)
+                .thumbnail(imageUrls)
                 .address(address)
                 .user(user)
+                .build();
+    }
+
+    public static ExhibitionResDTO.ExhibitionCreateResDTO toExhibitionCreateResDTO(Long exhibitionId, LocalDateTime createdAt) {
+        return ExhibitionResDTO.ExhibitionCreateResDTO.builder()
+                .exhibitionId(exhibitionId)
+                .createdAt(createdAt)
                 .build();
     }
 

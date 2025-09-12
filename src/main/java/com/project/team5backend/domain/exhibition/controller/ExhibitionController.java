@@ -49,15 +49,14 @@ public class ExhibitionController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @Operation(summary = "전시 생성", description = "전시 생성하면 전시 객체가 심사 대상에 포함됩니다.")
-    public CustomResponse<String> createExhibition(
+    public CustomResponse<ExhibitionResDTO.ExhibitionCreateResDTO> createExhibition(
             @AuthenticationPrincipal CurrentUser currentUser,
-            @RequestPart("request") @Valid ExhibitionReqDTO.CreateExhibitionReqDTO request,
+            @RequestPart("request") @Valid ExhibitionReqDTO.ExhibitionCreateReqDTO request,
             @RequestPart(value = "images", required = false) List<MultipartFile> images
     ) {
-        ImageUtils.validateImages(images); // 이미지 검증 (개수, null 여부)
-        exhibitionCommandService.createExhibition(request, currentUser.getId(), images);
-        return CustomResponse.onSuccess("전시글 등록이 완료되었습니다. 관리자 승인 대기열에 추가합니다.");
+        return CustomResponse.onSuccess(exhibitionCommandService.createExhibition(request, currentUser.getId(), images));
     }
+
     @PostMapping("/{exhibitionId}/like")
     @Operation(summary = "전시 좋아요", description = "좋아요 없으면 등록, 있으면 취소")
     public CustomResponse<ExhibitionResDTO.LikeExhibitionResDTO> likeExhibition(
