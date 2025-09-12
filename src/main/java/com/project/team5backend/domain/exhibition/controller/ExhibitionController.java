@@ -112,13 +112,12 @@ public class ExhibitionController {
         return CustomResponse.onSuccess(exhibitionQueryService.getTodayArtiePicks(currentUser.getEmail()));
     }
 
-    @DeleteMapping("/{exhibitionId}")
     @Operation(summary = "전시 삭제", description = "전시가 삭제된 전시로 변경하는 api")
+    @DeleteMapping("/{exhibitionId}")
     public CustomResponse<String> deleteExhibition(
-            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @AuthenticationPrincipal CurrentUser currentUser,
             @PathVariable Long exhibitionId){
-        //유저 검증 로직 필요
-        exhibitionCommandService.deleteExhibition(exhibitionId, userDetails.getEmail());
+        exhibitionCommandService.deleteExhibition(exhibitionId, currentUser.getId());
         return CustomResponse.onSuccess("해당 전시가 삭제되었습니다.");
     }
 }

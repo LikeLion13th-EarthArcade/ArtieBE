@@ -12,5 +12,5 @@ public interface ExhibitionCommandService {
 
     ExhibitionResDTO.ExhibitionLikeResDTO toggleLike(Long exhibitionId, Long userId);
 
-    void deleteExhibition(Long exhibitionId, String email);
+    void deleteExhibition(Long exhibitionId, Long userId);
 }

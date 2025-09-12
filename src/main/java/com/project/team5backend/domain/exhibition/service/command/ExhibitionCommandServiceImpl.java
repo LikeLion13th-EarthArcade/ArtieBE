@@ -97,7 +97,7 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
         User user = userRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(()-> new UserException(UserErrorCode.USER_NOT_FOUND));
 
-        Exhibition exhibition = exhibitionRepository.findByIdAndIsDeletedFalse(exhibitionId)
+        Exhibition exhibition = exhibitionRepository.findByIdAndIsDeletedFalseAndStatusApprove(exhibitionId, Status.APPROVED)
                 .orElseThrow(()-> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
 
         boolean alreadyLiked = exhibitionLikeRepository.existsByUserIdAndExhibitionId(user.getId(), exhibitionId);
@@ -105,33 +105,21 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
     }
 
     @Override
-    public void deleteExhibition(Long exhibitionId, String email) {
+    public void deleteExhibition(Long exhibitionId, Long userId) {
         Exhibition exhibition = exhibitionRepository.findByIdAndIsDeletedFalseAndStatusApprove(exhibitionId, Status.APPROVED)
                 .orElseThrow(() -> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
 
-        if (exhibition.isDeleted()) return;
-
         exhibition.delete();
+        exhibition.markDeleted(); // 삭제 시간
 
-        // 전시이미지 소프트 삭제
-        List<ExhibitionImage> images = exhibitionImageRepository.findByExhibitionId(exhibitionId);
-        images.forEach(ExhibitionImage::deleteImage);
-        List<String> keys = images.stream().map(ExhibitionImage::getImageUrl).toList();
-        // 3) 좋아요 하드 삭제 (벌크)
-        exhibitionLikeRepository.deleteByExhibitionId(exhibitionId);
+        List<String> imageUrls = deleteExhibitionImage(exhibitionId); // 전시이미지 소프트 삭제
 
-        // 4) 리뷰 소프트 삭제 (벌크)
-        exhibitionReviewRepository.softDeleteByExhibitionId(exhibitionId);
+        exhibitionLikeRepository.deleteByExhibitionId(exhibitionId); // 좋아요 하드 삭제 (벌크)
+        exhibitionReviewRepository.softDeleteByExhibitionId(exhibitionId); // 리뷰 소프트 삭제 (벌크)
 
-        // 집계 초기화
-        exhibition.resetCount();
+        exhibition.resetCount(); // 집계 초기화
 
-        // s3 보존 휴지통 prefix로 이동시키기
-        try{
-            imageCommandService.moveToTrashPrefix(keys);
-        } catch (ImageException e) {
-            throw new ImageException(ImageErrorCode.S3_MOVE_TRASH_FAIL);
-        }
+        moveImagesToTrash(imageUrls); // s3 보존 휴지통 prefix로 이동시키기
     }
     private ExhibitionResDTO.ExhibitionLikeResDTO cancelLike(User user, Exhibition exhibition) {
         exhibitionLikeRepository.deleteByUserIdAndExhibitionId(user.getId(), exhibition.getId());
@@ -144,5 +132,21 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
         exhibition.increaseLikeCount();
         interactLogService.logLike(user.getId(), exhibition.getId());
         return ExhibitionLikeConverter.toExhibitionLikeResDTO(exhibition.getId(), "관심목록에 추가되었습니다.");
+    }
+
+    private List<String> deleteExhibitionImage(Long exhibitionId) {
+        List<ExhibitionImage> images = exhibitionImageRepository.findByExhibitionId(exhibitionId);
+        images.forEach(ExhibitionImage::deleteImage);
+        return images.stream()
+                .map(ExhibitionImage::getImageUrl)
+                .toList();
+    }
+
+    private void moveImagesToTrash(List<String> keys) {
+        try {
+            imageCommandService.moveToTrashPrefix(keys);
+        } catch (ImageException e) {
+            throw new ImageException(ImageErrorCode.S3_MOVE_TRASH_FAIL);
+        }
     }
 }

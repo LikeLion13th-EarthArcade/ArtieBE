@@ -98,9 +98,9 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
 
     @Override
     public SpaceResDTO.LikeSpaceResDTO likeSpace(long spaceId, long userId) {
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(()-> new UserException(UserErrorCode.USER_NOT_FOUND));
-        Space space = spaceRepository.findById(spaceId)
+        Space space = spaceRepository.findByIdAndIsDeletedFalseAndStatusApproved(spaceId, Status.APPROVED)
                 .orElseThrow(()-> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
 
         boolean alreadyLiked = spaceLikeRepository.existsByUserIdAndSpaceId(user.getId(), spaceId);
