@@ -46,29 +46,17 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
     private final InteractLogService interactLogService;
     private final ExhibitionLikeRepository exhibitionLikeRepository;
     private final UserRepository userRepository;
-    private final ExhibitionReviewRepository exhibitionReviewRepository;
-    private final ExhibitionReviewImageRepository exhibitionReviewImageRepository;
     @Override
-    public ExhibitionResDTO.DetailExhibitionResDTO getDetailExhibition(Long exhibitionId) {
+    public ExhibitionResDTO.ExhibitionDetailResDTO findExhibitionDetail(Long exhibitionId) {
         Exhibition exhibition = exhibitionRepository.findByIdAndIsDeletedFalseAndStatusApprove(exhibitionId, Status.APPROVED)
                 .orElseThrow(() -> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
 
         // ai 분석을 위한 로그 생성
         interactLogService.logClick(1L, exhibitionId);
         // 전시 이미지들의 fileKey만 조회
-        List<String> imageFileKeys = exhibitionImageRepository.findImageUrlsByExhibitionId(exhibitionId);
+        List<String> imageUrls = exhibitionImageRepository.findImageUrlsByExhibitionId(exhibitionId);
 
-        List<ExhibitionReview> reviews = exhibitionReviewRepository.findAllByExhibitionId(exhibition.getId());
-
-        List<ExhibitionReviewResDTO.exReviewDetailResDTO> detailReviews = reviews.stream()
-                .map(review -> {
-                    // 리뷰에 연결된 이미지 fileKey 조회
-                    List<String> imageUrls = exhibitionReviewImageRepository.findImageUrlsByExhibitionReviewId(review.getId());
-                    return ExhibitionReviewConverter.toDetailExReviewResDTO(review, imageUrls);
-                })
-                .toList();
-
-        return ExhibitionConverter.toDetailExhibitionResDTO(exhibition, imageFileKeys, detailReviews);
+        return ExhibitionConverter.toExhibitionDetailResDTO(exhibition, imageUrls);
     }
 
     @Override

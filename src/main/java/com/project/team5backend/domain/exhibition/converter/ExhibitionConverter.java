@@ -58,8 +58,8 @@ public class ExhibitionConverter {
                 .build();
     }
 
-    public static ExhibitionResDTO.DetailExhibitionResDTO toDetailExhibitionResDTO(Exhibition exhibition, List<String> imageFileKeys, List<ExhibitionReviewResDTO.exReviewDetailResDTO> reviews) {
-        return ExhibitionResDTO.DetailExhibitionResDTO.builder()
+    public static ExhibitionResDTO.ExhibitionDetailResDTO toExhibitionDetailResDTO(Exhibition exhibition, List<String> imageUrls) {
+        return ExhibitionResDTO.ExhibitionDetailResDTO.builder()
                 .exhibitionId(exhibition.getId())
                 .title(exhibition.getTitle())
                 .description(exhibition.getDescription())
@@ -67,7 +67,7 @@ public class ExhibitionConverter {
                 .endDate(exhibition.getEndDate())
                 .openTime(exhibition.getOpenTime())
                 .closeTime(exhibition.getCloseTime())
-                .imageFileKeys(imageFileKeys)
+                .imageUrls(imageUrls)
                 .websiteUrl(exhibition.getWebsiteUrl())
                 .address(
                         exhibition.getAddress() != null
@@ -87,7 +87,6 @@ public class ExhibitionConverter {
                                 .map(ef -> ef.getFacility().getName()) // Facility 엔티티의 name 사용
                                 .toList()
                 )
-                .reviews(reviews)
                 .build();
     }
 

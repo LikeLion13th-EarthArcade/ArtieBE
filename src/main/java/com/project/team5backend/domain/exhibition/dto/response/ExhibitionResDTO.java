@@ -21,7 +21,7 @@ public class ExhibitionResDTO {
     ){}
 
     @Builder
-    public record DetailExhibitionResDTO (
+    public record ExhibitionDetailResDTO (
             Long exhibitionId,
             String title,
             String description,
@@ -29,7 +29,7 @@ public class ExhibitionResDTO {
             LocalDate endDate,
             LocalTime openTime,
             LocalTime closeTime,
-            List<String> imageFileKeys,
+            List<String> imageUrls,
             String websiteUrl,
             String address,
             BigDecimal latitude,
@@ -38,8 +38,7 @@ public class ExhibitionResDTO {
             ExhibitionType exhibitionType,
             ExhibitionMood exhibitionMood,
             Integer price,
-            List<String> facilities,
-            List<ExhibitionReviewResDTO.exReviewDetailResDTO> reviews
+            List<String> facilities
     ) {}
     @Builder
     public record DetailPendingExhibitionResDTO (

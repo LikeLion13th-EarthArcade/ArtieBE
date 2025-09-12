@@ -58,17 +58,17 @@ public class ExhibitionController {
 
     @PostMapping("/{exhibitionId}/like")
     @Operation(summary = "전시 좋아요", description = "좋아요 없으면 등록, 있으면 취소")
-    public CustomResponse<ExhibitionResDTO.ExhibitionLikeResDTO> likeExhibition(
+    public CustomResponse<ExhibitionResDTO.ExhibitionLikeResDTO> toggleExhibitionLike(
             @AuthenticationPrincipal CurrentUser currentUser,
             @PathVariable Long exhibitionId
     ) {
-        return CustomResponse.onSuccess(exhibitionCommandService.likeExhibition(exhibitionId, currentUser.getId()));
+        return CustomResponse.onSuccess(exhibitionCommandService.toggleLike(exhibitionId, currentUser.getId()));
     }
 
     @GetMapping("/{exhibitionId}")
     @Operation(summary = "전시 상세 보기", description = "전시 상세 보기 api")
-    public CustomResponse<ExhibitionResDTO.DetailExhibitionResDTO> detailExhibition(@PathVariable Long exhibitionId) {
-        return CustomResponse.onSuccess(exhibitionQueryService.getDetailExhibition(exhibitionId));
+    public CustomResponse<ExhibitionResDTO.ExhibitionDetailResDTO> getExhibitionDetail(@PathVariable Long exhibitionId) {
+        return CustomResponse.onSuccess(exhibitionQueryService.findExhibitionDetail(exhibitionId));
     }
 
     @Operation(summary = "전시 검색", description = "전시 검색하면 한페이지에 4개의 전시와 서울 시청 중심의 위도 경도 반환")

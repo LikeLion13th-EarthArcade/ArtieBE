@@ -93,7 +93,7 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
     }
 
     @Override
-    public ExhibitionResDTO.ExhibitionLikeResDTO likeExhibition(Long exhibitionId, Long userId) {
+    public ExhibitionResDTO.ExhibitionLikeResDTO toggleLike(Long exhibitionId, Long userId) {
         User user = userRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(()-> new UserException(UserErrorCode.USER_NOT_FOUND));
 

@@ -10,7 +10,7 @@ import java.util.List;
 
 public interface ExhibitionQueryService {
 
-    ExhibitionResDTO.DetailExhibitionResDTO getDetailExhibition(Long id);
+    ExhibitionResDTO.ExhibitionDetailResDTO findExhibitionDetail(Long id);
 
     // 전시 검색
     ExhibitionResDTO.SearchExhibitionPageResDTO searchExhibition(ExhibitionCategory exhibitionCategory, String district, ExhibitionMood exhibitionMood, LocalDate date, Sort sort, int page);
