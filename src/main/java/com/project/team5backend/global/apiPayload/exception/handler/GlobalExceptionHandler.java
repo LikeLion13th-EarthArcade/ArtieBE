@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -114,8 +115,15 @@ public class GlobalExceptionHandler {
             if (targetType.equals(LocalDate.class)) {
                 errorCode = GeneralErrorCode.INVALID_LOCAL_DATE;
             }
+            else if (targetType.equals(LocalTime.class)) {
+                errorCode = GeneralErrorCode.INVALID_LOCAL_TIME;
+            }
             else if (targetType.isEnum()) {
                 errorCode = GeneralErrorCode.INVALID_ENUM;
+            }
+            // 숫자 필드 잘못된 형식
+            else if (targetType.equals(Integer.class)) {
+                errorCode = GeneralErrorCode.INVALID_INTEGER;
             }
             else {
                 errorCode = GeneralErrorCode.INVALID_FIELD_FORMAT;
