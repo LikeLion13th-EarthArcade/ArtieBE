@@ -12,6 +12,8 @@ import com.project.team5backend.domain.exhibition.repository.ExhibitionRepositor
 import com.project.team5backend.domain.image.repository.ExhibitionImageRepository;
 import com.project.team5backend.domain.recommendation.service.InteractLogService;
 import com.project.team5backend.domain.user.entity.User;
+import com.project.team5backend.domain.user.exception.UserErrorCode;
+import com.project.team5backend.domain.user.exception.UserException;
 import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.global.entity.enums.Status;
@@ -25,7 +27,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 @Service
 @RequiredArgsConstructor
@@ -118,25 +122,15 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
     }
 
     @Override
-    public List<ExhibitionResDTO.ArtieRecommendationResDTO> getTodayArtiePicks(String email) {
+    public List<ExhibitionResDTO.ArtieRecommendationResDTO> getTodayArtieRecommendations(Long userId) {
         LocalDate today = LocalDate.now();
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
-
         List<Exhibition> candidates = exhibitionRepository.findUnpopularCandidates(today, 20); // 후보 20개
-
-        // 날짜 기반 고정 셔플(하루 동안 결과 고정)
-        long seed = today.toEpochDay(); // 필요하면 +고정 salt
-        java.util.Random r = new java.util.Random(seed);
-        java.util.Collections.shuffle(candidates, r);
+        Collections.shuffle(candidates, new Random(today.toEpochDay())); // 하루 단위 고정 셔플
 
         return candidates.stream()
                 .limit(4)
-                .map(exhibition -> {
-                    boolean isLiked = exhibitionLikeRepository.existsByUserIdAndExhibitionId(user.getId(), exhibition.getId());
-                    return ExhibitionConverter.toArtieRecommendationResDTO(exhibition, isLiked);
-                })
+                .map(exhibition -> ExhibitionConverter.toArtieRecommendationResDTO(exhibition, isExhibitionLiked(userId, exhibition.getId())))
                 .toList();
     }
 

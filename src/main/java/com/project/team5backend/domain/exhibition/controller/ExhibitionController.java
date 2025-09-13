@@ -105,10 +105,10 @@ public class ExhibitionController {
 
     @Operation(summary = "artie 추천 전시회", description = "artie 추천 전시 4개 반환 - 하루 단위로 업데이트")
     @GetMapping("/artie-recommendation")
-    public CustomResponse<List<ExhibitionResDTO.ArtieRecommendationResDTO>> artieRecommendation(
+    public CustomResponse<List<ExhibitionResDTO.ArtieRecommendationResDTO>> getTodayArtieRecommendations(
             @AuthenticationPrincipal CurrentUser currentUser
     ) {
-        return CustomResponse.onSuccess(exhibitionQueryService.getTodayArtiePicks(currentUser.getEmail()));
+        return CustomResponse.onSuccess(exhibitionQueryService.getTodayArtieRecommendations(currentUser.getId()));
     }
 
     @Operation(summary = "전시 삭제", description = "전시가 삭제된 전시로 변경하는 api")

@@ -25,5 +25,5 @@ public interface ExhibitionQueryService {
     ExhibitionResDTO.RegionalPopularExhibitionListResDTO getRegionalPopularExhibitions();
 
     // artie 픽
-    List<ExhibitionResDTO.ArtieRecommendationResDTO> getTodayArtiePicks(String email);
+    List<ExhibitionResDTO.ArtieRecommendationResDTO> getTodayArtieRecommendations(Long userId);
 }
