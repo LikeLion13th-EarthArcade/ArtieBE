@@ -114,15 +114,16 @@ public class ExhibitionResDTO {
     ){}
 
     @Builder
-    public record PopularRegionExhibitionResDTO(
+    public record RegionalPopularExhibitionResDTO(
             Long exhibitionId,
+            String district,
             String title,
             String thumbnail
     ){}
 
     @Builder
-    public record PopularRegionExhibitionListResDTO(
-            List<PopularRegionExhibitionResDTO> exhibitions
+    public record RegionalPopularExhibitionListResDTO(
+            List<RegionalPopularExhibitionResDTO> exhibitions
     ){}
 
     @Builder

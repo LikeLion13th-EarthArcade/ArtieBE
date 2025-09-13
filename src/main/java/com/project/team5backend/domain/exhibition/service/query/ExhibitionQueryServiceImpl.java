@@ -79,7 +79,7 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
             throw new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND);
         }
         return exhibitions.stream()
-                .map(exhibition -> ExhibitionConverter.toHotNowExhibitionResDTO(exhibition, isExhibitionLiked(userId, exhibition.getId())))
+                .map(exhibition -> ExhibitionConverter.toExhibitionHotNowResDTO(exhibition, isExhibitionLiked(userId, exhibition.getId())))
                 .toList();
     }
 
@@ -94,26 +94,27 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
         }
         Exhibition upcomingEx = exhibitions.get(0);
         List<String> imageUrls = exhibitionImageRepository.findImageUrlsByExhibitionId(upcomingEx.getId());
-        return ExhibitionConverter.toUpcomingPopularityExhibitionResDTO(upcomingEx.getId(), upcomingEx.getTitle(), imageUrls);
+        return ExhibitionConverter.toUpcomingPopularExhibitionResDTO(upcomingEx.getId(), upcomingEx.getTitle(), imageUrls);
     }
 
     @Override
-    public ExhibitionResDTO.PopularRegionExhibitionListResDTO getPopularRegionExhibitions() {
+    public ExhibitionResDTO.RegionalPopularExhibitionListResDTO getRegionalPopularExhibitions() {
         LocalDate currentDate = LocalDate.now();
-
         Pageable topFour = PageRequest.of(0, 4);
-        List<Exhibition> exhibitions = exhibitionRepository.findTopByDistrict(currentDate, topFour, Status.APPROVED);
-        if (exhibitions.isEmpty()) {
-            throw new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND);
-        } else if (exhibitions.size() < 4) {
-            log.info("size : {}", exhibitions.size());
-            throw new ExhibitionException(ExhibitionErrorCode.DIFFERENT_EXHIBITION_NOT_FOUND);
-        }
-        List<ExhibitionResDTO.PopularRegionExhibitionResDTO> popularRegionExhibitionResDTOs = exhibitions.stream()
-                .map(ExhibitionConverter::toPopularRegionExhibitionResDTO)
-                .toList();
 
-        return ExhibitionConverter.toPopularRegionExhibitionListResDTO(popularRegionExhibitionResDTOs);
+        List<Exhibition> exhibitions = exhibitionRepository.findTopByDistrict(currentDate, topFour, Status.APPROVED);
+        if (exhibitions.size() < 4) {
+            throw new ExhibitionException(
+                    exhibitions.isEmpty()
+                            ? ExhibitionErrorCode.EXHIBITION_NOT_FOUND
+                            : ExhibitionErrorCode.DIFFERENT_EXHIBITION_NOT_FOUND
+            );
+        }
+        return ExhibitionConverter.toRegionalPopularExhibitionListResDTO(
+                exhibitions.stream()
+                        .map(ExhibitionConverter::toRegionalPopularExhibitionResDTO)
+                        .toList()
+        );
     }
 
     @Override

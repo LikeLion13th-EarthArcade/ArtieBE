@@ -93,14 +93,14 @@ public class ExhibitionController {
 
     @Operation(summary = "지금 뜨는, 다가오는 전시회", description = "아직 시작되지 않은 전시중에서 likeCount가 가장 높은 전시 반환")
     @GetMapping("/upcoming-popularity")
-    public CustomResponse<ExhibitionResDTO.UpcomingPopularExhibitionResDTO> upcomingPopularExhibition() {
+    public CustomResponse<ExhibitionResDTO.UpcomingPopularExhibitionResDTO> getUpcomingPopularExhibition() {
         return CustomResponse.onSuccess(exhibitionQueryService.getUpcomingPopularExhibition());
     }
 
     @Operation(summary = "지금 뜨는 지역별 전시회", description = "현재 진행중인 전시중 reviewCount가 높은, 각기 다른 지역구를 가진 전시 4개 반환")
     @GetMapping("/trending-region")
-    public CustomResponse<ExhibitionResDTO.PopularRegionExhibitionListResDTO> trendingRegionExhibition() {
-        return CustomResponse.onSuccess(exhibitionQueryService.getPopularRegionExhibitions());
+    public CustomResponse<ExhibitionResDTO.RegionalPopularExhibitionListResDTO> getRegionalPopularExhibitions() {
+        return CustomResponse.onSuccess(exhibitionQueryService.getRegionalPopularExhibitions());
     }
 
     @Operation(summary = "artie 추천 전시회", description = "artie 추천 전시 4개 반환 - 하루 단위로 업데이트")

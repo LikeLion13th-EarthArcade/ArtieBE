@@ -22,7 +22,7 @@ public interface ExhibitionQueryService {
     ExhibitionResDTO.UpcomingPopularExhibitionResDTO getUpcomingPopularExhibition();
 
     // 지금 뜨는 지역별 전시회
-    ExhibitionResDTO.PopularRegionExhibitionListResDTO getPopularRegionExhibitions();
+    ExhibitionResDTO.RegionalPopularExhibitionListResDTO getRegionalPopularExhibitions();
 
     // artie 픽
     List<ExhibitionResDTO.ArtieRecommendationResDTO> getTodayArtiePicks(String email);

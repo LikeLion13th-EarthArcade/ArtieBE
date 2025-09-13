@@ -137,7 +137,7 @@ public class ExhibitionConverter {
                 .build();
     }
 
-    public static ExhibitionResDTO.ExhibitionHotNowResDTO toHotNowExhibitionResDTO(Exhibition exhibition, boolean isLiked) {
+    public static ExhibitionResDTO.ExhibitionHotNowResDTO toExhibitionHotNowResDTO(Exhibition exhibition, boolean isLiked) {
         return ExhibitionResDTO.ExhibitionHotNowResDTO.builder()
                 .exhibitionId(exhibition.getId())
                 .title(exhibition.getTitle())
@@ -154,7 +154,7 @@ public class ExhibitionConverter {
                 .build();
     }
 
-    public static ExhibitionResDTO.UpcomingPopularExhibitionResDTO toUpcomingPopularityExhibitionResDTO(
+    public static ExhibitionResDTO.UpcomingPopularExhibitionResDTO toUpcomingPopularExhibitionResDTO(
             Long exhibitionId, String title, List<String> imageUrls
     ) {
         return ExhibitionResDTO.UpcomingPopularExhibitionResDTO.builder()
@@ -164,15 +164,16 @@ public class ExhibitionConverter {
                 .build();
     }
 
-    public static ExhibitionResDTO.PopularRegionExhibitionListResDTO toPopularRegionExhibitionListResDTO(List<ExhibitionResDTO.PopularRegionExhibitionResDTO> exhibitions) {
-        return ExhibitionResDTO.PopularRegionExhibitionListResDTO.builder()
+    public static ExhibitionResDTO.RegionalPopularExhibitionListResDTO toRegionalPopularExhibitionListResDTO(List<ExhibitionResDTO.RegionalPopularExhibitionResDTO> exhibitions) {
+        return ExhibitionResDTO.RegionalPopularExhibitionListResDTO.builder()
                 .exhibitions(exhibitions)
                 .build();
     }
 
-    public static ExhibitionResDTO.PopularRegionExhibitionResDTO toPopularRegionExhibitionResDTO(Exhibition exhibition) {
-        return ExhibitionResDTO.PopularRegionExhibitionResDTO.builder()
+    public static ExhibitionResDTO.RegionalPopularExhibitionResDTO toRegionalPopularExhibitionResDTO(Exhibition exhibition) {
+        return ExhibitionResDTO.RegionalPopularExhibitionResDTO.builder()
                 .exhibitionId(exhibition.getId())
+                .district(exhibition.getAddress().getDistrict())
                 .title(exhibition.getTitle())
                 .thumbnail(exhibition.getThumbnail())
                 .build();
