@@ -85,8 +85,9 @@ public class Exhibition extends BaseTimeEntity {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public void delete() {
+    public void softDelete() {
         isDeleted = true;
+        markDeleted();
     }
 
     public void increaseLikeCount() {
