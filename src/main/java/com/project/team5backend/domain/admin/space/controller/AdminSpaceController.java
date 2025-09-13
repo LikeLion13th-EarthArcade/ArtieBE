@@ -5,6 +5,7 @@ import com.project.team5backend.domain.admin.space.service.command.AdminSpaceCom
 import com.project.team5backend.domain.admin.space.service.query.AdminSpaceQueryService;
 import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.global.entity.enums.StatusGroup;
+import com.project.team5backend.global.util.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
@@ -37,11 +38,11 @@ public class AdminSpaceController {
     @Operation(summary = "공간등록 관리 ")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public CustomResponse<Page<AdminSpaceResDTO.SpaceSummaryResDTO>> getAdminSpaceList(
+    public CustomResponse<PageResponse<AdminSpaceResDTO.SpaceSummaryResDTO>> getAdminSpaceList(
             @RequestParam(name = "status", required = false, defaultValue = "ALL") StatusGroup status,
             @RequestParam(name = "page", defaultValue = "0") int page
     ) {
-        return CustomResponse.onSuccess(adminSpaceQueryService.getSummarySpaceList(status, page));
+        return CustomResponse.onSuccess(PageResponse.of(adminSpaceQueryService.getSummarySpaceList(status, page)));
     }
 
     @Operation(summary = "공간 상세 보기 (admin)", description = "상태에 상관없이 공간 상세 보기 가능")
