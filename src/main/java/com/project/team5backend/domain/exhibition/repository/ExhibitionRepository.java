@@ -89,23 +89,24 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
     @Query("""
         update Exhibition e
         set e.reviewCount = e.reviewCount + 1,
-            e.ratingAvg = ((e.ratingAvg * (e.reviewCount - 1)) + :rating) / (e.reviewCount)
-        where e.id =:exhibitionId
+            e.reviewSum   = e.reviewSum + :rate,
+            e.ratingAvg   = (e.reviewSum + :rate) / (e.reviewCount + 1)
+        where e.id = :exhibitionId
         """)
-    void applyReviewCreated(@Param("exhibitionId") Long exhibitionId, @Param("rating")  double rating);
+    void applyReviewCreated(@Param("exhibitionId") Long exhibitionId, @Param("rate")  int rate);
 
     @Modifying
     @Query("""
         update Exhibition e
         set e.reviewCount = e.reviewCount - 1,
+            e.reviewSum = e.reviewSum - :rate,
             e.ratingAvg   = case
-                              when e.reviewCount <= 0
-                                then 0
-                              else ((e.ratingAvg * (e.reviewCount + 1)) - :rating) / e.reviewCount
+                              when e.reviewCount - 1 <= 0 then 0
+                              else (e.reviewSum - :rate) / (e.reviewCount - 1)
                              end
         where e.id =:exhibitionId and e.reviewCount > 0
         """)
-    void applyReviewDeleted(@Param("exhibitionId") Long exhibitionId, @Param("rating")  double rating);
+    void applyReviewDeleted(@Param("exhibitionId") Long exhibitionId, @Param("rate")  int rate);
 
     @Query("""
         select e from Exhibition e
@@ -126,7 +127,7 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
           AND e.status = :status
           AND e.startDate <= :today AND e.endDate >= :today
           AND (e.exhibitionCategory = :exhibitionCategory OR e.exhibitionMood = :exhibitionMood)
-        ORDER BY (e.reviewCount + e.totalReviewScore) DESC
+        ORDER BY (e.reviewCount + e.reviewSum) DESC
         """)
     List<Exhibition> recommendByKeywords(
             @Param("exhibitionCategory") ExhibitionCategory exhibitionCategory,

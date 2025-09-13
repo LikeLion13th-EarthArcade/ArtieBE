@@ -13,6 +13,7 @@ import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -34,9 +35,10 @@ public class ExhibitionConverter {
                 .exhibitionType(createReqDTO.exhibitionType())
                 .exhibitionMood(createReqDTO.exhibitionMood())
                 .isDeleted(false)
-                .ratingAvg(BigDecimal.ZERO)
+                .ratingAvg(0.0)
                 .likeCount(0)
                 .reviewCount(0)
+                .reviewSum(0)
                 .thumbnail(imageUrls)
                 .address(address)
                 .user(user)
@@ -198,9 +200,9 @@ public class ExhibitionConverter {
 
     //ai 추천 결과 관련 컨버터
     public static ExhibitionResDTO.ExhibitionCardResDTO toCard(Exhibition e, boolean isLiked) {
-        var avg = (e.getRatingAvg()==null)
-                ? java.math.BigDecimal.ZERO
-                : e.getRatingAvg().setScale(1, java.math.RoundingMode.HALF_UP);
+        double avg = BigDecimal.valueOf(e.getRatingAvg())
+                .setScale(1, RoundingMode.HALF_UP)
+                .doubleValue();
 
         return ExhibitionResDTO.ExhibitionCardResDTO.builder()
                 .exhibitionId(e.getId())
@@ -213,7 +215,7 @@ public class ExhibitionConverter {
                 .startDate(e.getStartDate())
                 .endDate(e.getEndDate())
                 .reviewAvg(avg)
-                .reviewCount(e.getReviewCount()==null? 0 : e.getReviewCount())
+                .reviewCount(e.getReviewCount())
                 .isLiked(isLiked)
                 .build();
     }

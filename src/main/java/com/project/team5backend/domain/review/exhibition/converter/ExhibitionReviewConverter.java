@@ -16,7 +16,7 @@ public class ExhibitionReviewConverter {
 
     public static ExhibitionReview toEntity(ExhibitionReviewReqDTO.createExReviewReqDTO createExReviewReqDTO, Exhibition exhibition, User user) {
         return ExhibitionReview.builder()
-                .rating(createExReviewReqDTO.rating())
+                .rate(createExReviewReqDTO.rate())
                 .content(createExReviewReqDTO.content())
                 .exhibition(exhibition)
                 .user(user)
@@ -34,7 +34,7 @@ public class ExhibitionReviewConverter {
     public static ExhibitionReviewResDTO.ExReviewDetailResDTO toExReviewDetailResDTO(ExhibitionReview review, List<String> imageUrls) {
         return ExhibitionReviewResDTO.ExReviewDetailResDTO.builder()
                 .reviewId(review.getId())
-                .rating(review.getRating())
+                .rate(review.getRate())
                 .content(review.getContent())
                 .imageUrls(imageUrls)
                 .createdAt(review.getCreatedAt())

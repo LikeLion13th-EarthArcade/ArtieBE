@@ -55,10 +55,10 @@ public class RecommendationService {
     // 홈 요약(프리뷰 1개)
     public RecommendResDTO.PersonalizedSummaryResDTO summary(Long userId) {
         var k = computeKeys(userId);
-        if (!k.eligible()) return new RecommendResDTO.PersonalizedSummaryResDTO(false, null, null, null,null,null,null,null,null,null,null,0,null);
+        if (!k.eligible()) return new RecommendResDTO.PersonalizedSummaryResDTO(false, null, null, null,null,null,null,null,null,null,0.0,0,null);
 
         List<Exhibition> top4 = recommendWithEmbedding(userId, k, 4);
-        if (top4.isEmpty()) return new RecommendResDTO.PersonalizedSummaryResDTO(false, null, null, null,null,null,null,null,null,null,null,0,null);
+        if (top4.isEmpty()) return new RecommendResDTO.PersonalizedSummaryResDTO(false, null, null, null,null,null,null,null,null,null,0.0,0,null);
 
         Exhibition e = top4.get(0);
 
@@ -141,8 +141,7 @@ public class RecommendationService {
         double minR = Double.POSITIVE_INFINITY, maxR = Double.NEGATIVE_INFINITY;
         Map<Long, Double> rScore = new HashMap<>();
         for (var e : candidates) {
-            double r = (e.getReviewCount()==null?0:e.getReviewCount())
-                    + (e.getTotalReviewScore()==null?0:e.getTotalReviewScore());
+            double r = e.getReviewCount() + e.getReviewSum();
             rScore.put(e.getId(), r);
             if (r < minR) minR = r;
             if (r > maxR) maxR = r;

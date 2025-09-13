@@ -62,19 +62,14 @@ public class Exhibition extends BaseTimeEntity {
     @Embedded
     private Address address;
 
-    @Column(name = "rating_avg", columnDefinition = "DECIMAL(4,2) NOT NULL DEFAULT 0")
-    private BigDecimal ratingAvg;
+    private double ratingAvg;
 
-    @Column(name = "rating_count")
-    private Integer reviewCount;
+    private int reviewCount;
 
-    @Column(name = "like_count")
-    private Integer likeCount;
+    private int likeCount;
 
-    @Column(name = "total_review_score")
-    private Integer totalReviewScore;
+    private int reviewSum;
 
-    @Column(name = "is_deleted")
     private boolean isDeleted;
 
     @OneToMany(mappedBy = "exhibition", cascade = CascadeType.ALL, orphanRemoval = true)

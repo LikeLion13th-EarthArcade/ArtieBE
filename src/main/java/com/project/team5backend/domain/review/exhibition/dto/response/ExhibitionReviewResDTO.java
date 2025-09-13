@@ -9,7 +9,7 @@ public class ExhibitionReviewResDTO {
     @Builder
     public record ExReviewDetailResDTO(
             Long reviewId,
-            Double rating,
+            int rate,
             String content,
             List<String> imageUrls,
             LocalDateTime createdAt,

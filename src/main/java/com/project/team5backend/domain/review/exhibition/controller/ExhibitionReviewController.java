@@ -70,7 +70,7 @@ public class ExhibitionReviewController {
     public CustomResponse<String> deleteExhibitionReview(
             @AuthenticationPrincipal CurrentUser currentUser,
             @PathVariable("reviewId") Long exhibitionReviewId) {
-        exhibitionReviewCommandService.deleteExhibitionReview(exhibitionReviewId, currentUser.getEmail());
+        exhibitionReviewCommandService.deleteExhibitionReview(exhibitionReviewId, currentUser.getId());
         return CustomResponse.onSuccess("해당 전시 리뷰가 삭제되었습니다.");
     }
 }

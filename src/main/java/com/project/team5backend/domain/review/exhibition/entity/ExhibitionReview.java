@@ -23,9 +23,8 @@ public class ExhibitionReview extends BaseTimeEntity {
 
     private String content;
 
-    private Double rating;
+    private int rate;
 
-    @Column(name = "is_deleted")
     private boolean isDeleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -42,5 +41,6 @@ public class ExhibitionReview extends BaseTimeEntity {
 
     public void softDelete() {
         isDeleted = true;
+        markDeleted();
     }
 }

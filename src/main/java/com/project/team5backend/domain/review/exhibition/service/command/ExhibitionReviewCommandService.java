@@ -9,5 +9,5 @@ import java.util.List;
 public interface ExhibitionReviewCommandService {
     ExhibitionReviewResDTO.ExReviewCreateResDTO createExhibitionReview(Long exhibitionId, Long userId, ExhibitionReviewReqDTO.createExReviewReqDTO createExReviewReqDTO, List<MultipartFile> images);
 
-    void deleteExhibitionReview(Long exhibitionReviewId, String email);
+    void deleteExhibitionReview(Long exhibitionReviewId, Long userId);
 }
