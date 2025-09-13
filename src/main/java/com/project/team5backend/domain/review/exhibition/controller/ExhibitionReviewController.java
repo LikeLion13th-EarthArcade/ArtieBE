@@ -50,7 +50,6 @@ public class ExhibitionReviewController {
         return CustomResponse.onSuccess(exhibitionReviewCommandService.createExhibitionReview(exhibitionId, currentUser.getId(), request, images));
     }
 
-
     @Operation(summary = "리뷰 목록 조회", description = "리뷰 목록 조회 api")
     @GetMapping("{exhibitionId}/reviews")
     public CustomResponse<PageResponse<ExhibitionReviewResDTO.ExReviewDetailResDTO>> getExhibitionReviews(
@@ -65,6 +64,7 @@ public class ExhibitionReviewController {
             @PathVariable("reviewId") Long exhibitionReviewId){
         return CustomResponse.onSuccess(exhibitionReviewQueryService.getExhibitionReviewDetail(exhibitionReviewId));
     }
+
     @Operation(summary = "리뷰 삭제", description = "리뷰 소프트 삭제")
     @DeleteMapping("/reviews/{reviewId}")
     public CustomResponse<String> deleteExhibitionReview(

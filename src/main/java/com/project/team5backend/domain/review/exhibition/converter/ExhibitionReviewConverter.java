@@ -31,12 +31,12 @@ public class ExhibitionReviewConverter {
                 .build();
     }
 
-    public static ExhibitionReviewResDTO.ExReviewDetailResDTO toDetailExReviewResDTO(ExhibitionReview review, List<String> fileKeys) {
+    public static ExhibitionReviewResDTO.ExReviewDetailResDTO toExReviewDetailResDTO(ExhibitionReview review, List<String> imageUrls) {
         return ExhibitionReviewResDTO.ExReviewDetailResDTO.builder()
                 .reviewId(review.getId())
                 .rating(review.getRating())
                 .content(review.getContent())
-                .imageUrls(fileKeys)
+                .imageUrls(imageUrls)
                 .createdAt(review.getCreatedAt())
                 .userName(review.getUser().getName())
                 .build();

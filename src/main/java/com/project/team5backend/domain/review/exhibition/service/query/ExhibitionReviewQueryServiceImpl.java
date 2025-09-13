@@ -17,7 +17,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -32,10 +31,10 @@ public class ExhibitionReviewQueryServiceImpl implements ExhibitionReviewQuerySe
         ExhibitionReview exhibitionReview = exhibitionReviewRepository.findByIdAndIsDeletedFalse(exhibitionReviewId)
                 .orElseThrow(()-> new ExhibitionReviewException(ExhibitionReviewErrorCode.EXHIBITION_REVIEW_NOT_FOUND));
 
-        List<String> fileKeys = exhibitionReview.getExhibitionReviewImages().stream()
-                .map(ExhibitionReviewImage::getImageUrl).collect(Collectors.toList());
-
-        return ExhibitionReviewConverter.toDetailExReviewResDTO(exhibitionReview, fileKeys);
+        List<String> imageUrls = exhibitionReview.getExhibitionReviewImages().stream()
+                .map(ExhibitionReviewImage::getImageUrl)
+                .toList();
+        return ExhibitionReviewConverter.toExReviewDetailResDTO(exhibitionReview, imageUrls);
     }
 
     @Override
@@ -48,7 +47,7 @@ public class ExhibitionReviewQueryServiceImpl implements ExhibitionReviewQuerySe
             List<String> imageUrls = review.getExhibitionReviewImages().stream()
                     .map(ExhibitionReviewImage::getImageUrl)
                     .toList();
-            return ExhibitionReviewConverter.toDetailExReviewResDTO(review, imageUrls);
+            return ExhibitionReviewConverter.toExReviewDetailResDTO(review, imageUrls);
         });
     }
 }

@@ -16,7 +16,12 @@ public interface ExhibitionReviewRepository extends JpaRepository<ExhibitionRevi
     @Query("update ExhibitionReview er set er.isDeleted = true where er.exhibition.id =:exhibitionId")
     void softDeleteByExhibitionId(@Param("exhibitionId") Long exhibitionId);
 
-    @Query("select er from ExhibitionReview er where er.id=:exhibitionReviewId and er.isDeleted is false")
+    @Query("""
+        select er from ExhibitionReview er
+        join fetch er.user u
+        left join er.exhibitionReviewImages eri
+        where er.id =:exhibitionReviewId and er.isDeleted is false
+    """)
     Optional<ExhibitionReview> findByIdAndIsDeletedFalse(@Param("exhibitionReviewId") Long exhibitionReviewId);
 
     @Query("SELECT DISTINCT er FROM ExhibitionReview er " +
