@@ -11,6 +11,7 @@ import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.global.security.userdetails.CurrentUser;
 import com.project.team5backend.global.security.userdetails.CustomUserDetails;
+import com.project.team5backend.global.util.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Encoding;
@@ -73,7 +74,7 @@ public class ExhibitionController {
 
     @Operation(summary = "전시 검색", description = "전시 검색하면 한페이지에 4개의 전시와 서울 시청 중심의 위도 경도 반환")
     @GetMapping("/search")
-    public CustomResponse<ExhibitionResDTO.SearchExhibitionPageResDTO> searchExhibitions(
+    public CustomResponse<ExhibitionResDTO.ExhibitionSearchPageResDTO> searchExhibitions(
             @RequestParam(name = "exhibitionCategory", required = false) ExhibitionCategory exhibitionCategory,
             @RequestParam(name = "distinct", required = false) String district,
             @RequestParam(name = "exhibitionMood", required = false) ExhibitionMood exhibitionMood,
@@ -81,7 +82,7 @@ public class ExhibitionController {
             @RequestParam(defaultValue = "POPULAR") Sort sort,   // new | old | popular
             @RequestParam(name = "page", defaultValue = "0") int page
     ) {
-        return CustomResponse.onSuccess(exhibitionQueryService.searchExhibition(exhibitionCategory, district, exhibitionMood, localDate, sort, page));
+        return CustomResponse.onSuccess(exhibitionQueryService.searchExhibitions(exhibitionCategory, district, exhibitionMood, localDate, sort, page));
     }
 
     @Operation(summary = "지금 뜨는 전시회", description = "현재 진행중인 전시중에서 reviewCount가 가장 높은 전시 반환")

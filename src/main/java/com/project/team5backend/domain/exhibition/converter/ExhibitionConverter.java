@@ -6,12 +6,11 @@ import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.facility.entity.ExhibitionFacility;
 import com.project.team5backend.domain.facility.entity.Facility;
 import com.project.team5backend.global.entity.enums.Status;
-import com.project.team5backend.domain.exhibition.review.dto.response.ExhibitionReviewResDTO;
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.global.entity.embedded.Address;
+import com.project.team5backend.global.util.PageResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.springframework.data.domain.Page;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
@@ -118,8 +117,8 @@ public class ExhibitionConverter {
                 .build();
     }
 
-    public static ExhibitionResDTO.SearchExhibitionResDTO toSearchExhibitionResDTO(Exhibition exhibition) {
-        return ExhibitionResDTO.SearchExhibitionResDTO.builder()
+    public static ExhibitionResDTO.ExhibitionSearchResDTO toExhibitionSearchResDTO(Exhibition exhibition) {
+        return ExhibitionResDTO.ExhibitionSearchResDTO.builder()
                 .exhibitionId(exhibition.getId())
                 .title(exhibition.getTitle())
                 .thumbnail(exhibition.getThumbnail())
@@ -131,31 +130,11 @@ public class ExhibitionConverter {
                 .build();
     }
 
-    public static ExhibitionResDTO.SearchExhibitionPageResDTO toSearchExhibitionPageResDTO(
-            List<ExhibitionResDTO.SearchExhibitionResDTO> items,
-            Page<?> page,
-            Double defaultCenterLat,
-            Double defaultCenterLng) {
-
-        // PageInfo 생성
-        ExhibitionResDTO.SearchExhibitionPageResDTO.PageInfo pageInfo =
-                new ExhibitionResDTO.SearchExhibitionPageResDTO.PageInfo(
-                        page.getNumber(),
-                        page.getSize(),
-                        page.getTotalElements(),
-                        page.getTotalPages(),
-                        page.isFirst(),
-                        page.isLast()
-                );
-
-        // MapInfo 생성
-        ExhibitionResDTO.SearchExhibitionPageResDTO.MapInfo mapInfo =
-                new ExhibitionResDTO.SearchExhibitionPageResDTO.MapInfo(
-                        defaultCenterLat,
-                        defaultCenterLng
-                );
-
-        return new ExhibitionResDTO.SearchExhibitionPageResDTO(items, pageInfo, mapInfo);
+    public static ExhibitionResDTO.ExhibitionSearchPageResDTO toExhibitionSearchPageResDTO(PageResponse<ExhibitionResDTO.ExhibitionSearchResDTO> page, Double lat, Double lon) {
+        return ExhibitionResDTO.ExhibitionSearchPageResDTO.builder()
+                .page(page)
+                .map(new ExhibitionResDTO.ExhibitionSearchPageResDTO.MapInfo(lat, lon))
+                .build();
     }
 
     public static ExhibitionResDTO.HotNowExhibitionResDTO toHotNowExhibitionResDTO(Exhibition exhibition, boolean isLiked) {

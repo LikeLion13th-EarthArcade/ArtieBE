@@ -1,9 +1,11 @@
 package com.project.team5backend.domain.exhibition.dto.response;
 
+import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionCategory;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionMood;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionType;
 import com.project.team5backend.domain.exhibition.review.dto.response.ExhibitionReviewResDTO;
+import com.project.team5backend.global.util.PageResponse;
 import lombok.Builder;
 
 import java.math.BigDecimal;
@@ -68,7 +70,7 @@ public class ExhibitionResDTO {
     ){}
 
     @Builder
-    public record SearchExhibitionResDTO (
+    public record ExhibitionSearchResDTO (
             Long exhibitionId,
             String title,
             String thumbnail,
@@ -77,25 +79,16 @@ public class ExhibitionResDTO {
             String address,
             BigDecimal latitude,
             BigDecimal longitude
-    ){}
+    ){ }
+
     @Builder
-    public record SearchExhibitionPageResDTO (
-            List<SearchExhibitionResDTO> items,
-            PageInfo pageInfo,
-            MapInfo map // 기본값 - 서울 중심
-    ) {
+    public record ExhibitionSearchPageResDTO(
+            PageResponse<ExhibitionSearchResDTO> page,
+            MapInfo map
+    ){
         public record MapInfo(
                 Double defaultCenterLat,
                 Double defaultCenterLng
-        ) {}
-
-        public record PageInfo(
-                int page,          // 0-based
-                int size,          // 항상 4
-                long totalElements,
-                int totalPages,
-                boolean first,
-                boolean last
         ) {}
     }
 

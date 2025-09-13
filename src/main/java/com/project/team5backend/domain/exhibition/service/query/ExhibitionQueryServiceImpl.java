@@ -5,21 +5,17 @@ import com.project.team5backend.domain.exhibition.dto.response.ExhibitionResDTO;
 import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionCategory;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionMood;
-import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.domain.exhibition.exception.ExhibitionErrorCode;
 import com.project.team5backend.domain.exhibition.exception.ExhibitionException;
 import com.project.team5backend.domain.exhibition.repository.ExhibitionLikeRepository;
 import com.project.team5backend.domain.exhibition.repository.ExhibitionRepository;
-import com.project.team5backend.global.entity.enums.Sort;
-import com.project.team5backend.domain.exhibition.review.converter.ExhibitionReviewConverter;
-import com.project.team5backend.domain.exhibition.review.dto.response.ExhibitionReviewResDTO;
-import com.project.team5backend.domain.exhibition.review.entity.ExhibitionReview;
-import com.project.team5backend.domain.exhibition.review.repository.ExhibitionReviewRepository;
 import com.project.team5backend.domain.image.repository.ExhibitionImageRepository;
-import com.project.team5backend.domain.image.repository.ExhibitionReviewImageRepository;
 import com.project.team5backend.domain.recommendation.service.InteractLogService;
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.user.repository.UserRepository;
+import com.project.team5backend.global.entity.enums.Sort;
+import com.project.team5backend.global.entity.enums.Status;
+import com.project.team5backend.global.util.PageResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -38,8 +34,8 @@ import java.util.List;
 public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
 
     private static final int PAGE_SIZE = 4;
-    private static final double SEOUL_CENTER_LAT = 37.5665;
-    private static final double SEOUL_CENTER_LNG = 126.9780;
+    private static final double SEOUL_CITY_HALL_LAT = 37.5665;
+    private static final double SEOUL_CITY_HALL_LNG = 126.9780;
 
     private final ExhibitionRepository exhibitionRepository;
     private final ExhibitionImageRepository exhibitionImageRepository;
@@ -60,27 +56,19 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
     }
 
     @Override
-    public ExhibitionResDTO.SearchExhibitionPageResDTO searchExhibition(
+    public ExhibitionResDTO.ExhibitionSearchPageResDTO searchExhibitions(
             ExhibitionCategory exhibitionCategory, String district, ExhibitionMood exhibitionMood, LocalDate localDate, Sort sort, int page) {
 
-        log.info("전시 검색 - exhibitionCategory: {}, district: {}, exhibitionMood: {}, localDate: {}, sort: {}, page: {}",
-                exhibitionCategory, district, exhibitionMood, localDate, sort, page);
-
-        // Pageable 생성
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt"));
 
         // 동적 쿼리로 전시 검색
         Page<Exhibition> exhibitionPage = exhibitionRepository.findExhibitionsWithFilters(
                 exhibitionCategory, district, exhibitionMood, localDate, sort, pageable);
 
-        // 검색 결과를 DTO로 변환 - Converter 사용
-        List<ExhibitionResDTO.SearchExhibitionResDTO> items = exhibitionPage.getContent().stream()
-                .map(ExhibitionConverter::toSearchExhibitionResDTO)
-                .toList();
+        Page<ExhibitionResDTO.ExhibitionSearchResDTO> exhibitionSearchResDTOPage = exhibitionPage
+                .map(ExhibitionConverter::toExhibitionSearchResDTO);
 
-        // PageInfo와 MapInfo 생성 - Converter 사용
-        return ExhibitionConverter.toSearchExhibitionPageResDTO(
-                items, exhibitionPage, SEOUL_CENTER_LAT, SEOUL_CENTER_LNG);
+        return ExhibitionConverter.toExhibitionSearchPageResDTO(PageResponse.of(exhibitionSearchResDTOPage), SEOUL_CITY_HALL_LAT, SEOUL_CITY_HALL_LNG);
     }
 
     @Override
