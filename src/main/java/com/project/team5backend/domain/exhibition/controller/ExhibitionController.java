@@ -10,8 +10,6 @@ import com.project.team5backend.global.SwaggerBody;
 import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.global.security.userdetails.CurrentUser;
-import com.project.team5backend.global.security.userdetails.CustomUserDetails;
-import com.project.team5backend.global.util.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Encoding;
@@ -87,10 +85,10 @@ public class ExhibitionController {
 
     @Operation(summary = "지금 뜨는 전시회", description = "현재 진행중인 전시중에서 reviewCount가 가장 높은 전시 반환")
     @GetMapping("/hot-now")
-    public CustomResponse<List<ExhibitionResDTO.HotNowExhibitionResDTO>> hotNowExhibition(
+    public CustomResponse<List<ExhibitionResDTO.ExhibitionHotNowResDTO>> getExhibitionHotNow(
             @AuthenticationPrincipal CurrentUser currentUser
     ) {
-        return CustomResponse.onSuccess(exhibitionQueryService.getHotNowExhibition(currentUser.getEmail()));
+        return CustomResponse.onSuccess(exhibitionQueryService.getHotNowExhibitions(currentUser.getId()));
     }
 
     @Operation(summary = "지금 뜨는, 다가오는 전시회", description = "아직 시작되지 않은 전시중에서 likeCount가 가장 높은 전시 반환")

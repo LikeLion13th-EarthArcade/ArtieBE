@@ -137,8 +137,8 @@ public class ExhibitionConverter {
                 .build();
     }
 
-    public static ExhibitionResDTO.HotNowExhibitionResDTO toHotNowExhibitionResDTO(Exhibition exhibition, boolean isLiked) {
-        return ExhibitionResDTO.HotNowExhibitionResDTO.builder()
+    public static ExhibitionResDTO.ExhibitionHotNowResDTO toHotNowExhibitionResDTO(Exhibition exhibition, boolean isLiked) {
+        return ExhibitionResDTO.ExhibitionHotNowResDTO.builder()
                 .exhibitionId(exhibition.getId())
                 .title(exhibition.getTitle())
                 .description(exhibition.getDescription())

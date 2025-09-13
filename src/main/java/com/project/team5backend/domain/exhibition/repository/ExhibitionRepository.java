@@ -52,7 +52,7 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
         and e.endDate >=:current
         order by e.reviewCount desc , e.createdAt desc
    """)
-    List<Exhibition> findHotNowExhibition(@Param("current") LocalDate current, Pageable pageable, @Param("status") Status status);
+    List<Exhibition> findExhibitionHotNow(@Param("current") LocalDate current, Pageable pageable, @Param("status") Status status);
 
     // 다가오는, 지금뜨는 전시회
     @Query("""

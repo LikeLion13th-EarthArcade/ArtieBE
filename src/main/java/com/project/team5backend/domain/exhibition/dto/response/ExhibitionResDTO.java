@@ -1,10 +1,8 @@
 package com.project.team5backend.domain.exhibition.dto.response;
 
-import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionCategory;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionMood;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionType;
-import com.project.team5backend.domain.exhibition.review.dto.response.ExhibitionReviewResDTO;
 import com.project.team5backend.global.util.PageResponse;
 import lombok.Builder;
 
@@ -93,7 +91,7 @@ public class ExhibitionResDTO {
     }
 
     @Builder
-    public record HotNowExhibitionResDTO (
+    public record ExhibitionHotNowResDTO(
             Long exhibitionId,
             String title,
             String description,

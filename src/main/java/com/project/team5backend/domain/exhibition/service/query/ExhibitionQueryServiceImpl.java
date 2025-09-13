@@ -12,6 +12,8 @@ import com.project.team5backend.domain.exhibition.repository.ExhibitionRepositor
 import com.project.team5backend.domain.image.repository.ExhibitionImageRepository;
 import com.project.team5backend.domain.recommendation.service.InteractLogService;
 import com.project.team5backend.domain.user.entity.User;
+import com.project.team5backend.domain.user.exception.UserErrorCode;
+import com.project.team5backend.domain.user.exception.UserException;
 import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.global.entity.enums.Status;
@@ -72,26 +74,16 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
     }
 
     @Override
-    public List<ExhibitionResDTO.HotNowExhibitionResDTO> getHotNowExhibition(String email) {
+    public List<ExhibitionResDTO.ExhibitionHotNowResDTO> getHotNowExhibitions(Long userId) {
         LocalDate currentDate = LocalDate.now();
+        Pageable page = PageRequest.of(0, 4);
 
-        User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new IllegalArgumentException("유저가 존재하지 않습니다."));
-        Pageable topOne = PageRequest.of(0, 4);
-
-        List<Exhibition> exhibitions = exhibitionRepository.findHotNowExhibition(currentDate, topOne, Status.APPROVED);
+        List<Exhibition> exhibitions = exhibitionRepository.findExhibitionHotNow(currentDate, page, Status.APPROVED);
         if (exhibitions.isEmpty()) {
             throw new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND);
         }
         return exhibitions.stream()
-                .map(exhibition -> {
-                    boolean isLiked = exhibitionLikeRepository
-                            .existsByUserIdAndExhibitionId(
-                                    exhibition.getUser().getId(),
-                                    exhibition.getId()
-                            );
-                    return ExhibitionConverter.toHotNowExhibitionResDTO(exhibition, isLiked);
-                })
+                .map(exhibition -> ExhibitionConverter.toHotNowExhibitionResDTO(exhibition, isExhibitionLiked(userId, exhibition.getId())))
                 .toList();
     }
 
@@ -152,4 +144,7 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
                 .toList();
     }
 
+    private boolean isExhibitionLiked(Long userId, Long exhibitionId) {
+        return exhibitionLikeRepository.existsByUserIdAndExhibitionId(userId, exhibitionId);
+    }
 }
