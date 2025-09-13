@@ -6,6 +6,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface SpaceReviewQueryService {
-    Page<SpaceReviewResDTO.DetailSpaceReviewResDTO> getSpaceReviewList(long spaceId, Pageable pageable);
-    SpaceReviewResDTO.DetailSpaceReviewResDTO getSpaceReviewDetail(long spaceReviewId);
+    Page<SpaceReviewResDTO.SpaceReviewDetailResDTO> getSpaceReviewList(long spaceId, Pageable pageable);
+    SpaceReviewResDTO.SpaceReviewDetailResDTO getSpaceReviewDetail(long spaceReviewId);
 }

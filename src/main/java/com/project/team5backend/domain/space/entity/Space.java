@@ -50,32 +50,30 @@ public class Space extends BaseTimeEntity {
 
     private String snsUrl; // SNS 주소
 
-    @Column(columnDefinition = "DECIMAL(4,2) NOT NULL DEFAULT 0")
-    private BigDecimal ratingAvg;
+    private double ratingAvg;
 
-    private Integer reviewCount = 0;
+    private int reviewCount;
 
-    private Integer likeCount = 0;
+    private int likeCount;
 
-    private Integer totalReviewScore = 0;
+    private int reviewSum;
 
-    @Column(nullable = false)
-    private boolean isDeleted = false;
+    private boolean isDeleted;
 
     @Embedded
     private Address address; // 공간 주소 (위도, 경도 포함)
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private SpaceType type;     // 공간 유형
+    private SpaceType spaceType;     // 공간 유형
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private SpaceSize size;     // 공간 크기
+    private SpaceSize spaceSize;     // 공간 크기
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private SpaceMood mood;     // 공간 분위기
+    private SpaceMood spaceMood;     // 공간 분위기
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

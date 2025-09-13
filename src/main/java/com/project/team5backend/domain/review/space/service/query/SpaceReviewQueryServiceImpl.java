@@ -23,17 +23,17 @@ public class SpaceReviewQueryServiceImpl implements SpaceReviewQueryService {
     private final SpaceReviewRepository spaceReviewRepository;
 
     @Override
-    public SpaceReviewResDTO.DetailSpaceReviewResDTO getSpaceReviewDetail(long spaceReviewId) {
+    public SpaceReviewResDTO.SpaceReviewDetailResDTO getSpaceReviewDetail(long spaceReviewId) {
         SpaceReview spaceReview = spaceReviewRepository.findByIdAndIsDeletedFalse(spaceReviewId)
                 .orElseThrow(() -> new SpaceReviewException(SpaceReviewErrorCode.SPACE_REVIEW_NOT_FOUND));
 
         List<String> imageUrls = spaceReview.getSpaceReviewImages().stream()
                 .map(SpaceReviewImage::getImageUrl)
                 .toList();
-        return SpaceReviewConverter.toDetailSpaceReviewResDTO(spaceReview, imageUrls);
+        return SpaceReviewConverter.toSpaceReviewDetailResDTO(spaceReview, imageUrls);
     }
 
-    public Page<SpaceReviewResDTO.DetailSpaceReviewResDTO> getSpaceReviewList(long spaceId, Pageable pageable) {
+    public Page<SpaceReviewResDTO.SpaceReviewDetailResDTO> getSpaceReviewList(long spaceId, Pageable pageable) {
         Page<SpaceReview> spaceReviewPage = spaceReviewRepository.findBySpaceIdAndIsDeletedFalse(spaceId, pageable);
 
 
@@ -42,7 +42,7 @@ public class SpaceReviewQueryServiceImpl implements SpaceReviewQueryService {
                     .map(SpaceReviewImage::getImageUrl)
                     .toList();
 
-            return SpaceReviewConverter.toDetailSpaceReviewResDTO(spaceReview, imageUrls);
+            return SpaceReviewConverter.toSpaceReviewDetailResDTO(spaceReview, imageUrls);
         });
     }
 }

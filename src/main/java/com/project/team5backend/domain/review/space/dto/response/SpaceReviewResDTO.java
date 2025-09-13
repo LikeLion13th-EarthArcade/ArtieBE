@@ -8,26 +8,18 @@ import java.util.List;
 public class SpaceReviewResDTO {
 
     @Builder
-    public record CreateSpaceReviewResDTO (
+    public record SpaceReviewCreateResDTO(
             Long spaceReviewId,
             String message
     ){}
 
     @Builder
-    public record DetailSpaceReviewResDTO(
+    public record SpaceReviewDetailResDTO(
             Long spaceReviewId,
-            Double rating,
+            int rate,
             String content,
             List<String> imageUrls,
             LocalDateTime createdAt,
             String userName
     ) {}
-    public record ReviewDetailResponse(
-            Long reviewId,
-            String name,
-            Double rating,
-            String content,
-            List<String> images,
-            LocalDateTime createdAt
-    ){}
 }

@@ -1,6 +1,7 @@
 package com.project.team5backend.domain.review.space.service.command;
 
 import com.project.team5backend.domain.image.converter.ImageConverter;
+import com.project.team5backend.domain.image.entity.ExhibitionReviewImage;
 import com.project.team5backend.domain.image.entity.SpaceReviewImage;
 import com.project.team5backend.domain.image.exception.ImageErrorCode;
 import com.project.team5backend.domain.image.exception.ImageException;
@@ -21,6 +22,7 @@ import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.user.exception.UserErrorCode;
 import com.project.team5backend.domain.user.exception.UserException;
 import com.project.team5backend.domain.user.repository.UserRepository;
+import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.global.util.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Transactional
@@ -37,37 +40,26 @@ public class SpaceReviewCommandServiceImpl implements SpaceReviewCommandService 
 
     private final SpaceReviewRepository spaceReviewRepository;
     private final SpaceRepository spaceRepository;
-    private final UserRepository userRepository;
-    private final SpaceReviewImageRepository reviewImageRepository;
+    private final UserRepository userRepository;;
     private final S3Uploader s3Uploader;
     private final SpaceReviewImageRepository spaceReviewImageRepository;
     private final ImageCommandService imageCommandService;
 
     @Override
-    public SpaceReviewResDTO.CreateSpaceReviewResDTO createSpaceReview(long spaceId, long userId, SpaceReviewReqDTO.CreateSpaceReviewReqDTO request, List<MultipartFile> images) {
-        Space space = spaceRepository.findById(spaceId)
+    public SpaceReviewResDTO.SpaceReviewCreateResDTO createSpaceReview(long spaceId, long userId, SpaceReviewReqDTO.SpaceReviewCreateReqDTO spaceReviewCreateReqDTO, List<MultipartFile> images) {
+        Space space = spaceRepository.findByIdAndIsDeletedFalseAndStatusApproved(spaceId, Status.APPROVED)
                 .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
-        User user = userRepository.findById(userId)
+        User user = userRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
-        if (images == null || images.isEmpty()) images = List.of();
-
-        SpaceReview spaceReview = SpaceReviewConverter.toSpaceReview(request, space, user);
+        SpaceReview spaceReview = SpaceReviewConverter.toSpaceReview(spaceReviewCreateReqDTO, space, user);
         spaceReviewRepository.save(spaceReview);
 
-        List<SpaceReviewImage> spaceReviewImages = new ArrayList<>();
-        for (MultipartFile file : images) {
-            String url = s3Uploader.upload(file, "spaceReview"); // S3 URL
-            SpaceReviewImage spaceReviewImage = ImageConverter.toSpaceReviewImage(spaceReview, url);
-            spaceReviewImages.add(spaceReviewImage);
-        }
-        reviewImageRepository.saveAll(spaceReviewImages);
+        saveReviewImages(images, spaceReview);
 
-        // 리뷰 생성에 따른 공간 별점 평균 업데이트
-        double rating = spaceReview.getRating();
-        spaceRepository.applyReviewCreated(spaceId, rating);
+        spaceRepository.applyReviewCreated(spaceId, spaceReview.getRate()); // 리뷰 생성에 따른 공간 별점 평균 업데이트
 
-        return SpaceReviewConverter.toCreateSpaceReviewResDTO(spaceReview.getId());
+        return SpaceReviewConverter.toSpaceReviewCreateResDTO(spaceReview.getId());
     }
 
     @Override
@@ -84,15 +76,27 @@ public class SpaceReviewCommandServiceImpl implements SpaceReviewCommandService 
         images.forEach(SpaceReviewImage::deleteImage);
         List<String> imageUrls = images.stream().map(SpaceReviewImage::getImageUrl).toList();
 
-        // 리뷰 평균/카운트 갱신
-        double rating = spaceReview.getRating();
-        spaceRepository.applySpaceReviewDeleted(spaceReview.getSpace().getId(), rating);
+        spaceRepository.applySpaceReviewDeleted(spaceReview.getSpace().getId(), spaceReview.getRate());  // 리뷰 평균/카운트 갱신
 
         // s3 보존 휴지통 prefix로 이동시키기
         try{
             imageCommandService.moveToTrashPrefix(imageUrls);
         } catch (ImageException e) {
             throw new ImageException(ImageErrorCode.S3_MOVE_TRASH_FAIL);
+        }
+    }
+    private void saveReviewImages(List<MultipartFile> images, SpaceReview spaceReview) {
+        List<SpaceReviewImage> reviewImages = Optional.ofNullable(images)
+                .orElseGet(List::of)
+                .stream()
+                .map(file -> {
+                    String url = s3Uploader.upload(file, "spaceReviews");
+                    return ImageConverter.toSpaceReviewImage(spaceReview, url);
+                })
+                .toList();
+
+        if (!reviewImages.isEmpty()) {
+            spaceReviewImageRepository.saveAll(reviewImages);
         }
     }
 }

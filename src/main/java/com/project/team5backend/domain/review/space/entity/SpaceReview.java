@@ -23,7 +23,7 @@ public class SpaceReview extends BaseTimeEntity {
 
     private String content;
 
-    private Double rating;
+    private int rate;
 
     private boolean isDeleted;
 

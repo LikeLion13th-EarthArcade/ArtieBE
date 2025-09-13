@@ -43,10 +43,10 @@ public class SpaceReviewController {
             value = "/{spaceId}/reviews",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "공간 리뷰 생성")
-    public CustomResponse<SpaceReviewResDTO.CreateSpaceReviewResDTO> createSpaceReview(
+    public CustomResponse<SpaceReviewResDTO.SpaceReviewCreateResDTO> createSpaceReview(
             @AuthenticationPrincipal CurrentUser currentUser,
             @PathVariable Long spaceId,
-            @RequestPart("request") @Valid SpaceReviewReqDTO.CreateSpaceReviewReqDTO request,
+            @RequestPart("request") @Valid SpaceReviewReqDTO.SpaceReviewCreateReqDTO request,
             @RequestPart(name = "images", required = false) List<MultipartFile> images
     ) {
         return CustomResponse.onSuccess(spaceReviewCommandService.createSpaceReview(spaceId, currentUser.getId(), request, images));
@@ -54,7 +54,7 @@ public class SpaceReviewController {
 
     @Operation(summary = "공간 리뷰 목록 조회")
     @GetMapping("{spaceId}/reviews")
-    public CustomResponse<Page<SpaceReviewResDTO.DetailSpaceReviewResDTO>> getSpaceReviewList(
+    public CustomResponse<Page<SpaceReviewResDTO.SpaceReviewDetailResDTO>> getSpaceReviewList(
             @PathVariable Long spaceId,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
@@ -65,7 +65,7 @@ public class SpaceReviewController {
 
     @Operation(summary = "공간 리뷰 상세 조회")
     @GetMapping("reviews/{reviewId}")
-    public CustomResponse<SpaceReviewResDTO.DetailSpaceReviewResDTO> getSpaceReviewDetail(@PathVariable("reviewId") Long spaceReviewId) {
+    public CustomResponse<SpaceReviewResDTO.SpaceReviewDetailResDTO> getSpaceReviewDetail(@PathVariable("reviewId") Long spaceReviewId) {
         return CustomResponse.onSuccess(spaceReviewQueryService.getSpaceReviewDetail(spaceReviewId));
     }
 

@@ -36,23 +36,24 @@ public interface SpaceRepository extends JpaRepository<Space, Long>,SpaceReposit
     @Query("""
         update Space s
         set s.reviewCount = s.reviewCount + 1,
-            s.ratingAvg = ((s.ratingAvg * (s.reviewCount - 1)) + :rating) / (s.reviewCount)
+            s.reviewSum   = s.reviewSum + :rate,
+            s.ratingAvg   = s.reviewSum * 1.0 / s.reviewCount
         where s.id =:spaceId
         """)
-    void applyReviewCreated(@Param("spaceId") Long spaceId, @Param("rating")  double rating);
+    void applyReviewCreated(@Param("spaceId") Long spaceId, @Param("rate")  int rate);
 
     @Modifying
     @Query("""
         update Space s
         set s.reviewCount = s.reviewCount - 1,
+            s.reviewSum = s.reviewSum - :rate,
             s.ratingAvg   = case
-                              when s.reviewCount <= 0
-                                then 0
-                              else ((s.ratingAvg * (s.reviewCount + 1)) - :rating) / s.reviewCount
+                              when s.reviewCount <= 0 then 0
+                              else s.reviewSum * 1.0 / s.reviewCount
                              end
-        where s.id =:spaceId and s.reviewCount > 0
+        where s.id =:exhibitionId and s.reviewCount > 0
         """)
-    void applySpaceReviewDeleted(@Param("spaceId") Long spaceId, @Param("rating")  double rating);
+    void applySpaceReviewDeleted(@Param("spaceId") Long spaceId, @Param("rate")  int rate);
 
     @Query("select count(s) from Space s where s.status = :status")
     long findPendingSpacesCountByStatus(@Param("status") Status status);
