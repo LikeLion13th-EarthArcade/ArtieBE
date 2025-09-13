@@ -7,6 +7,7 @@ import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.global.entity.embedded.Address;
 import com.project.team5backend.global.entity.enums.Status;
+import com.project.team5backend.global.util.PageResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import com.project.team5backend.domain.space.dto.request.SpaceReqDTO;
@@ -100,29 +101,10 @@ public class SpaceConverter {
                 .build();
     }
 
-    public static SpaceResDTO.SearchSpacePageResDTO toSearchSpacePageResDTO(List<SpaceResDTO.SpaceSearchResDTO> items,
-                                                                            Page<?> page,
-                                                                            Double defaultCenterLat,
-                                                                            Double defaultCenterLng) {
-
-        // PageInfo 생성
-        SpaceResDTO.SearchSpacePageResDTO.PageInfo pageInfo =
-                new SpaceResDTO.SearchSpacePageResDTO.PageInfo(
-                        page.getNumber(),
-                        page.getSize(),
-                        page.getTotalElements(),
-                        page.getTotalPages(),
-                        page.isFirst(),
-                        page.isLast()
-                );
-
-        // MapInfo 생성
-        SpaceResDTO.SearchSpacePageResDTO.MapInfo mapInfo =
-                new SpaceResDTO.SearchSpacePageResDTO.MapInfo(
-                        defaultCenterLat,
-                        defaultCenterLng
-                );
-
-        return new SpaceResDTO.SearchSpacePageResDTO(items, pageInfo, mapInfo);
+    public static SpaceResDTO.SpaceSearchPageResDTO toSpaceSearchPageResDTO(PageResponse<SpaceResDTO.SpaceSearchResDTO> page, Double lat, Double lon) {
+        return SpaceResDTO.SpaceSearchPageResDTO.builder()
+                .page(page)
+                .map(new SpaceResDTO.SpaceSearchPageResDTO.MapInfo(lat, lon))
+                .build();
     }
 }

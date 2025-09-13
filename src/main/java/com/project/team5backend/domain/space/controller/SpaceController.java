@@ -73,7 +73,7 @@ public class SpaceController {
 
     @Operation(summary = "공간 검색", description = "공간 검색하면 한페이지에 4개의 전시와 서울 시청 중심의 위도 경도 반환")
     @GetMapping("/search")
-    public CustomResponse<SpaceResDTO.SearchSpacePageResDTO> searchSpaces(
+    public CustomResponse<SpaceResDTO.SpaceSearchPageResDTO> searchSpaces(
             @Parameter(description = "대여 시작일", example = "2025-09-12")
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate requestedStartDate,
             @Parameter(description = "대여 종료일", example = "2025-09-13")

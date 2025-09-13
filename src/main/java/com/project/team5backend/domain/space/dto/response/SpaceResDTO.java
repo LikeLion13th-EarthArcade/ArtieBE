@@ -3,6 +3,7 @@ package com.project.team5backend.domain.space.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.project.team5backend.domain.space.entity.enums.SpaceMood;
 import com.project.team5backend.domain.space.entity.enums.SpaceSize;
+import com.project.team5backend.global.util.PageResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -50,25 +51,17 @@ public class SpaceResDTO {
     ){}
 
     // 페이지 결과 DTO
-    public record SearchSpacePageResDTO(
-            List<SpaceSearchResDTO> items,
-            PageInfo pageInfo,
-            MapInfo mapInfo
+    @Builder
+    public record SpaceSearchPageResDTO(
+            PageResponse<SpaceSearchResDTO> page,
+            MapInfo map
     ) {
-        public record PageInfo(
-                int number,
-                int size,
-                long totalElements,
-                int totalPages,
-                boolean first,
-                boolean last
-        ) {}
-
         public record MapInfo(
                 Double latitude,
                 Double longitude
         ) {}
     }
+
     // 검색 결과 DTO
     @Builder
     public record SpaceSearchResDTO(
