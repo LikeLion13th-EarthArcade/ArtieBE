@@ -10,7 +10,9 @@ import com.project.team5backend.domain.image.entity.ExhibitionReviewImage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,18 +39,16 @@ public class ExhibitionReviewQueryServiceImpl implements ExhibitionReviewQuerySe
     }
 
     @Override
-    public Page<ExhibitionReviewResDTO.ExReviewDetailResDTO> getExhibitionReviewList(
-            Long exhibitionId, Pageable pageable) {
+    public Page<ExhibitionReviewResDTO.ExReviewDetailResDTO> getExhibitionReviews(Long exhibitionId, int page) {
+        Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
+
         Page<ExhibitionReview> reviewPage = exhibitionReviewRepository.findByExhibitionIdAndIsDeletedFalse(exhibitionId, pageable);
 
-
         return reviewPage.map(review -> {
-            // 연관관계로 fileKeys 추출
-            List<String> fileKeys = review.getExhibitionReviewImages().stream()
+            List<String> imageUrls = review.getExhibitionReviewImages().stream()
                     .map(ExhibitionReviewImage::getImageUrl)
-                    .collect(Collectors.toList());
-
-            return ExhibitionReviewConverter.toDetailExReviewResDTO(review, fileKeys);
+                    .toList();
+            return ExhibitionReviewConverter.toDetailExReviewResDTO(review, imageUrls);
         });
     }
 }

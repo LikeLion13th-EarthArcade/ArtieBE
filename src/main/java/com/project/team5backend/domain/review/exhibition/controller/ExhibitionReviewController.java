@@ -7,16 +7,13 @@ import com.project.team5backend.domain.review.exhibition.service.query.Exhibitio
 import com.project.team5backend.global.SwaggerBody;
 import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.global.security.userdetails.CurrentUser;
+import com.project.team5backend.global.util.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -56,13 +53,10 @@ public class ExhibitionReviewController {
 
     @Operation(summary = "리뷰 목록 조회", description = "리뷰 목록 조회 api")
     @GetMapping("{exhibitionId}/reviews")
-    public CustomResponse<Page<ExhibitionReviewResDTO.ExReviewDetailResDTO>> getExhibitionReviews(
+    public CustomResponse<PageResponse<ExhibitionReviewResDTO.ExReviewDetailResDTO>> getExhibitionReviews(
             @PathVariable Long exhibitionId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size){
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        Page<ExhibitionReviewResDTO.ExReviewDetailResDTO> reviewPage = exhibitionReviewQueryService.getExhibitionReviewList(exhibitionId, pageable);
-        return CustomResponse.onSuccess(reviewPage);
+            @RequestParam(defaultValue = "0") int page){
+        return CustomResponse.onSuccess(PageResponse.of(exhibitionReviewQueryService.getExhibitionReviews(exhibitionId, page)));
     }
 
     @Operation(summary = "리뷰 상세 조회", description = "리뷰 상세 조회 api")
@@ -76,7 +70,7 @@ public class ExhibitionReviewController {
     public CustomResponse<String> deleteExhibitionReview(
             @AuthenticationPrincipal CurrentUser currentUser,
             @PathVariable("reviewId") Long exhibitionReviewId) {
-        exReviewCommandService.deleteExhibitionReview(exhibitionReviewId, currentUser.getEmail());
+        exhibitionReviewCommandService.deleteExhibitionReview(exhibitionReviewId, currentUser.getEmail());
         return CustomResponse.onSuccess("해당 전시 리뷰가 삭제되었습니다.");
     }
 }
