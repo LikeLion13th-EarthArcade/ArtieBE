@@ -40,7 +40,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
 
     //전시 공간 상세 조회
     @Override
-    public SpaceResDTO.DetailSpaceResDTO getSpaceDetail(long spaceId) {
+    public SpaceResDTO.SpaceDetailResDTO getSpaceDetail(long spaceId) {
         Space space = spaceRepository.findByIdAndIsDeletedFalseAndStatusApproved(spaceId, Status.APPROVED)
                 .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
 
@@ -62,7 +62,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
                 requestedStartDate, requestedEndDate, district, size, type, mood, facilities, sort, pageable);
 
         // 검색 결과를 DTO로 변환 - Converter 사용
-        List<SpaceResDTO.SearchSpaceResDTO> items = spacePage.getContent().stream()
+        List<SpaceResDTO.SpaceSearchResDTO> items = spacePage.getContent().stream()
                 .map(SpaceConverter::toSearchSpaceResDTO)
                 .toList();
 

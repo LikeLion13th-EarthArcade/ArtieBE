@@ -17,14 +17,14 @@ public class SpaceResDTO {
 
     // 공간 등록 DTO
     @Builder
-    public record CreateSpaceResDTO (
+    public record SpaceCreateResDTO(
             Long id,
             LocalDateTime createdAt
     ){}
 
     // 상세 조회 DTO
     @Builder
-    public record DetailSpaceResDTO (
+    public record SpaceDetailResDTO(
             Long spaceId,
             String name,
             List<String> imageUrls,
@@ -44,14 +44,14 @@ public class SpaceResDTO {
     ){}
 
     @Builder
-    public record LikeSpaceResDTO(
+    public record SpaceLikeResDTO(
             Long spaceId,
             String message
     ){}
 
     // 페이지 결과 DTO
     public record SearchSpacePageResDTO(
-            List<SearchSpaceResDTO> items,
+            List<SpaceSearchResDTO> items,
             PageInfo pageInfo,
             MapInfo mapInfo
     ) {
@@ -71,7 +71,7 @@ public class SpaceResDTO {
     }
     // 검색 결과 DTO
     @Builder
-    public record SearchSpaceResDTO (
+    public record SpaceSearchResDTO(
             Long spaceId,
             String name,
             String address,

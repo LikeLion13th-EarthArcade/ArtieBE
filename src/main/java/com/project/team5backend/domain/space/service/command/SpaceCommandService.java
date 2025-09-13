@@ -9,10 +9,10 @@ import java.util.List;
 
 
 public interface SpaceCommandService {
-    SpaceResDTO.CreateSpaceResDTO createSpace(SpaceReqDTO.CreateSpaceReqDTO createSpaceReqDTO, long userId, List<MultipartFile> urls);
+    SpaceResDTO.SpaceCreateResDTO createSpace(SpaceReqDTO.SpaceCreateReqDTO spaceCreateReqDTO, long userId, List<MultipartFile> urls);
 
     void deleteSpace(long spaceId, long userId);
 
-    SpaceResDTO.LikeSpaceResDTO likeSpace(long spaceId, long userId);
+    SpaceResDTO.SpaceLikeResDTO likeSpace(long spaceId, long userId);
 //    void approveSpace(Long spaceId);
 }

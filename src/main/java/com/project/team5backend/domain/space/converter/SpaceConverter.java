@@ -16,7 +16,7 @@ import java.util.List;
 
 @Component
 public class SpaceConverter {
-    public static Space toSpace(SpaceReqDTO.CreateSpaceReqDTO request, User user, String thumbnail, Address address){
+    public static Space toSpace(SpaceReqDTO.SpaceCreateReqDTO request, User user, String thumbnail, Address address){
 
         return Space.builder()
                 .name(request.name())
@@ -49,15 +49,15 @@ public class SpaceConverter {
                 .build();
     }
 
-    public static SpaceResDTO.CreateSpaceResDTO toCreateSpaceResDTO(Space space){
-        return SpaceResDTO.CreateSpaceResDTO.builder()
+    public static SpaceResDTO.SpaceCreateResDTO toCreateSpaceResDTO(Space space){
+        return SpaceResDTO.SpaceCreateResDTO.builder()
                 .id(space.getId())
                 .createdAt(space.getCreatedAt())
                 .build();
     }
 
-    public static SpaceResDTO.DetailSpaceResDTO toDetailSpaceResDTO(Space space, List<String> imageUrls){
-        return SpaceResDTO.DetailSpaceResDTO.builder()
+    public static SpaceResDTO.SpaceDetailResDTO toDetailSpaceResDTO(Space space, List<String> imageUrls){
+        return SpaceResDTO.SpaceDetailResDTO.builder()
                 .spaceId(space.getId())
                 .name(space.getName())
                 .imageUrls(imageUrls)
@@ -87,8 +87,8 @@ public class SpaceConverter {
                 .build();
     }
 
-    public static SpaceResDTO.SearchSpaceResDTO toSearchSpaceResDTO(Space space){
-        return SpaceResDTO.SearchSpaceResDTO.builder()
+    public static SpaceResDTO.SpaceSearchResDTO toSearchSpaceResDTO(Space space){
+        return SpaceResDTO.SpaceSearchResDTO.builder()
                 .spaceId(space.getId())
                 .name(space.getName())
                 .thumbnail(space.getThumbnail())
@@ -100,7 +100,7 @@ public class SpaceConverter {
                 .build();
     }
 
-    public static SpaceResDTO.SearchSpacePageResDTO toSearchSpacePageResDTO(List<SpaceResDTO.SearchSpaceResDTO> items,
+    public static SpaceResDTO.SearchSpacePageResDTO toSearchSpacePageResDTO(List<SpaceResDTO.SpaceSearchResDTO> items,
                                                                             Page<?> page,
                                                                             Double defaultCenterLat,
                                                                             Double defaultCenterLng) {

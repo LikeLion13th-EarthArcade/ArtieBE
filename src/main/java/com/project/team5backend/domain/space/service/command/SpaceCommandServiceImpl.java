@@ -1,8 +1,5 @@
 package com.project.team5backend.domain.space.service.command;
 
-import com.project.team5backend.domain.exhibition.converter.ExhibitionLikeConverter;
-import com.project.team5backend.domain.exhibition.dto.response.ExhibitionResDTO;
-import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.facility.entity.Facility;
 import com.project.team5backend.domain.facility.entity.SpaceFacility;
 import com.project.team5backend.domain.facility.repository.FacilityRepository;
@@ -64,7 +61,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
     private final ImageCommandService imageCommandService;
 
     @Override
-    public SpaceResDTO.CreateSpaceResDTO createSpace(SpaceReqDTO.CreateSpaceReqDTO request, long userId, List<MultipartFile> images) {
+    public SpaceResDTO.SpaceCreateResDTO createSpace(SpaceReqDTO.SpaceCreateReqDTO request, long userId, List<MultipartFile> images) {
 
         ImageUtils.validateImages(images); // 이미지 검증 (개수, null 여부)
 
@@ -97,7 +94,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
     }
 
     @Override
-    public SpaceResDTO.LikeSpaceResDTO likeSpace(long spaceId, long userId) {
+    public SpaceResDTO.SpaceLikeResDTO likeSpace(long spaceId, long userId) {
         User user = userRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(()-> new UserException(UserErrorCode.USER_NOT_FOUND));
         Space space = spaceRepository.findByIdAndIsDeletedFalseAndStatusApproved(spaceId, Status.APPROVED)
@@ -132,13 +129,13 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
         }
     }
 
-    private SpaceResDTO.LikeSpaceResDTO cancelLike(User user, Space space) {
+    private SpaceResDTO.SpaceLikeResDTO cancelLike(User user, Space space) {
         spaceLikeRepository.deleteByUserIdAndSpaceId(user.getId(), space.getId());
         space.decreaseLikeCount();
         return SpaceLikeConverter.toLikeSpaceResDTO(space.getId(), "관심목록에서 삭제되었습니다.");
     }
 
-    private SpaceResDTO.LikeSpaceResDTO addLike(User user, Space space) {
+    private SpaceResDTO.SpaceLikeResDTO addLike(User user, Space space) {
         spaceLikeRepository.save(SpaceLikeConverter.toSpaceLike(user, space));
         space.increaseLikeCount();
         interactLogService.logLike(user.getId(), space.getId());
