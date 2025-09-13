@@ -150,7 +150,9 @@ public class ExhibitionConverter {
                 .location(exhibition.getAddress().getRoadAddress() + exhibition.getAddress().getDetail())
                 .startDate(exhibition.getStartDate())
                 .endDate(exhibition.getEndDate())
-                .reviewAvg(exhibition.getRatingAvg())
+                .reviewAvg(BigDecimal.valueOf(exhibition.getRatingAvg())
+                        .setScale(1, RoundingMode.HALF_UP)
+                        .doubleValue())
                 .reviewCount(exhibition.getReviewCount())
                 .isLiked(isLiked)
                 .build();

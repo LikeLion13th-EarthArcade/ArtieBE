@@ -47,7 +47,6 @@ public class Exhibition extends BaseTimeEntity {
     private String websiteUrl;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "category")
     private ExhibitionCategory exhibitionCategory;
 
     @Enumerated(EnumType.STRING)

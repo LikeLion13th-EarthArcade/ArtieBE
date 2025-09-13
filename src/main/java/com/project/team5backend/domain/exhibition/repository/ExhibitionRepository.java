@@ -70,7 +70,7 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
       SELECT e.*,
             ROW_NUMBER() OVER (
              PARTITION BY e.district
-             ORDER BY e.rating_count DESC, e.updated_at DESC, e.exhibition_id DESC
+             ORDER BY e.review_count DESC, e.updated_at DESC, e.exhibition_id DESC
            ) rn
       FROM exhibition e
      WHERE e.is_deleted = false
@@ -80,7 +80,7 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
     )
     SELECT * FROM ranked
     WHERE rn = 1
-    ORDER BY rating_count DESC, updated_at DESC, exhibition_id DESC
+    ORDER BY review_count DESC, updated_at DESC, exhibition_id DESC
     """, nativeQuery = true)
     List<Exhibition> findTopByDistrict(@Param("current") LocalDate current, Pageable pageable, @Param("status") Status status);
 
@@ -90,7 +90,7 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
         update Exhibition e
         set e.reviewCount = e.reviewCount + 1,
             e.reviewSum   = e.reviewSum + :rate,
-            e.ratingAvg   = (e.reviewSum + :rate) / (e.reviewCount + 1)
+            e.ratingAvg   = e.reviewSum * 1.0 / e.reviewCount
         where e.id = :exhibitionId
         """)
     void applyReviewCreated(@Param("exhibitionId") Long exhibitionId, @Param("rate")  int rate);
@@ -101,24 +101,12 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
         set e.reviewCount = e.reviewCount - 1,
             e.reviewSum = e.reviewSum - :rate,
             e.ratingAvg   = case
-                              when e.reviewCount - 1 <= 0 then 0
-                              else (e.reviewSum - :rate) / (e.reviewCount - 1)
+                              when e.reviewCount <= 0 then 0
+                              else e.reviewSum * 1.0 / e.reviewCount
                              end
         where e.id =:exhibitionId and e.reviewCount > 0
         """)
     void applyReviewDeleted(@Param("exhibitionId") Long exhibitionId, @Param("rate")  int rate);
-
-    @Query("""
-        select e from Exhibition e
-        where e.status =:status and e.isDeleted = false and e.endDate >= :today
-        """)
-    Page<Exhibition> findPendingExhibitions(LocalDate today, Pageable pageable,@Param("status") Status status);
-
-    @Query("""
-        select e from Exhibition e
-        where e.id =:exhibitionId and e.status =:status and e.isDeleted = false
-        """)
-    Optional<Exhibition> findPendingExhibition(Long exhibitionId, @Param("status") Status status);
 
     // 삭제 x, 승인 o, 진행중이고, 리뷰수와 토탈리뷰점수를 더한 값이 높은 순으로 나열
     @Query("""
