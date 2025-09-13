@@ -1,6 +1,7 @@
 package com.project.team5backend.domain.review.exhibition.repository;
 
 import com.project.team5backend.domain.review.exhibition.entity.ExhibitionReview;
+import com.project.team5backend.domain.review.space.entity.SpaceReview;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -17,15 +18,19 @@ public interface ExhibitionReviewRepository extends JpaRepository<ExhibitionRevi
     void softDeleteByExhibitionId(@Param("exhibitionId") Long exhibitionId);
 
     @Query("""
-        select er from ExhibitionReview er
-        join fetch er.user u
-        left join er.exhibitionReviewImages eri
-        where er.id =:exhibitionReviewId and er.isDeleted is false
+        select sr from SpaceReview sr
+        join fetch sr.user u
+        left join sr.spaceReviewImages eri
+        where sr.id =:spaceReviewId and sr.isDeleted is false
     """)
-    Optional<ExhibitionReview> findByIdAndIsDeletedFalse(@Param("exhibitionReviewId") Long exhibitionReviewId);
+    Optional<SpaceReview> findByIdAndIsDeletedFalse(@Param("spaceReviewId") Long spaceReviewId);
 
-    @Query("SELECT DISTINCT er FROM ExhibitionReview er " +
-            "WHERE er.exhibition.id = :exhibitionId AND er.isDeleted = false " +
-            "ORDER BY er.createdAt DESC")
+    @Query("""
+        SELECT DISTINCT sr FROM SpaceReview sr
+        JOIN FETCH sr.user u
+        LEFT JOIN sr.spaceReviewImages sri
+        WHERE sr.space.id =:spaceId AND sr.isDeleted = false
+        ORDER BY sr.createdAt DESC
+        """)
     Page<ExhibitionReview> findByExhibitionIdAndIsDeletedFalse(@Param("exhibitionId") Long exhibitionId, Pageable pageable);
 }

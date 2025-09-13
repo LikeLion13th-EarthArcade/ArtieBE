@@ -56,11 +56,9 @@ public class SpaceReviewController {
     @GetMapping("{spaceId}/reviews")
     public CustomResponse<Page<SpaceReviewResDTO.SpaceReviewDetailResDTO>> getSpaceReviewList(
             @PathVariable Long spaceId,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "0") int page
     ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        return CustomResponse.onSuccess(spaceReviewQueryService.getSpaceReviewList(spaceId, pageable));
+        return CustomResponse.onSuccess(spaceReviewQueryService.getSpaceReviewList(spaceId, page));
     }
 
     @Operation(summary = "공간 리뷰 상세 조회")

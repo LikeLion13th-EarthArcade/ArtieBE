@@ -18,11 +18,20 @@ public interface SpaceReviewRepository extends JpaRepository<SpaceReview, Long> 
     @Query("update SpaceReview sr set sr.isDeleted = true where sr.space.id =:spaceId")
     void softDeleteBySpaceId(@Param("spaceId") Long spaceId);
 
-    @Query("SELECT DISTINCT sr FROM SpaceReview sr " +
-            "WHERE sr.space.id =:spaceId AND sr.isDeleted = false " +
-            "ORDER BY sr.createdAt DESC")
-    Page<SpaceReview> findBySpaceIdAndIsDeletedFalse(@Param("spaceId") long spaceId, Pageable pageable);
+    @Query("""
+        select sr from SpaceReview sr
+        join fetch sr.user u
+        left join sr.spaceReviewImages sri
+        where sr.id =:spaceReviewId and sr.isDeleted is false
+    """)
+    Optional<SpaceReview> findByIdAndIsDeletedFalse(@Param("spaceReviewId") Long spaceReviewId);
 
-    @Query("select sr from SpaceReview sr where sr.id=:spaceReviewId and sr.isDeleted is false")
-    Optional<SpaceReview> findByIdAndIsDeletedFalse(@Param("spaceReviewId") long spaceReviewId);
+    @Query("""
+        SELECT DISTINCT sr FROM SpaceReview sr
+        JOIN FETCH sr.user u
+        LEFT JOIN sr.spaceReviewImages sri
+        WHERE sr.space.id =:spaceId AND sr.isDeleted = false
+        ORDER BY sr.createdAt DESC
+    """)
+    Page<SpaceReview> findBySpaceIdAndIsDeletedFalse(@Param("spaceId") Long spaceId, Pageable pageable);
 }
