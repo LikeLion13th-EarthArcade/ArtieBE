@@ -46,7 +46,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
 
         List<String> imageUrls = spaceImageRepository.findImageUrlsBySpaceId(spaceId);
 
-        return SpaceConverter.toDetailSpaceResDTO(space, imageUrls);
+        return SpaceConverter.toSpaceDetailResDTO(space, imageUrls);
     }
 
     //전시 검색
@@ -63,7 +63,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
 
         // 검색 결과를 DTO로 변환 - Converter 사용
         List<SpaceResDTO.SpaceSearchResDTO> items = spacePage.getContent().stream()
-                .map(SpaceConverter::toSearchSpaceResDTO)
+                .map(SpaceConverter::toSpaceSearchResDTO)
                 .toList();
 
         // PageInfo와 MapInfo 생성 - Converter 사용

@@ -3,8 +3,6 @@ package com.project.team5backend.domain.space.service.command;
 import com.project.team5backend.domain.facility.entity.Facility;
 import com.project.team5backend.domain.facility.entity.SpaceFacility;
 import com.project.team5backend.domain.facility.repository.FacilityRepository;
-import com.project.team5backend.domain.facility.repository.SpaceFacilityRepository;
-import com.project.team5backend.domain.image.entity.ExhibitionImage;
 import com.project.team5backend.domain.image.entity.SpaceImage;
 import com.project.team5backend.domain.image.repository.SpaceImageRepository;
 import com.project.team5backend.domain.image.converter.ImageConverter;
@@ -82,7 +80,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
         // 시설 매핑 (문자열 → Facility 엔티티 조회 → SpaceFacility 생성)
         List<Facility> facilities = facilityRepository.findByNameIn(request.facilities());
         facilities.forEach(facility -> {
-            SpaceFacility sf = SpaceConverter.toCreateSpaceFacility(space, facility);
+            SpaceFacility sf = SpaceConverter.toSpaceFacility(space, facility);
             space.getSpaceFacilities().add(sf);
         });
 
@@ -90,7 +88,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
         for (String url : imageUrls) {
             spaceImageRepository.save(ImageConverter.toSpaceImage(space, url));
         }
-        return SpaceConverter.toCreateSpaceResDTO(space);
+        return SpaceConverter.toSpaceCreateResDTO(space);
     }
 
     @Override

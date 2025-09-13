@@ -42,21 +42,21 @@ public class SpaceConverter {
                 .build();
     }
 
-    public static SpaceFacility toCreateSpaceFacility(Space space, Facility facility) {
+    public static SpaceFacility toSpaceFacility(Space space, Facility facility) {
         return SpaceFacility.builder()
                 .space(space)
                 .facility(facility)
                 .build();
     }
 
-    public static SpaceResDTO.SpaceCreateResDTO toCreateSpaceResDTO(Space space){
+    public static SpaceResDTO.SpaceCreateResDTO toSpaceCreateResDTO(Space space){
         return SpaceResDTO.SpaceCreateResDTO.builder()
                 .id(space.getId())
                 .createdAt(space.getCreatedAt())
                 .build();
     }
 
-    public static SpaceResDTO.SpaceDetailResDTO toDetailSpaceResDTO(Space space, List<String> imageUrls){
+    public static SpaceResDTO.SpaceDetailResDTO toSpaceDetailResDTO(Space space, List<String> imageUrls){
         return SpaceResDTO.SpaceDetailResDTO.builder()
                 .spaceId(space.getId())
                 .name(space.getName())
@@ -87,7 +87,7 @@ public class SpaceConverter {
                 .build();
     }
 
-    public static SpaceResDTO.SpaceSearchResDTO toSearchSpaceResDTO(Space space){
+    public static SpaceResDTO.SpaceSearchResDTO toSpaceSearchResDTO(Space space){
         return SpaceResDTO.SpaceSearchResDTO.builder()
                 .spaceId(space.getId())
                 .name(space.getName())

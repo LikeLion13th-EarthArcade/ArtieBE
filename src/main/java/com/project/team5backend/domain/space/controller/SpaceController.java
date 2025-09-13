@@ -67,7 +67,7 @@ public class SpaceController {
 
     @Operation(summary = "전시 공간 상세 조회")
     @GetMapping("/{spaceId}")
-    public CustomResponse<SpaceResDTO.SpaceDetailResDTO> getSpaceDetails(@PathVariable Long spaceId) {
+    public CustomResponse<SpaceResDTO.SpaceDetailResDTO> getSpaceDetail(@PathVariable Long spaceId) {
         return CustomResponse.onSuccess(spaceQueryService.getSpaceDetail(spaceId));
     }
 
