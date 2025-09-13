@@ -13,6 +13,5 @@ public interface SpaceCommandService {
 
     void deleteSpace(long spaceId, long userId);
 
-    SpaceResDTO.SpaceLikeResDTO likeSpace(long spaceId, long userId);
-//    void approveSpace(Long spaceId);
+    SpaceResDTO.SpaceLikeResDTO toggleLike(long spaceId, long userId);
 }

@@ -58,11 +58,11 @@ public class SpaceController {
 
     @PostMapping("/{spaceId}/like")
     @Operation(summary = "공간 좋아요", description = "좋아요 없으면 등록, 있으면 취소")
-    public CustomResponse<SpaceResDTO.SpaceLikeResDTO> likeSpace(
+    public CustomResponse<SpaceResDTO.SpaceLikeResDTO> toggleSpaceLike(
             @AuthenticationPrincipal CurrentUser currentUser,
             @PathVariable Long spaceId
     ) {
-        return CustomResponse.onSuccess(spaceCommandService.likeSpace(spaceId, currentUser.getId()));
+        return CustomResponse.onSuccess(spaceCommandService.toggleLike(spaceId, currentUser.getId()));
     }
 
     @Operation(summary = "전시 공간 상세 조회")

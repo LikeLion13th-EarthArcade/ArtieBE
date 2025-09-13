@@ -94,7 +94,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
     }
 
     @Override
-    public SpaceResDTO.SpaceLikeResDTO likeSpace(long spaceId, long userId) {
+    public SpaceResDTO.SpaceLikeResDTO toggleLike(long spaceId, long userId) {
         User user = userRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(()-> new UserException(UserErrorCode.USER_NOT_FOUND));
         Space space = spaceRepository.findByIdAndIsDeletedFalseAndStatusApproved(spaceId, Status.APPROVED)
