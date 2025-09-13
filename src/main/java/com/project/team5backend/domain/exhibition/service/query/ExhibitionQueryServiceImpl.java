@@ -12,8 +12,6 @@ import com.project.team5backend.domain.exhibition.repository.ExhibitionRepositor
 import com.project.team5backend.domain.image.repository.ExhibitionImageRepository;
 import com.project.team5backend.domain.recommendation.service.InteractLogService;
 import com.project.team5backend.domain.user.entity.User;
-import com.project.team5backend.domain.user.exception.UserErrorCode;
-import com.project.team5backend.domain.user.exception.UserException;
 import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.global.entity.enums.Status;
@@ -62,11 +60,9 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
             ExhibitionCategory exhibitionCategory, String district, ExhibitionMood exhibitionMood, LocalDate localDate, Sort sort, int page) {
 
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt"));
-
         // 동적 쿼리로 전시 검색
         Page<Exhibition> exhibitionPage = exhibitionRepository.findExhibitionsWithFilters(
                 exhibitionCategory, district, exhibitionMood, localDate, sort, pageable);
-
         Page<ExhibitionResDTO.ExhibitionSearchResDTO> exhibitionSearchResDTOPage = exhibitionPage
                 .map(ExhibitionConverter::toExhibitionSearchResDTO);
 
@@ -88,18 +84,17 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
     }
 
     @Override
-    public ExhibitionResDTO.UpcomingPopularityExhibitionResDTO getUpcomingPopularExhibition() {
+    public ExhibitionResDTO.UpcomingPopularExhibitionResDTO getUpcomingPopularExhibition() {
         LocalDate currentDate = LocalDate.now();
-
         Pageable topOne = PageRequest.of(0, 1);
+
         List<Exhibition> exhibitions = exhibitionRepository.findUpcomingPopularExhibition(currentDate, topOne, Status.APPROVED);
         if (exhibitions.isEmpty()) {
             throw new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND);
         }
         Exhibition upcomingEx = exhibitions.get(0);
-
-        List<String> fileKeys = exhibitionImageRepository.findImageUrlsByExhibitionId(upcomingEx.getId());
-        return ExhibitionConverter.toUpcomingPopularityExhibitionResDTO(upcomingEx.getId(), upcomingEx.getTitle(), fileKeys);
+        List<String> imageUrls = exhibitionImageRepository.findImageUrlsByExhibitionId(upcomingEx.getId());
+        return ExhibitionConverter.toUpcomingPopularityExhibitionResDTO(upcomingEx.getId(), upcomingEx.getTitle(), imageUrls);
     }
 
     @Override

@@ -19,7 +19,7 @@ public interface ExhibitionQueryService {
     List<ExhibitionResDTO.ExhibitionHotNowResDTO> getHotNowExhibitions(Long userId);
 
     // 다가오는 인기있는 전시회(좋아요 수)
-    ExhibitionResDTO.UpcomingPopularityExhibitionResDTO getUpcomingPopularExhibition();
+    ExhibitionResDTO.UpcomingPopularExhibitionResDTO getUpcomingPopularExhibition();
 
     // 지금 뜨는 지역별 전시회
     ExhibitionResDTO.PopularRegionExhibitionListResDTO getPopularRegionExhibitions();

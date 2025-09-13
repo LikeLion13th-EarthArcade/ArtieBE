@@ -154,13 +154,13 @@ public class ExhibitionConverter {
                 .build();
     }
 
-    public static ExhibitionResDTO.UpcomingPopularityExhibitionResDTO toUpcomingPopularityExhibitionResDTO(
-            Long exhibitionId, String title, List<String> fileKeys
+    public static ExhibitionResDTO.UpcomingPopularExhibitionResDTO toUpcomingPopularityExhibitionResDTO(
+            Long exhibitionId, String title, List<String> imageUrls
     ) {
-        return ExhibitionResDTO.UpcomingPopularityExhibitionResDTO.builder()
+        return ExhibitionResDTO.UpcomingPopularExhibitionResDTO.builder()
                 .exhibitionId(exhibitionId)
                 .title(title)
-                .images(fileKeys)
+                .imagesUrls(imageUrls)
                 .build();
     }
 

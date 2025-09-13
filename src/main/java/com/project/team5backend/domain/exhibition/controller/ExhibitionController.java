@@ -93,7 +93,7 @@ public class ExhibitionController {
 
     @Operation(summary = "지금 뜨는, 다가오는 전시회", description = "아직 시작되지 않은 전시중에서 likeCount가 가장 높은 전시 반환")
     @GetMapping("/upcoming-popularity")
-    public CustomResponse<ExhibitionResDTO.UpcomingPopularityExhibitionResDTO> upcomingPopularityExhibition() {
+    public CustomResponse<ExhibitionResDTO.UpcomingPopularExhibitionResDTO> upcomingPopularExhibition() {
         return CustomResponse.onSuccess(exhibitionQueryService.getUpcomingPopularExhibition());
     }
 

@@ -107,10 +107,10 @@ public class ExhibitionResDTO {
     ){}
 
     @Builder
-    public record UpcomingPopularityExhibitionResDTO (
+    public record UpcomingPopularExhibitionResDTO(
             Long exhibitionId,
             String title,
-            List<String> images
+            List<String> imagesUrls
     ){}
 
     @Builder
