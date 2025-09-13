@@ -9,7 +9,7 @@ import com.project.team5backend.domain.exhibition.exception.ExhibitionErrorCode;
 import com.project.team5backend.domain.exhibition.exception.ExhibitionException;
 import com.project.team5backend.domain.exhibition.repository.ExhibitionLikeRepository;
 import com.project.team5backend.domain.exhibition.repository.ExhibitionRepository;
-import com.project.team5backend.domain.exhibition.review.repository.ExhibitionReviewRepository;
+import com.project.team5backend.domain.review.exhibition.repository.ExhibitionReviewRepository;
 import com.project.team5backend.domain.facility.entity.ExhibitionFacility;
 import com.project.team5backend.domain.facility.entity.Facility;
 import com.project.team5backend.domain.facility.repository.FacilityRepository;

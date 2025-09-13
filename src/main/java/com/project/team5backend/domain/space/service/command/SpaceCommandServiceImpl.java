@@ -10,7 +10,7 @@ import com.project.team5backend.domain.image.exception.ImageErrorCode;
 import com.project.team5backend.domain.image.exception.ImageException;
 import com.project.team5backend.domain.image.service.command.ImageCommandService;
 import com.project.team5backend.domain.recommendation.service.InteractLogService;
-import com.project.team5backend.domain.space.review.repository.SpaceReviewRepository;
+import com.project.team5backend.domain.review.space.repository.SpaceReviewRepository;
 import com.project.team5backend.domain.space.converter.SpaceConverter;
 import com.project.team5backend.domain.space.converter.SpaceLikeConverter;
 import com.project.team5backend.domain.space.dto.request.SpaceReqDTO;
