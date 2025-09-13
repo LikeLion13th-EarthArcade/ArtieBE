@@ -3,6 +3,7 @@ package com.project.team5backend.domain.space.dto.response;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.project.team5backend.domain.space.entity.enums.SpaceMood;
 import com.project.team5backend.domain.space.entity.enums.SpaceSize;
+import com.project.team5backend.global.util.PageResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.*;
 
@@ -17,14 +18,14 @@ public class SpaceResDTO {
 
     // 공간 등록 DTO
     @Builder
-    public record CreateSpaceResDTO (
+    public record SpaceCreateResDTO(
             Long id,
             LocalDateTime createdAt
     ){}
 
     // 상세 조회 DTO
     @Builder
-    public record DetailSpaceResDTO (
+    public record SpaceDetailResDTO(
             Long spaceId,
             String name,
             List<String> imageUrls,
@@ -44,34 +45,26 @@ public class SpaceResDTO {
     ){}
 
     @Builder
-    public record LikeSpaceResDTO(
+    public record SpaceLikeResDTO(
             Long spaceId,
             String message
     ){}
 
     // 페이지 결과 DTO
-    public record SearchSpacePageResDTO(
-            List<SearchSpaceResDTO> items,
-            PageInfo pageInfo,
-            MapInfo mapInfo
+    @Builder
+    public record SpaceSearchPageResDTO(
+            PageResponse<SpaceSearchResDTO> page,
+            MapInfo map
     ) {
-        public record PageInfo(
-                int number,
-                int size,
-                long totalElements,
-                int totalPages,
-                boolean first,
-                boolean last
-        ) {}
-
         public record MapInfo(
                 Double latitude,
                 Double longitude
         ) {}
     }
+
     // 검색 결과 DTO
     @Builder
-    public record SearchSpaceResDTO (
+    public record SpaceSearchResDTO(
             Long spaceId,
             String name,
             String address,

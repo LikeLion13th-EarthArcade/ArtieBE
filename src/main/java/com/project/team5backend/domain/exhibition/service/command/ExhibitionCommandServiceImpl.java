@@ -25,7 +25,6 @@ import com.project.team5backend.domain.user.exception.UserErrorCode;
 import com.project.team5backend.domain.user.exception.UserException;
 import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.address.converter.AddressConverter;
-import com.project.team5backend.global.address.dto.request.AddressReqDTO;
 import com.project.team5backend.global.address.dto.response.AddressResDTO;
 import com.project.team5backend.global.address.service.AddressService;
 import com.project.team5backend.global.apiPayload.code.GeneralErrorCode;
@@ -109,8 +108,7 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
         Exhibition exhibition = exhibitionRepository.findByIdAndIsDeletedFalseAndStatusApprove(exhibitionId, Status.APPROVED)
                 .orElseThrow(() -> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
 
-        exhibition.delete();
-        exhibition.markDeleted(); // 삭제 시간
+        exhibition.softDelete();
 
         List<String> imageUrls = deleteExhibitionImage(exhibitionId); // 전시이미지 소프트 삭제
 
@@ -142,9 +140,9 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
                 .toList();
     }
 
-    private void moveImagesToTrash(List<String> keys) {
+    private void moveImagesToTrash(List<String> imageUrls) {
         try {
-            imageCommandService.moveToTrashPrefix(keys);
+            imageCommandService.moveToTrashPrefix(imageUrls);
         } catch (ImageException e) {
             throw new ImageException(ImageErrorCode.S3_MOVE_TRASH_FAIL);
         }

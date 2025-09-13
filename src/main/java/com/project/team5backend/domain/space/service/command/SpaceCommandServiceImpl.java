@@ -1,12 +1,8 @@
 package com.project.team5backend.domain.space.service.command;
 
-import com.project.team5backend.domain.exhibition.converter.ExhibitionLikeConverter;
-import com.project.team5backend.domain.exhibition.dto.response.ExhibitionResDTO;
-import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.facility.entity.Facility;
 import com.project.team5backend.domain.facility.entity.SpaceFacility;
 import com.project.team5backend.domain.facility.repository.FacilityRepository;
-import com.project.team5backend.domain.facility.repository.SpaceFacilityRepository;
 import com.project.team5backend.domain.image.entity.SpaceImage;
 import com.project.team5backend.domain.image.repository.SpaceImageRepository;
 import com.project.team5backend.domain.image.converter.ImageConverter;
@@ -57,14 +53,13 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
     private final SpaceImageRepository spaceImageRepository;
     private final SpaceReviewRepository spaceReviewRepository;
     private final FacilityRepository facilityRepository;
-    private final SpaceFacilityRepository spaceFacilityRepository;
     private final InteractLogService interactLogService;
     private final AddressService addressService;
     private final S3Uploader s3Uploader;
     private final ImageCommandService imageCommandService;
 
     @Override
-    public SpaceResDTO.CreateSpaceResDTO createSpace(SpaceReqDTO.CreateSpaceReqDTO request, long userId, List<MultipartFile> images) {
+    public SpaceResDTO.SpaceCreateResDTO createSpace(SpaceReqDTO.SpaceCreateReqDTO request, long userId, List<MultipartFile> images) {
 
         ImageUtils.validateImages(images); // 이미지 검증 (개수, null 여부)
 
@@ -85,7 +80,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
         // 시설 매핑 (문자열 → Facility 엔티티 조회 → SpaceFacility 생성)
         List<Facility> facilities = facilityRepository.findByNameIn(request.facilities());
         facilities.forEach(facility -> {
-            SpaceFacility sf = SpaceConverter.toCreateSpaceFacility(space, facility);
+            SpaceFacility sf = SpaceConverter.toSpaceFacility(space, facility);
             space.getSpaceFacilities().add(sf);
         });
 
@@ -93,11 +88,11 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
         for (String url : imageUrls) {
             spaceImageRepository.save(ImageConverter.toSpaceImage(space, url));
         }
-        return SpaceConverter.toCreateSpaceResDTO(space);
+        return SpaceConverter.toSpaceCreateResDTO(space);
     }
 
     @Override
-    public SpaceResDTO.LikeSpaceResDTO likeSpace(long spaceId, long userId) {
+    public SpaceResDTO.SpaceLikeResDTO toggleLike(long spaceId, long userId) {
         User user = userRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(()-> new UserException(UserErrorCode.USER_NOT_FOUND));
         Space space = spaceRepository.findByIdAndIsDeletedFalseAndStatusApproved(spaceId, Status.APPROVED)
@@ -111,37 +106,44 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
     public void deleteSpace(long spaceId, long userId) {
         Space space = spaceRepository.findByIdAndIsDeletedFalseAndStatusApproved(spaceId, Status.APPROVED)
                 .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
-
         space.softDelete();
 
-        List<String> imageUrls = spaceImageRepository.findBySpaceId(spaceId).stream()
-                .peek(SpaceImage::deleteImage)
-                .map(SpaceImage::getImageUrl)
-                .toList();
+        List<String> imageUrls = deleteSpaceImage(spaceId);
 
-        // 좋아요 하드 삭제 (벌크)
-        spaceLikeRepository.deleteBySpaceId(spaceId);
-        // 리뷰 소프트 삭제 (벌크)
-        spaceReviewRepository.softDeleteBySpaceId(spaceId);
+        spaceLikeRepository.deleteBySpaceId(spaceId); // 좋아요 하드 삭제 (벌크)
+        spaceReviewRepository.softDeleteBySpaceId(spaceId); // 리뷰 소프트 삭제 (벌크)
 
-        // s3 보존 휴지통 prefix로 이동시키기
-        try{
-            imageCommandService.moveToTrashPrefix(imageUrls);
-        } catch (ImageException e) {
-            throw new ImageException(ImageErrorCode.S3_MOVE_TRASH_FAIL);
-        }
+        space.resetCount();
+        moveImagesToTrash(imageUrls); // s3 보존 휴지통 prefix로 이동시키기
     }
 
-    private SpaceResDTO.LikeSpaceResDTO cancelLike(User user, Space space) {
+    private SpaceResDTO.SpaceLikeResDTO cancelLike(User user, Space space) {
         spaceLikeRepository.deleteByUserIdAndSpaceId(user.getId(), space.getId());
         space.decreaseLikeCount();
         return SpaceLikeConverter.toLikeSpaceResDTO(space.getId(), "관심목록에서 삭제되었습니다.");
     }
 
-    private SpaceResDTO.LikeSpaceResDTO addLike(User user, Space space) {
+    private SpaceResDTO.SpaceLikeResDTO addLike(User user, Space space) {
         spaceLikeRepository.save(SpaceLikeConverter.toSpaceLike(user, space));
         space.increaseLikeCount();
         interactLogService.logLike(user.getId(), space.getId());
         return SpaceLikeConverter.toLikeSpaceResDTO(space.getId(), "관심목록에 추가되었습니다.");
+    }
+
+    private List<String> deleteSpaceImage(Long spaceId) {
+        List<SpaceImage> images = spaceImageRepository.findBySpaceId(spaceId);
+        images.forEach(SpaceImage::deleteImage);
+        return images.stream()
+                .peek(SpaceImage::deleteImage)
+                .map(SpaceImage::getImageUrl)
+                .toList();
+    }
+
+    private void moveImagesToTrash(List<String> imageUrls) {
+        try {
+            imageCommandService.moveToTrashPrefix(imageUrls);
+        } catch (ImageException e) {
+            throw new ImageException(ImageErrorCode.S3_MOVE_TRASH_FAIL);
+        }
     }
 }

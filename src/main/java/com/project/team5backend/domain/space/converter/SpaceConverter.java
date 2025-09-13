@@ -7,6 +7,7 @@ import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.global.entity.embedded.Address;
 import com.project.team5backend.global.entity.enums.Status;
+import com.project.team5backend.global.util.PageResponse;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import com.project.team5backend.domain.space.dto.request.SpaceReqDTO;
@@ -16,7 +17,7 @@ import java.util.List;
 
 @Component
 public class SpaceConverter {
-    public static Space toSpace(SpaceReqDTO.CreateSpaceReqDTO request, User user, String thumbnail, Address address){
+    public static Space toSpace(SpaceReqDTO.SpaceCreateReqDTO request, User user, String thumbnail, Address address){
 
         return Space.builder()
                 .name(request.name())
@@ -42,22 +43,22 @@ public class SpaceConverter {
                 .build();
     }
 
-    public static SpaceFacility toCreateSpaceFacility(Space space, Facility facility) {
+    public static SpaceFacility toSpaceFacility(Space space, Facility facility) {
         return SpaceFacility.builder()
                 .space(space)
                 .facility(facility)
                 .build();
     }
 
-    public static SpaceResDTO.CreateSpaceResDTO toCreateSpaceResDTO(Space space){
-        return SpaceResDTO.CreateSpaceResDTO.builder()
+    public static SpaceResDTO.SpaceCreateResDTO toSpaceCreateResDTO(Space space){
+        return SpaceResDTO.SpaceCreateResDTO.builder()
                 .id(space.getId())
                 .createdAt(space.getCreatedAt())
                 .build();
     }
 
-    public static SpaceResDTO.DetailSpaceResDTO toDetailSpaceResDTO(Space space, List<String> imageUrls){
-        return SpaceResDTO.DetailSpaceResDTO.builder()
+    public static SpaceResDTO.SpaceDetailResDTO toSpaceDetailResDTO(Space space, List<String> imageUrls){
+        return SpaceResDTO.SpaceDetailResDTO.builder()
                 .spaceId(space.getId())
                 .name(space.getName())
                 .imageUrls(imageUrls)
@@ -87,42 +88,23 @@ public class SpaceConverter {
                 .build();
     }
 
-    public static SpaceResDTO.SearchSpaceResDTO toSearchSpaceResDTO(Space space){
-        return SpaceResDTO.SearchSpaceResDTO.builder()
+    public static SpaceResDTO.SpaceSearchResDTO toSpaceSearchResDTO(Space space){
+        return SpaceResDTO.SpaceSearchResDTO.builder()
                 .spaceId(space.getId())
                 .name(space.getName())
                 .thumbnail(space.getThumbnail())
                 .openTime(space.getOpenTime())
                 .closeTime(space.getCloseTime())
-                .address(space.getAddress().getRoadAddress() + space.getAddress().getDetail())
+                .address(space.getAddress().getRoadAddress() + " " + space.getAddress().getDetail())
                 .latitude(space.getAddress().getLatitude())
                 .longitude(space.getAddress().getLongitude())
                 .build();
     }
 
-    public static SpaceResDTO.SearchSpacePageResDTO toSearchSpacePageResDTO(List<SpaceResDTO.SearchSpaceResDTO> items,
-                                                                            Page<?> page,
-                                                                            Double defaultCenterLat,
-                                                                            Double defaultCenterLng) {
-
-        // PageInfo 생성
-        SpaceResDTO.SearchSpacePageResDTO.PageInfo pageInfo =
-                new SpaceResDTO.SearchSpacePageResDTO.PageInfo(
-                        page.getNumber(),
-                        page.getSize(),
-                        page.getTotalElements(),
-                        page.getTotalPages(),
-                        page.isFirst(),
-                        page.isLast()
-                );
-
-        // MapInfo 생성
-        SpaceResDTO.SearchSpacePageResDTO.MapInfo mapInfo =
-                new SpaceResDTO.SearchSpacePageResDTO.MapInfo(
-                        defaultCenterLat,
-                        defaultCenterLng
-                );
-
-        return new SpaceResDTO.SearchSpacePageResDTO(items, pageInfo, mapInfo);
+    public static SpaceResDTO.SpaceSearchPageResDTO toSpaceSearchPageResDTO(PageResponse<SpaceResDTO.SpaceSearchResDTO> page, Double lat, Double lon) {
+        return SpaceResDTO.SpaceSearchPageResDTO.builder()
+                .page(page)
+                .map(new SpaceResDTO.SpaceSearchPageResDTO.MapInfo(lat, lon))
+                .build();
     }
 }

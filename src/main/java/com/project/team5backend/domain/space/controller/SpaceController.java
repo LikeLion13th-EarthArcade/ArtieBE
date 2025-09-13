@@ -11,7 +11,6 @@ import com.project.team5backend.domain.space.service.query.SpaceQueryService;
 import com.project.team5backend.global.SwaggerBody;
 import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.global.security.userdetails.CurrentUser;
-import com.project.team5backend.global.util.ImageUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -49,34 +48,32 @@ public class SpaceController {
             produces = MediaType.APPLICATION_JSON_VALUE
     )
     @Operation(summary = "전시 공간 등록", description = "등록시 공간 객체가 심사 대상에 포함됩니다.")
-    public CustomResponse<SpaceResDTO.CreateSpaceResDTO> registerSpace(
+    public CustomResponse<SpaceResDTO.SpaceCreateResDTO> createSpace(
             @AuthenticationPrincipal CurrentUser currentUser,
-            @RequestPart("request") @Valid SpaceReqDTO.CreateSpaceReqDTO createSpaceReqDTO,
+            @RequestPart("request") @Valid SpaceReqDTO.SpaceCreateReqDTO spaceCreateReqDTO,
             @RequestPart(value = "images", required = false) List<MultipartFile> images
     ) {
-        ImageUtils.validateImages(images); // 이미지 검증 (개수, null 여부)
-        SpaceResDTO.CreateSpaceResDTO createSpaceResDTO = spaceCommandService.createSpace(createSpaceReqDTO, currentUser.getId(), images);
-        return CustomResponse.onSuccess(createSpaceResDTO);
+        return CustomResponse.onSuccess(spaceCommandService.createSpace(spaceCreateReqDTO, currentUser.getId(), images));
     }
 
     @PostMapping("/{spaceId}/like")
     @Operation(summary = "공간 좋아요", description = "좋아요 없으면 등록, 있으면 취소")
-    public CustomResponse<SpaceResDTO.LikeSpaceResDTO> likeSpace(
+    public CustomResponse<SpaceResDTO.SpaceLikeResDTO> toggleSpaceLike(
             @AuthenticationPrincipal CurrentUser currentUser,
             @PathVariable Long spaceId
     ) {
-        return CustomResponse.onSuccess(spaceCommandService.likeSpace(spaceId, currentUser.getId()));
+        return CustomResponse.onSuccess(spaceCommandService.toggleLike(spaceId, currentUser.getId()));
     }
 
     @Operation(summary = "전시 공간 상세 조회")
     @GetMapping("/{spaceId}")
-    public CustomResponse<SpaceResDTO.DetailSpaceResDTO> getSpaceDetails(@PathVariable Long spaceId) {
+    public CustomResponse<SpaceResDTO.SpaceDetailResDTO> getSpaceDetail(@PathVariable Long spaceId) {
         return CustomResponse.onSuccess(spaceQueryService.getSpaceDetail(spaceId));
     }
 
     @Operation(summary = "공간 검색", description = "공간 검색하면 한페이지에 4개의 전시와 서울 시청 중심의 위도 경도 반환")
     @GetMapping("/search")
-    public CustomResponse<SpaceResDTO.SearchSpacePageResDTO> searchSpaces(
+    public CustomResponse<SpaceResDTO.SpaceSearchPageResDTO> searchSpaces(
             @Parameter(description = "대여 시작일", example = "2025-09-12")
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate requestedStartDate,
             @Parameter(description = "대여 종료일", example = "2025-09-13")
@@ -104,23 +101,4 @@ public class SpaceController {
         spaceCommandService.deleteSpace(spaceId, currentUser.getId());
         return CustomResponse.onSuccess("공간이 삭제되었습니다.");
     }
-
-
-//    @Operation(summary = "전시 공간 검색")
-//    @GetMapping("/search")
-//    public CustomResponse<SpaceResponse.SpaceSearchPageResponse> searchSpaces(
-//            @RequestParam(name = "startDate", required = false)
-//            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate startDate,
-//            @RequestParam(name = "endDate", required = false)
-//            @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate,
-//            @RequestParam(name = "district", required = false) String district,
-//            @RequestParam(name = "size", required = false) SpaceSize size,
-//            @RequestParam(name = "exhibitionType", required = false) SpaceType exhibitionType,
-//            @RequestParam(name = "exhibitionMood", required = false) SpaceMood exhibitionMood,
-//            @RequestParam(name = "page", defaultValue = "0") int page
-//            ) {
-//        return CustomResponse.onSuccess(
-//                spaceQueryService.searchSpaces(startDate, endDate, district, size, exhibitionType, exhibitionMood, page)
-//        );
-//    }
 }
