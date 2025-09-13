@@ -23,7 +23,7 @@ public interface ExhibitionReviewRepository extends JpaRepository<ExhibitionRevi
         left join sr.spaceReviewImages eri
         where sr.id =:spaceReviewId and sr.isDeleted is false
     """)
-    Optional<SpaceReview> findByIdAndIsDeletedFalse(@Param("spaceReviewId") Long spaceReviewId);
+    Optional<ExhibitionReview> findByIdAndIsDeletedFalse(@Param("spaceReviewId") Long spaceReviewId);
 
     @Query("""
         SELECT DISTINCT sr FROM SpaceReview sr
