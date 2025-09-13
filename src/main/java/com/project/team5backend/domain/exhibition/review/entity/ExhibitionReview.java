@@ -1,6 +1,6 @@
 package com.project.team5backend.domain.exhibition.review.entity;
 
-import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
+import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.image.entity.ExhibitionReviewImage;
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.global.entity.BaseTimeEntity;

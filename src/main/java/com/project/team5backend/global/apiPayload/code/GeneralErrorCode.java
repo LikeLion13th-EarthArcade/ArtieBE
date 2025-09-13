@@ -29,7 +29,12 @@ public enum GeneralErrorCode implements BaseErrorCode {
     BAD_REQUEST_BODY(HttpStatus.BAD_REQUEST, "HTTP400_4", "요청 본문을 읽을 수 없음 JSON 작성 오류일 가능성이 높을겁니다 아마도요 (정의되지 않은 400)"),
 
     INVALID_LOCAL_DATE(HttpStatus.BAD_REQUEST, "LOCAL_DATE400", "YYYY-MM-DD 형식의 유효한 날짜만 허용"),
+
+    INVALID_LOCAL_TIME(HttpStatus.BAD_REQUEST, "LOCAL_TIME400", "HH:mm 형식의 유효한 시간이 아닙니다 (00:00 ~ 23:59 범위만 허용)"),
+
     INVALID_ENUM(HttpStatus.BAD_REQUEST, "ENUM400", "ENUM 입력 오류"),
+
+    INVALID_INTEGER(HttpStatus.BAD_REQUEST, "INTEGER400", "숫자만 입력 가능합니다"),
     ;
 
     // 필요한 필드값 선언

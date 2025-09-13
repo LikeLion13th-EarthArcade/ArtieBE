@@ -1,6 +1,6 @@
 package com.project.team5backend.domain.exhibition.review.converter;
 
-import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
+import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.exhibition.review.dto.request.ExhibitionReviewReqDTO;
 import com.project.team5backend.domain.exhibition.review.dto.response.ExhibitionReviewResDTO;
 import com.project.team5backend.domain.exhibition.review.entity.ExhibitionReview;

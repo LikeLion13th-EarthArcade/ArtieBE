@@ -16,6 +16,18 @@ public class MessageConstant {
     public static final String BLANK_RESERVATION_END_DATE = "예약 종료 시간 누락";
     public static final String BLANK_PHONE_NUMBER = "전화 번호 누락";
     public static final String BLANK_RESERVATION_CANCEL_REASON = "취소 사유 누락";
+    // EXHIBITION
+    public static final String BLANK_EXHIBITION_TITLE = "전시 제목 누락";
+    public static final String BLANK_EXHIBITION_START_DATE = "전시 시작일 누락";
+    public static final String BLANK_EXHIBITION_END_DATE = "전시 종료일 누락";
+    public static final String BLANK_EXHIBITION_OPEN_TIME = "운영 시작 시간 누락";
+    public static final String BLANK_EXHIBITION_CLOSE_TIME = "운영 종료 시간 누락";
+    public static final String BLANK_EXHIBITION_CATEGORY = "전시 카테고리 누락";
+    public static final String BLANK_EXHIBITION_TYPE = "전시 유형 누락";
+    public static final String BLANK_EXHIBITION_MOOD = "전시 분위기 누락";
+    public static final String BLANK_EXHIBITION_ADDRESS = "전시 장소 누락";
+    public static final String BLANK_EXHIBITION_PRICE = "전시 가격 누락";
+
 
 
     // PATTERN EXCEPTION

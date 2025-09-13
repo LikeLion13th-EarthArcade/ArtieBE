@@ -1,10 +1,10 @@
 package com.project.team5backend.domain.exhibition.review.service.command;
 
-import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
+import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.global.entity.enums.Status;
-import com.project.team5backend.domain.exhibition.exhibition.exception.ExhibitionErrorCode;
-import com.project.team5backend.domain.exhibition.exhibition.exception.ExhibitionException;
-import com.project.team5backend.domain.exhibition.exhibition.repository.ExhibitionRepository;
+import com.project.team5backend.domain.exhibition.exception.ExhibitionErrorCode;
+import com.project.team5backend.domain.exhibition.exception.ExhibitionException;
+import com.project.team5backend.domain.exhibition.repository.ExhibitionRepository;
 import com.project.team5backend.domain.exhibition.review.converter.ExhibitionReviewConverter;
 import com.project.team5backend.domain.exhibition.review.dto.request.ExhibitionReviewReqDTO;
 import com.project.team5backend.domain.exhibition.review.entity.ExhibitionReview;

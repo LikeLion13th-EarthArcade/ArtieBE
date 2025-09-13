@@ -1,8 +1,8 @@
 package com.project.team5backend.domain.recommendation.dto.response;
 
-import com.project.team5backend.domain.exhibition.exhibition.dto.response.ExhibitionResDTO;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.ExhibitionCategory;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.ExhibitionMood;
+import com.project.team5backend.domain.exhibition.dto.response.ExhibitionResDTO;
+import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionCategory;
+import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionMood;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;

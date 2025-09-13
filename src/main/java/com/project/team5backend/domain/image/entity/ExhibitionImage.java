@@ -1,11 +1,9 @@
 package com.project.team5backend.domain.image.entity;
 
-import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
+import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.global.entity.BaseCreateDeleteEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter

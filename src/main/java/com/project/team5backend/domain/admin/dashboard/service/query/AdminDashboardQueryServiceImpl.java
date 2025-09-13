@@ -1,7 +1,7 @@
 package com.project.team5backend.domain.admin.dashboard.service.query;
 
 import com.project.team5backend.domain.admin.dashboard.dto.response.AdminDashboardResDTO;
-import com.project.team5backend.domain.exhibition.exhibition.repository.ExhibitionRepository;
+import com.project.team5backend.domain.exhibition.repository.ExhibitionRepository;
 import com.project.team5backend.domain.space.repository.SpaceRepository;
 import com.project.team5backend.global.entity.enums.Status;
 import lombok.RequiredArgsConstructor;

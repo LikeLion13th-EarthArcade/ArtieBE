@@ -1,6 +1,6 @@
 package com.project.team5backend.domain.recommendation.service;
 
-import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
+import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.recommendation.entity.ExhibitionEmbedding;
 import com.project.team5backend.domain.recommendation.repository.ExhibitionEmbeddingRepository;
 import lombok.RequiredArgsConstructor;
