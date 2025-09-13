@@ -35,55 +35,37 @@ public class ExhibitionRepositoryImpl implements ExhibitionRepositoryCustom {
 
         QExhibition exhibition = QExhibition.exhibition;
 
-        // 동적 쿼리 조건 생성
-        BooleanBuilder builder = new BooleanBuilder()
-                .and(exhibition.isDeleted.isFalse())
-                .and(exhibition.status.eq(Status.APPROVED));
-
-        // 날짜 조건
-        if (localDate != null) {
-            // 사용자가 날짜를 지정한 경우: 그 날짜에 '진행중'인 전시만
-            builder.and(exhibition.startDate.loe(localDate))
-                    .and(exhibition.endDate.goe(localDate));
-        } else {
-            // 날짜 미지정: 아직 끝나지 않은 전시(진행중 or 진행예정)
-            LocalDate today = LocalDate.now();
-            builder.and(exhibition.endDate.goe(today));
-        }
-
-        // 카테고리 필터
-        if (exhibitionCategory != null) {
-            builder.and(exhibition.exhibitionCategory.eq(exhibitionCategory));
-        }
-
-        // 지역 필터 (Address 엔티티의 roadAddress 필드 사용)
-        if (district != null && !district.trim().isEmpty()) {
-            builder.and(exhibition.address.district.equalsIgnoreCase(district.trim()));
-        }
-
-        // 분위기 필터
-        if (exhibitionMood != null) {
-            builder.and(exhibition.exhibitionMood.eq(exhibitionMood));
-        }
-
-        // 전체 개수 조회 (fetchCount 대신 fetch().size() 사용 - 최신 QueryDSL 버전 호환)
         Long total = queryFactory
                 .select(exhibition.count())
                 .from(exhibition)
-                .where(builder)
+                .where(
+                        exhibition.isDeleted.isFalse(),
+                        exhibition.status.eq(Status.APPROVED),
+                        dateCondition(exhibition, localDate),
+                        categoryCondition(exhibition, exhibitionCategory),
+                        districtCondition(exhibition, district),
+                        moodCondition(exhibition, exhibitionMood)
+                )
                 .fetchOne();
 
         // 정렬, 디폴트 최신순
         OrderSpecifier<?> order = switch (sort == null ? Sort.POPULAR : sort) {
             case OLD     -> exhibition.createdAt.asc();
-            case POPULAR -> new OrderSpecifier<>(Order.DESC, exhibition.reviewCount, OrderSpecifier.NullHandling.NullsLast);
+            case POPULAR -> exhibition.reviewCount.desc().nullsLast();
             case NEW     -> exhibition.createdAt.desc();
         };
 
         // 페이징된 결과 조회
         List<Exhibition> content = queryFactory
                 .selectFrom(exhibition)
-                .where(builder)
+                .where(
+                        exhibition.isDeleted.isFalse(),
+                        exhibition.status.eq(Status.APPROVED),
+                        dateCondition(exhibition, localDate),
+                        categoryCondition(exhibition, exhibitionCategory),
+                        districtCondition(exhibition, district),
+                        moodCondition(exhibition, exhibitionMood)
+                )
                 .orderBy(order, exhibition.id.desc()) // 최신순 정렬
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
@@ -138,6 +120,32 @@ public class ExhibitionRepositoryImpl implements ExhibitionRepositoryCustom {
                 .fetch();
 
         return new PageImpl<>(content, pageable, total != null ? total : 0L);
+    }
+
+    private BooleanExpression dateCondition(QExhibition exhibition, LocalDate localDate) {
+        if (localDate != null) {
+            // 사용자가 날짜를 지정한 경우: 그 날짜에 진행 중인 전시
+            return exhibition.startDate.loe(localDate)
+                    .and(exhibition.endDate.goe(localDate));
+        } else {
+            // 날짜 미지정: 아직 끝나지 않은 전시(진행 중 or 예정)
+            LocalDate today = LocalDate.now();
+            return exhibition.endDate.goe(today);
+        }
+    }
+
+    private BooleanExpression categoryCondition(QExhibition exhibition, ExhibitionCategory category) {
+        return category != null ? exhibition.exhibitionCategory.eq(category) : null;
+    }
+
+    private BooleanExpression districtCondition(QExhibition exhibition, String district) {
+        return (district != null && !district.isBlank())
+                ? exhibition.address.district.eq(district.trim())
+                : null;
+    }
+
+    private BooleanExpression moodCondition(QExhibition exhibition, ExhibitionMood mood) {
+        return mood != null ? exhibition.exhibitionMood.eq(mood) : null;
     }
 
     private BooleanExpression statusCondition(QExhibition exhibition, StatusGroup status) {

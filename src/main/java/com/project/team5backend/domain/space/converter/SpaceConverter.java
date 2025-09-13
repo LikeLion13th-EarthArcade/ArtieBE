@@ -95,7 +95,7 @@ public class SpaceConverter {
                 .thumbnail(space.getThumbnail())
                 .openTime(space.getOpenTime())
                 .closeTime(space.getCloseTime())
-                .address(space.getAddress().getRoadAddress() + space.getAddress().getDetail())
+                .address(space.getAddress().getRoadAddress() + " " + space.getAddress().getDetail())
                 .latitude(space.getAddress().getLatitude())
                 .longitude(space.getAddress().getLongitude())
                 .build();

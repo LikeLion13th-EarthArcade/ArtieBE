@@ -124,7 +124,7 @@ public class ExhibitionConverter {
                 .thumbnail(exhibition.getThumbnail())
                 .startDate(exhibition.getStartDate())
                 .endDate(exhibition.getEndDate())
-                .address(exhibition.getAddress().getRoadAddress() + exhibition.getAddress().getDetail())
+                .address(exhibition.getAddress().getRoadAddress() + " " + exhibition.getAddress().getDetail())
                 .latitude(exhibition.getAddress().getLatitude())
                 .longitude(exhibition.getAddress().getLongitude())
                 .build();

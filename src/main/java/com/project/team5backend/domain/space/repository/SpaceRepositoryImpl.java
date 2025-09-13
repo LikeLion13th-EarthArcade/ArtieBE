@@ -45,6 +45,7 @@ public class SpaceRepositoryImpl implements SpaceRepositoryCustom {
                 .from(space)
                 .where(
                         space.isDeleted.isFalse(),
+                        space.status.eq(Status.APPROVED),
                         noOverlappingReservation(reservation, space, requestedStartDate, requestedEndDate), // 예약기간
                         districtCondition(space, district),
                         sizeCondition(space, size),
@@ -66,6 +67,7 @@ public class SpaceRepositoryImpl implements SpaceRepositoryCustom {
                 .selectFrom(space)
                 .where(
                         space.isDeleted.isFalse(),
+                        space.status.eq(Status.APPROVED),
                         noOverlappingReservation(reservation, space, requestedStartDate, requestedEndDate),
                         districtCondition(space, district),
                         sizeCondition(space, size),
