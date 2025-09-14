@@ -68,7 +68,7 @@ public class ExhibitionReviewCommandServiceImpl implements ExhibitionReviewComma
     public void deleteExhibitionReview(Long exhibitionReviewId, Long userId) {
         ExhibitionReview exhibitionReview = exhibitionReviewRepository.findByIdAndIsDeletedFalse(exhibitionReviewId)
                 .orElseThrow(() -> new ExhibitionReviewException(ExhibitionReviewErrorCode.EXHIBITION_REVIEW_NOT_FOUND));
-        if (!Objects.equals(exhibitionReview.getUser().getId(), userId)) {
+        if (!exhibitionReview.getUser().getId().equals(userId)) {
             throw new ExhibitionReviewException(ExhibitionReviewErrorCode.EXHIBITION_REVIEW_FORBIDDEN);
         }
         exhibitionReview.softDelete();

@@ -46,7 +46,7 @@ public class SpaceReviewCommandServiceImpl implements SpaceReviewCommandService 
     private final ImageCommandService imageCommandService;
 
     @Override
-    public SpaceReviewResDTO.SpaceReviewCreateResDTO createSpaceReview(long spaceId, long userId, SpaceReviewReqDTO.SpaceReviewCreateReqDTO spaceReviewCreateReqDTO, List<MultipartFile> images) {
+    public SpaceReviewResDTO.SpaceReviewCreateResDTO createSpaceReview(Long spaceId, Long userId, SpaceReviewReqDTO.SpaceReviewCreateReqDTO spaceReviewCreateReqDTO, List<MultipartFile> images) {
         Space space = spaceRepository.findByIdAndIsDeletedFalseAndStatusApproved(spaceId, Status.APPROVED)
                 .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
         User user = userRepository.findByIdAndIsDeletedFalse(userId)
@@ -63,28 +63,18 @@ public class SpaceReviewCommandServiceImpl implements SpaceReviewCommandService 
     }
 
     @Override
-    public void deleteSpaceReview(long spaceReviewId, long userId) {
+    public void deleteSpaceReview(Long spaceReviewId, Long userId) {
         SpaceReview spaceReview = spaceReviewRepository.findByIdAndIsDeletedFalse(spaceReviewId)
                 .orElseThrow(() -> new SpaceReviewException(SpaceReviewErrorCode.SPACE_REVIEW_NOT_FOUND));
-
         if (!spaceReview.getUser().getId().equals(userId)) {
             throw new SpaceReviewException(SpaceReviewErrorCode.SPACE_REVIEW_FORBIDDEN);
         }
         spaceReview.softDelete();
-
-        List<SpaceReviewImage> images = spaceReviewImageRepository.findBySpaceReviewId(spaceReviewId);
-        images.forEach(SpaceReviewImage::deleteImage);
-        List<String> imageUrls = images.stream().map(SpaceReviewImage::getImageUrl).toList();
-
+        List<String> imageUrls = deleteExhibitionReviewImage(spaceReviewId); // 이미지 삭제
         spaceRepository.applySpaceReviewDeleted(spaceReview.getSpace().getId(), spaceReview.getRate());  // 리뷰 평균/카운트 갱신
-
-        // s3 보존 휴지통 prefix로 이동시키기
-        try{
-            imageCommandService.moveToTrashPrefix(imageUrls);
-        } catch (ImageException e) {
-            throw new ImageException(ImageErrorCode.S3_MOVE_TRASH_FAIL);
-        }
+        moveImagesToTrash(imageUrls);
     }
+
     private void saveReviewImages(List<MultipartFile> images, SpaceReview spaceReview) {
         List<SpaceReviewImage> reviewImages = Optional.ofNullable(images)
                 .orElseGet(List::of)
@@ -97,6 +87,22 @@ public class SpaceReviewCommandServiceImpl implements SpaceReviewCommandService 
 
         if (!reviewImages.isEmpty()) {
             spaceReviewImageRepository.saveAll(reviewImages);
+        }
+    }
+
+    private List<String> deleteExhibitionReviewImage(Long spaceReviewId) {
+        List<SpaceReviewImage> images = spaceReviewImageRepository.findBySpaceReviewId(spaceReviewId);
+        images.forEach(SpaceReviewImage::deleteImage);
+        return images.stream()
+                .map(SpaceReviewImage::getImageUrl)
+                .toList();
+    }
+
+    private void moveImagesToTrash(List<String> imageUrls) {
+        try {
+            imageCommandService.moveToTrashPrefix(imageUrls);
+        } catch (ImageException e) {
+            throw new ImageException(ImageErrorCode.S3_MOVE_TRASH_FAIL);
         }
     }
 }
