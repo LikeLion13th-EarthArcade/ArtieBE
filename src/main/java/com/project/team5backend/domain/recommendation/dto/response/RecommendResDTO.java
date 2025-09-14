@@ -20,7 +20,7 @@ public class RecommendResDTO {
             String location,
             LocalDate startDate,
             LocalDate endDate,
-            BigDecimal reviewAvg,
+            double reviewAvg,
             int reviewCount,
             Boolean isLiked
     ) {}

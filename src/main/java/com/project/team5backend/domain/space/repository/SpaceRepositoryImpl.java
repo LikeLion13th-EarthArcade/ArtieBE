@@ -131,15 +131,15 @@ public class SpaceRepositoryImpl implements SpaceRepositoryCustom {
     }
 
     private BooleanExpression sizeCondition(QSpace space, SpaceSize size) {
-        return size != null ? space.size.eq(size) : null;
+        return size != null ? space.spaceSize.eq(size) : null;
     }
 
     private BooleanExpression typeCondition(QSpace space, SpaceType type) {
-        return type != null ? space.type.eq(type) : null;
+        return type != null ? space.spaceType.eq(type) : null;
     }
 
     private BooleanExpression moodCondition(QSpace space, SpaceMood mood) {
-        return mood != null ? space.mood.eq(mood) : null;
+        return mood != null ? space.spaceMood.eq(mood) : null;
     }
 
     private BooleanExpression facilityCondition(QSpace space, QSpaceFacility spaceFacility, List<String> facilities) {

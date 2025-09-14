@@ -8,36 +8,34 @@ import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.global.entity.embedded.Address;
 import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.global.util.PageResponse;
-import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 import com.project.team5backend.domain.space.dto.request.SpaceReqDTO;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 @Component
 public class SpaceConverter {
-    public static Space toSpace(SpaceReqDTO.SpaceCreateReqDTO request, User user, String thumbnail, Address address){
+    public static Space toSpace(SpaceReqDTO.SpaceCreateReqDTO spaceCreateReqDTO, User user, String thumbnail, Address address){
 
         return Space.builder()
-                .name(request.name())
-                .description(request.description())
-                .openTime(request.openTime())
-                .closeTime(request.closeTime())
+                .name(spaceCreateReqDTO.name())
+                .description(spaceCreateReqDTO.description())
+                .openTime(spaceCreateReqDTO.openTime())
+                .closeTime(spaceCreateReqDTO.closeTime())
                 .thumbnail(thumbnail)
-                .phoneNumber(request.phoneNumber())
-                .email(request.email())
-                .websiteUrl(request.websiteUrl())
-                .snsUrl(request.snsUrl())
-                .ratingAvg(BigDecimal.ZERO)
+                .phoneNumber(spaceCreateReqDTO.phoneNumber())
+                .email(spaceCreateReqDTO.email())
+                .websiteUrl(spaceCreateReqDTO.websiteUrl())
+                .snsUrl(spaceCreateReqDTO.snsUrl())
+                .ratingAvg(0.0)
                 .likeCount(0)
                 .reviewCount(0)
-                .totalReviewScore(0)
+                .reviewSum(0)
                 .isDeleted(false)
                 .address(address)
-                .type(request.type())
-                .size(request.size())
-                .mood(request.mood())
+                .spaceType(spaceCreateReqDTO.spaceType())
+                .spaceSize(spaceCreateReqDTO.spaceSize())
+                .spaceMood(spaceCreateReqDTO.spaceMood())
                 .status(Status.PENDING)
                 .user(user)
                 .build();
@@ -73,8 +71,8 @@ public class SpaceConverter {
                 .longitude(space.getAddress().getLongitude())
                 .openTime(space.getOpenTime())
                 .closeTime(space.getCloseTime())
-                .spaceSize(space.getSize())
-                .spaceMood(space.getMood())
+                .spaceSize(space.getSpaceSize())
+                .spaceMood(space.getSpaceMood())
                 .description(space.getDescription())
                 .facilities(
                         space.getSpaceFacilities().stream()

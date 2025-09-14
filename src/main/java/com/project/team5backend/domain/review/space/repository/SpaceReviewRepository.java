@@ -1,0 +1,37 @@
+package com.project.team5backend.domain.review.space.repository;
+
+
+import com.project.team5backend.domain.review.space.entity.SpaceReview;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
+
+@Repository
+public interface SpaceReviewRepository extends JpaRepository<SpaceReview, Long> {
+    @Modifying
+    @Query("update SpaceReview sr set sr.isDeleted = true where sr.space.id =:spaceId")
+    void softDeleteBySpaceId(@Param("spaceId") Long spaceId);
+
+    @Query("""
+        select sr from SpaceReview sr
+        join fetch sr.user u
+        left join sr.spaceReviewImages sri
+        where sr.id =:spaceReviewId and sr.isDeleted is false
+    """)
+    Optional<SpaceReview> findByIdAndIsDeletedFalse(@Param("spaceReviewId") Long spaceReviewId);
+
+    @Query("""
+        SELECT DISTINCT sr FROM SpaceReview sr
+        JOIN FETCH sr.user u
+        LEFT JOIN sr.spaceReviewImages sri
+        WHERE sr.space.id =:spaceId AND sr.isDeleted = false
+        ORDER BY sr.createdAt DESC
+    """)
+    Page<SpaceReview> findBySpaceIdAndIsDeletedFalse(@Param("spaceId") Long spaceId, Pageable pageable);
+}

@@ -7,7 +7,6 @@ import com.project.team5backend.domain.space.entity.enums.SpaceSize;
 import com.project.team5backend.domain.space.entity.enums.SpaceType;
 import com.project.team5backend.global.address.dto.request.AddressReqDTO;
 import io.swagger.v3.oas.annotations.media.Schema;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
@@ -22,11 +21,11 @@ public class SpaceReqDTO {
             @NotNull
             AddressReqDTO.AddressCreateReqDTO address,
             @NotNull
-            SpaceType type,
+            SpaceType spaceType,
             @NotNull
-            SpaceSize size,
+            SpaceSize spaceSize,
             @NotNull
-            SpaceMood mood,
+            SpaceMood spaceMood,
             @NotBlank
             String name,
             @NotNull @Schema(description = "운영 시작 시간",  example = "10:00") @JsonFormat(pattern = "HH:mm")

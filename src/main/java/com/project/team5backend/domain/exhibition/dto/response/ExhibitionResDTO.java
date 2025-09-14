@@ -101,7 +101,7 @@ public class ExhibitionResDTO {
             String location,
             LocalDate startDate,
             LocalDate endDate,
-            BigDecimal reviewAvg,
+            double reviewAvg,
             int reviewCount,
             Boolean isLiked
     ){}
@@ -137,7 +137,7 @@ public class ExhibitionResDTO {
             String location,
             LocalDate startDate,
             LocalDate endDate,
-            BigDecimal reviewAvg,
+            double reviewAvg,
             int reviewCount,
             Boolean isLiked
     ){}
@@ -153,7 +153,7 @@ public class ExhibitionResDTO {
             String location,
             LocalDate startDate,
             LocalDate endDate,
-            BigDecimal reviewAvg,
+            double reviewAvg,
             int reviewCount,
             Boolean isLiked
     ){}

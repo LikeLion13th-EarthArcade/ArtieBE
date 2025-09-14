@@ -38,8 +38,8 @@ public class AdminSpaceConverter {
                 )
                 .openTime(space.getOpenTime())
                 .closeTime(space.getCloseTime())
-                .spaceSize(space.getSize())
-                .spaceMood(space.getMood())
+                .spaceSize(space.getSpaceSize())
+                .spaceMood(space.getSpaceMood())
                 .description(space.getDescription())
                 .facilities(
                         space.getSpaceFacilities().stream()
