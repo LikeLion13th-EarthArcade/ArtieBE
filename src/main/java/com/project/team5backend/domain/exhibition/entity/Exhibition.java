@@ -40,9 +40,7 @@ public class Exhibition extends BaseTimeEntity {
     private LocalDate endDate;
 
     @Column(nullable = false)
-    private LocalTime openTime; // 운영 시작 시간
-    @Column(nullable = false)
-    private LocalTime closeTime; // 운영 종료 시간
+    private String operatingHours; // 운영 시간
 
     private String websiteUrl;
 

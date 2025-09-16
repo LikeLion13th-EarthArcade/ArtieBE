@@ -70,7 +70,7 @@ public class SpaceReviewCommandServiceImpl implements SpaceReviewCommandService 
             throw new SpaceReviewException(SpaceReviewErrorCode.SPACE_REVIEW_FORBIDDEN);
         }
         spaceReview.softDelete();
-        List<String> imageUrls = deleteExhibitionReviewImage(spaceReviewId); // 이미지 삭제
+        List<String> imageUrls = deleteSpaceReviewImage(spaceReviewId); // 이미지 삭제
         spaceRepository.applySpaceReviewDeleted(spaceReview.getSpace().getId(), spaceReview.getRate());  // 리뷰 평균/카운트 갱신
         moveImagesToTrash(imageUrls);
     }
@@ -90,7 +90,7 @@ public class SpaceReviewCommandServiceImpl implements SpaceReviewCommandService 
         }
     }
 
-    private List<String> deleteExhibitionReviewImage(Long spaceReviewId) {
+    private List<String> deleteSpaceReviewImage(Long spaceReviewId) {
         List<SpaceReviewImage> images = spaceReviewImageRepository.findBySpaceReviewId(spaceReviewId);
         images.forEach(SpaceReviewImage::deleteImage);
         return images.stream()

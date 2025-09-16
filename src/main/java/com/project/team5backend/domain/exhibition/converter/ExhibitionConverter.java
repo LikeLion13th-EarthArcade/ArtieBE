@@ -26,8 +26,7 @@ public class ExhibitionConverter {
                 .description(createReqDTO.description())
                 .startDate(createReqDTO.startDate())
                 .endDate(createReqDTO.endDate())
-                .openTime(createReqDTO.openTime())
-                .closeTime(createReqDTO.closeTime())
+                .operatingHours(createReqDTO.operatingHours())
                 .price(createReqDTO.price())
                 .websiteUrl(createReqDTO.websiteUrl())
                 .status(Status.PENDING)
@@ -66,8 +65,7 @@ public class ExhibitionConverter {
                 .description(exhibition.getDescription())
                 .startDate(exhibition.getStartDate())
                 .endDate(exhibition.getEndDate())
-                .openTime(exhibition.getOpenTime())
-                .closeTime(exhibition.getCloseTime())
+                .operatingHours(exhibition.getOperatingHours())
                 .imageUrls(imageUrls)
                 .websiteUrl(exhibition.getWebsiteUrl())
                 .address(
@@ -76,34 +74,6 @@ public class ExhibitionConverter {
                                 exhibition.getAddress().getRoadAddress(),
                                 exhibition.getAddress().getDetail() != null ? exhibition.getAddress().getDetail() : "")
                                 : null
-                )
-                .latitude(exhibition.getAddress().getLatitude())
-                .longitude(exhibition.getAddress().getLongitude())
-                .exhibitionCategory(exhibition.getExhibitionCategory())
-                .exhibitionType(exhibition.getExhibitionType())
-                .exhibitionMood(exhibition.getExhibitionMood())
-                .price(exhibition.getPrice())
-                .facilities(
-                        exhibition.getExhibitionFacilities().stream()
-                                .map(ef -> ef.getFacility().getName()) // Facility 엔티티의 name 사용
-                                .toList()
-                )
-                .build();
-    }
-
-    public static ExhibitionResDTO.DetailPendingExhibitionResDTO toDetailPendingExhibitionResDTO(Exhibition exhibition, List<String> imageFileKeys) {
-        return ExhibitionResDTO.DetailPendingExhibitionResDTO.builder()
-                .exhibitionId(exhibition.getId())
-                .title(exhibition.getTitle())
-                .description(exhibition.getDescription())
-                .startDate(exhibition.getStartDate())
-                .endDate(exhibition.getEndDate())
-                .openTime(exhibition.getOpenTime())
-                .closeTime(exhibition.getCloseTime())
-                .imageFileKeys(imageFileKeys)
-                .websiteUrl(exhibition.getWebsiteUrl())
-                .address(
-                        exhibition.getAddress() != null ? exhibition.getAddress().toString() : null
                 )
                 .latitude(exhibition.getAddress().getLatitude())
                 .longitude(exhibition.getAddress().getLongitude())

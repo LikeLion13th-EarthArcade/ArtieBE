@@ -51,7 +51,7 @@ public interface SpaceRepository extends JpaRepository<Space, Long>,SpaceReposit
                               when s.reviewCount <= 0 then 0
                               else s.reviewSum * 1.0 / s.reviewCount
                              end
-        where s.id =:exhibitionId and s.reviewCount > 0
+        where s.id =:spaceId and s.reviewCount > 0
         """)
     void applySpaceReviewDeleted(@Param("spaceId") Long spaceId, @Param("rate")  int rate);
 
