@@ -32,8 +32,7 @@ public class SpaceResDTO {
             String address,
             BigDecimal latitude,
             BigDecimal longitude,
-            @Schema(example = "10:00") @JsonFormat(pattern = "HH:mm") LocalTime openTime,
-            @Schema(example = "20:00") @JsonFormat(pattern = "HH:mm") LocalTime closeTime,
+            String operatingHours,
             SpaceSize spaceSize,
             SpaceMood spaceMood,
             String description,
@@ -70,8 +69,7 @@ public class SpaceResDTO {
             String address,
             BigDecimal latitude,
             BigDecimal longitude,
-            @JsonFormat(pattern = "HH:mm") LocalTime openTime,
-            @JsonFormat(pattern = "HH:mm") LocalTime closeTime,
+            String operatingHours,
             String thumbnail
     ){}
 }

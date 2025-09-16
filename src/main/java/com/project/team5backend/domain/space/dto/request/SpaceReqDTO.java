@@ -28,10 +28,8 @@ public class SpaceReqDTO {
             SpaceMood spaceMood,
             @NotBlank
             String name,
-            @NotNull @Schema(description = "운영 시작 시간",  example = "10:00") @JsonFormat(pattern = "HH:mm")
-            LocalTime openTime,
-            @NotNull @Schema(description = "운영 종료 시간",  example = "20:00") @JsonFormat(pattern = "HH:mm")
-            LocalTime closeTime,
+            @NotBlank
+            String operatingHours,
             String description,
             List<String> facilities,
             String phoneNumber,

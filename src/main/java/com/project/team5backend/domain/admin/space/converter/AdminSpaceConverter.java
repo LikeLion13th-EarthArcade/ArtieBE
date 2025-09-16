@@ -36,8 +36,7 @@ public class AdminSpaceConverter {
                                 space.getAddress().getDetail() != null ? space.getAddress().getDetail() : "")
                                 : null
                 )
-                .openTime(space.getOpenTime())
-                .closeTime(space.getCloseTime())
+                .operatingHours(space.getOperatingHours())
                 .spaceSize(space.getSpaceSize())
                 .spaceMood(space.getSpaceMood())
                 .description(space.getDescription())

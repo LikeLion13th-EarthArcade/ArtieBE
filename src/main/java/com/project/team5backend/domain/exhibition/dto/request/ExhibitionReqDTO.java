@@ -2,7 +2,6 @@ package com.project.team5backend.domain.exhibition.dto.request;
 
 
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionCategory;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionMood;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionType;
@@ -13,7 +12,6 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 import java.util.List;
 
 import static com.project.team5backend.global.constant.valid.MessageConstant.*;
@@ -31,15 +29,10 @@ public class ExhibitionReqDTO {
             @NotNull(message = BLANK_EXHIBITION_END_DATE)
             LocalDate endDate,
 
-            @Schema(description = "운영 시작 시간", example = "10:00")
-            @JsonFormat(pattern = "HH:mm")
-            @NotNull(message = BLANK_EXHIBITION_OPEN_TIME)
-            LocalTime openTime,
 
-            @Schema(description = "운영 종료 시간", example = "20:00")
-            @JsonFormat(pattern = "HH:mm")
-            @NotNull(message = BLANK_EXHIBITION_CLOSE_TIME)
-            LocalTime closeTime,
+            @Schema(description = "운영 시작 시간", example = "월-금 10:00~19:00 / 주말 휴무")
+            @NotNull(message = BLANK_EXHIBITION_OPERATING_HOURS)
+            String operatingHours,
 
             String websiteUrl,
 
