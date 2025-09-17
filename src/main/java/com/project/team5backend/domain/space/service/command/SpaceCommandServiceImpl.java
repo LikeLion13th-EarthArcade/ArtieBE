@@ -29,8 +29,9 @@ import com.project.team5backend.global.address.dto.response.AddressResDTO;
 import com.project.team5backend.global.address.service.AddressService;
 import com.project.team5backend.global.entity.embedded.Address;
 import com.project.team5backend.global.entity.enums.Status;
+import com.project.team5backend.global.infra.s3.S3FileStorageAdapter;
 import com.project.team5backend.global.util.ImageUtils;
-import com.project.team5backend.global.infra.s3.S3Uploader;
+import com.project.team5backend.global.util.S3UrlUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -54,36 +55,35 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
     private final FacilityRepository facilityRepository;
     private final InteractLogService interactLogService;
     private final AddressService addressService;
-    private final S3Uploader s3Uploader;
+    private final S3FileStorageAdapter s3FileStorageAdapter;
     private final ImageCommandService imageCommandService;
+    private final S3UrlUtils s3UrlUtils;
 
     @Override
-    public SpaceResDTO.SpaceCreateResDTO createSpace(SpaceReqDTO.SpaceCreateReqDTO request, long userId, List<MultipartFile> images) {
+    public SpaceResDTO.SpaceCreateResDTO createSpace(SpaceReqDTO.SpaceCreateReqDTO spaceCreateReqDTO, long userId, List<MultipartFile> images) {
 
         ImageUtils.validateImages(images); // 이미지 검증 (개수, null 여부)
 
         User user = userRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
-        //주소 가져오기
-        AddressResDTO.AddressCreateResDTO addressResDTO = addressService.resolve(request.address());
+
+        AddressResDTO.AddressCreateResDTO addressResDTO = addressService.resolve(spaceCreateReqDTO.address());
         Address address = AddressConverter.toAddress(addressResDTO);
 
-        // 업로드 및 image 획득
         List<String> imageUrls = images.stream()
-                .map(file -> s3Uploader.upload(file, "spaces"))
+                .map(file -> s3FileStorageAdapter.upload(file, "spaces"))
                 .toList();
 
-        Space space = SpaceConverter.toSpace(request, user, imageUrls.get(0), address);
+        String thumbnail = s3UrlUtils.toFileKey(imageUrls.get(0));
+        Space space = SpaceConverter.toSpace(spaceCreateReqDTO, user, thumbnail, address);
         spaceRepository.save(space);
 
-        // 시설 매핑 (문자열 → Facility 엔티티 조회 → SpaceFacility 생성)
-        List<Facility> facilities = facilityRepository.findByNameIn(request.facilities());
+        List<Facility> facilities = facilityRepository.findByNameIn(spaceCreateReqDTO.facilities());
         facilities.forEach(facility -> {
             SpaceFacility sf = SpaceConverter.toSpaceFacility(space, facility);
             space.getSpaceFacilities().add(sf);
         });
 
-        // Space 이미지 엔티티 저장
         for (String url : imageUrls) {
             spaceImageRepository.save(ImageConverter.toSpaceImage(space, url));
         }
@@ -143,7 +143,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
 
     private void moveImagesToTrash(List<String> fileKeys) {
         try {
-            imageCommandService.moveToTrashPrefix(fileKeys);
+            imageCommandService.deleteImages(fileKeys);
         } catch (ImageException e) {
             throw new ImageException(ImageErrorCode.S3_MOVE_TRASH_FAIL);
         }

@@ -7,6 +7,7 @@ import com.project.team5backend.domain.review.exhibition.exception.ExhibitionRev
 import com.project.team5backend.domain.review.exhibition.exception.ExhibitionReviewException;
 import com.project.team5backend.domain.review.exhibition.repository.ExhibitionReviewRepository;
 import com.project.team5backend.domain.image.entity.ExhibitionReviewImage;
+import com.project.team5backend.global.util.S3UrlUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -25,6 +26,7 @@ import java.util.List;
 public class ExhibitionReviewQueryServiceImpl implements ExhibitionReviewQueryService {
 
     private final ExhibitionReviewRepository exhibitionReviewRepository;
+    private final S3UrlUtils s3UrlUtils;
 
     @Override
     public ExhibitionReviewResDTO.ExReviewDetailResDTO getExhibitionReviewDetail(Long exhibitionReviewId) {
@@ -32,7 +34,8 @@ public class ExhibitionReviewQueryServiceImpl implements ExhibitionReviewQuerySe
                 .orElseThrow(()-> new ExhibitionReviewException(ExhibitionReviewErrorCode.EXHIBITION_REVIEW_NOT_FOUND));
 
         List<String> imageUrls = exhibitionReview.getExhibitionReviewImages().stream()
-                .map(ExhibitionReviewImage::getImageUrl)
+                .map(ExhibitionReviewImage::getFileKey)
+                .map(s3UrlUtils::toImageUrl)
                 .toList();
         return ExhibitionReviewConverter.toExReviewDetailResDTO(exhibitionReview, imageUrls);
     }
@@ -45,7 +48,8 @@ public class ExhibitionReviewQueryServiceImpl implements ExhibitionReviewQuerySe
 
         return reviewPage.map(review -> {
             List<String> imageUrls = review.getExhibitionReviewImages().stream()
-                    .map(ExhibitionReviewImage::getImageUrl)
+                    .map(ExhibitionReviewImage::getFileKey)
+                    .map(s3UrlUtils::toImageUrl)
                     .toList();
             return ExhibitionReviewConverter.toExReviewDetailResDTO(review, imageUrls);
         });

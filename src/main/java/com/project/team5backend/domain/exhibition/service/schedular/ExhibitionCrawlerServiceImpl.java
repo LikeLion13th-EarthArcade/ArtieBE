@@ -12,6 +12,7 @@ import com.project.team5backend.global.address.converter.AddressConverter;
 import com.project.team5backend.global.address.dto.response.AddressResDTO;
 import com.project.team5backend.global.address.service.AddressService;
 import com.project.team5backend.global.entity.embedded.Address;
+import com.project.team5backend.global.util.S3UrlUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -35,6 +36,7 @@ public class ExhibitionCrawlerServiceImpl implements ExhibitionCrawlerService {
     private final ExhibitionImageRepository exhibitionImageRepository;
     private final AddressService addressService;
     private final OpenAiEnumService openAiEnumService;
+    private final S3UrlUtils s3UrlUtils;
 
     @Value("${culture.portal.service-key}")
     private String serviceKey;
@@ -78,9 +80,10 @@ public class ExhibitionCrawlerServiceImpl implements ExhibitionCrawlerService {
             // 2. OpenAI 분류
             ExhibitionResDTO.ExhibitionEnumResDTO enums = openAiEnumService.classify(exhibitionCrawlResDto.title(), exhibitionCrawlResDto.place());
             // 3. DB 저장
-            Exhibition exhibition = ExhibitionConverter.toExhibitionCrawl(exhibitionCrawlResDto, address, enums);
+            String thumbnail = s3UrlUtils.toFileKey(exhibitionCrawlResDto.thumbnail());
+            Exhibition exhibition = ExhibitionConverter.toExhibitionCrawl(exhibitionCrawlResDto, thumbnail, address, enums);
             exhibitionRepository.save(exhibition);
-            exhibitionImageRepository.save(ImageConverter.toExhibitionImage(exhibition, exhibitionCrawlResDto.thumbnail()));
+            exhibitionImageRepository.save(ImageConverter.toExhibitionImage(exhibition, thumbnail));
 
             log.info("전시 저장 성공: {}", exhibitionCrawlResDto.title());
         } catch (Exception e) {

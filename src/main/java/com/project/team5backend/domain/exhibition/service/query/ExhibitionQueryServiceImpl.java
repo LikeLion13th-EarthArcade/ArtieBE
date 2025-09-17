@@ -15,6 +15,7 @@ import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.global.util.PageResponse;
+import com.project.team5backend.global.util.S3UrlUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -42,7 +43,8 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
     private final ExhibitionImageRepository exhibitionImageRepository;
     private final InteractLogService interactLogService;
     private final ExhibitionLikeRepository exhibitionLikeRepository;
-    private final UserRepository userRepository;
+    private final S3UrlUtils s3UrlUtils;
+
     @Override
     public ExhibitionResDTO.ExhibitionDetailResDTO findExhibitionDetail(Long exhibitionId) {
         Exhibition exhibition = exhibitionRepository.findByIdAndIsDeletedFalseAndStatusApprovedWithUserAndExhibitionFacilities(exhibitionId, Status.APPROVED)
@@ -51,7 +53,9 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
         // ai 분석을 위한 로그 생성
         interactLogService.logClick(1L, exhibitionId);
         // 전시 이미지들의 fileKey만 조회
-        List<String> imageUrls = exhibitionImageRepository.findImageUrlsByExhibitionId(exhibitionId);
+        List<String> imageUrls = exhibitionImageRepository.findImageUrlsByExhibitionId(exhibitionId).stream()
+                .map(s3UrlUtils::toImageUrl)
+                .toList();
 
         return ExhibitionConverter.toExhibitionDetailResDTO(exhibition, imageUrls);
     }
@@ -94,7 +98,9 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
             throw new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND);
         }
         Exhibition upcomingEx = exhibitions.get(0);
-        List<String> imageUrls = exhibitionImageRepository.findImageUrlsByExhibitionId(upcomingEx.getId());
+        List<String> imageUrls = exhibitionImageRepository.findImageUrlsByExhibitionId(upcomingEx.getId()).stream()
+                .map(s3UrlUtils::toImageUrl)
+                .toList();
         return ExhibitionConverter.toUpcomingPopularExhibitionResDTO(upcomingEx.getId(), upcomingEx.getTitle(), imageUrls);
     }
 

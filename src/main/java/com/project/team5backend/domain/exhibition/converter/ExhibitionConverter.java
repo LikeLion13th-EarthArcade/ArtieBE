@@ -196,7 +196,7 @@ public class ExhibitionConverter {
     }
 
     // 크롤링 전용 dto
-    public static Exhibition toExhibitionCrawl(ExhibitionResDTO.ExhibitionCrawlResDto exhibitionCrawlResDto, Address address, ExhibitionResDTO.ExhibitionEnumResDTO exhibitionEnumResDTO) {
+    public static Exhibition toExhibitionCrawl(ExhibitionResDTO.ExhibitionCrawlResDto exhibitionCrawlResDto, String thumbnail, Address address, ExhibitionResDTO.ExhibitionEnumResDTO exhibitionEnumResDTO) {
         DateTimeFormatter formatter = DateTimeFormatter.BASIC_ISO_DATE;
         return Exhibition.builder()
                 .portalExhibitionId(Long.valueOf(exhibitionCrawlResDto.portalExhibitionId()))
@@ -216,7 +216,7 @@ public class ExhibitionConverter {
                 .likeCount(0)
                 .reviewCount(0)
                 .reviewSum(0)
-                .thumbnail(exhibitionCrawlResDto.thumbnail())
+                .thumbnail(thumbnail)
                 .address(address)
                 .user(null)
                 .build();

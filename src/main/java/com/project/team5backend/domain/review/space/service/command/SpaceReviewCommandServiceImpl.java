@@ -22,7 +22,7 @@ import com.project.team5backend.domain.user.exception.UserErrorCode;
 import com.project.team5backend.domain.user.exception.UserException;
 import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.entity.enums.Status;
-import com.project.team5backend.global.infra.s3.S3Uploader;
+import com.project.team5backend.global.infra.s3.S3FileStorageAdapter;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +39,7 @@ public class SpaceReviewCommandServiceImpl implements SpaceReviewCommandService 
     private final SpaceReviewRepository spaceReviewRepository;
     private final SpaceRepository spaceRepository;
     private final UserRepository userRepository;;
-    private final S3Uploader s3Uploader;
+    private final S3FileStorageAdapter s3FileStorageAdapter;
     private final SpaceReviewImageRepository spaceReviewImageRepository;
     private final ImageCommandService imageCommandService;
 
@@ -78,7 +78,7 @@ public class SpaceReviewCommandServiceImpl implements SpaceReviewCommandService 
                 .orElseGet(List::of)
                 .stream()
                 .map(file -> {
-                    String url = s3Uploader.upload(file, "spaceReviews");
+                    String url = s3FileStorageAdapter.upload(file, "spaceReviews");
                     return ImageConverter.toSpaceReviewImage(spaceReview, url);
                 })
                 .toList();
@@ -98,7 +98,7 @@ public class SpaceReviewCommandServiceImpl implements SpaceReviewCommandService 
 
     private void moveImagesToTrash(List<String> fileKeys) {
         try {
-            imageCommandService.moveToTrashPrefix(fileKeys);
+            imageCommandService.deleteImages(fileKeys);
         } catch (ImageException e) {
             throw new ImageException(ImageErrorCode.S3_MOVE_TRASH_FAIL);
         }

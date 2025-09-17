@@ -8,12 +8,10 @@ import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.global.entity.embedded.Address;
 import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.global.util.PageResponse;
-import org.springframework.stereotype.Component;
 import com.project.team5backend.domain.space.dto.request.SpaceReqDTO;
 
 import java.util.List;
 
-@Component
 public class SpaceConverter {
     public static Space toSpace(SpaceReqDTO.SpaceCreateReqDTO spaceCreateReqDTO, User user, String thumbnail, Address address){
 

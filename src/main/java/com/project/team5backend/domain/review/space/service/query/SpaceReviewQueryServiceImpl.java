@@ -8,6 +8,7 @@ import com.project.team5backend.domain.review.space.entity.SpaceReview;
 import com.project.team5backend.domain.review.space.exception.SpaceReviewErrorCode;
 import com.project.team5backend.domain.review.space.exception.SpaceReviewException;
 import com.project.team5backend.domain.review.space.repository.SpaceReviewRepository;
+import com.project.team5backend.global.util.S3UrlUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +24,7 @@ import java.util.List;
 @Transactional
 public class SpaceReviewQueryServiceImpl implements SpaceReviewQueryService {
     private final SpaceReviewRepository spaceReviewRepository;
+    private final S3UrlUtils s3UrlUtils;
 
     @Override
     public SpaceReviewResDTO.SpaceReviewDetailResDTO getSpaceReviewDetail(Long spaceReviewId) {
@@ -30,7 +32,8 @@ public class SpaceReviewQueryServiceImpl implements SpaceReviewQueryService {
                 .orElseThrow(() -> new SpaceReviewException(SpaceReviewErrorCode.SPACE_REVIEW_NOT_FOUND));
 
         List<String> imageUrls = spaceReview.getSpaceReviewImages().stream()
-                .map(SpaceReviewImage::getImageUrl)
+                .map(SpaceReviewImage::getFileKey)
+                .map(s3UrlUtils::toImageUrl)
                 .toList();
         return SpaceReviewConverter.toSpaceReviewDetailResDTO(spaceReview, imageUrls);
     }
@@ -41,7 +44,8 @@ public class SpaceReviewQueryServiceImpl implements SpaceReviewQueryService {
 
         return spaceReviewPage.map(spaceReview -> {
             List<String> imageUrls = spaceReview.getSpaceReviewImages().stream()
-                    .map(SpaceReviewImage::getImageUrl)
+                    .map(SpaceReviewImage::getFileKey)
+                    .map(s3UrlUtils::toImageUrl)
                     .toList();
             return SpaceReviewConverter.toSpaceReviewDetailResDTO(spaceReview, imageUrls);
         });

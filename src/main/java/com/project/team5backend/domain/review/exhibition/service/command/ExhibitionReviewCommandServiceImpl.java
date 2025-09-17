@@ -22,7 +22,7 @@ import com.project.team5backend.domain.user.exception.UserErrorCode;
 import com.project.team5backend.domain.user.exception.UserException;
 import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.entity.enums.Status;
-import com.project.team5backend.global.infra.s3.S3Uploader;
+import com.project.team5backend.global.infra.s3.S3FileStorageAdapter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -44,7 +44,7 @@ public class ExhibitionReviewCommandServiceImpl implements ExhibitionReviewComma
     private final ExhibitionReviewRepository exhibitionReviewRepository;
     private final ExhibitionReviewImageRepository exhibitionReviewImageRepository;
     private final ImageCommandService imageCommandService;
-    private final S3Uploader s3Uploader;
+    private final S3FileStorageAdapter s3FileStorageAdapter;
     @Override
     public ExhibitionReviewResDTO.ExReviewCreateResDTO createExhibitionReview(Long exhibitionId, Long userId, ExhibitionReviewReqDTO.createExReviewReqDTO createExhibitionReviewReqDTO, List<MultipartFile> images) {
         Exhibition exhibition = exhibitionRepository.findByIdAndIsDeletedFalseAndStatusApproveAndOpening(exhibitionId, LocalDate.now(), Status.APPROVED)
@@ -81,7 +81,7 @@ public class ExhibitionReviewCommandServiceImpl implements ExhibitionReviewComma
                 .orElseGet(List::of)
                 .stream()
                 .map(file -> {
-                    String url = s3Uploader.upload(file, "exhibitionReviews");
+                    String url = s3FileStorageAdapter.upload(file, "exhibitionReviews");
                     return ImageConverter.toExhibitionReviewImage(exhibitionReview, url);
                 })
                 .toList();
@@ -101,7 +101,7 @@ public class ExhibitionReviewCommandServiceImpl implements ExhibitionReviewComma
 
     private void moveImagesToTrash(List<String> fileKeys) {
         try {
-            imageCommandService.moveToTrashPrefix(fileKeys);
+            imageCommandService.deleteImages(fileKeys);
         } catch (ImageException e) {
             throw new ImageException(ImageErrorCode.S3_MOVE_TRASH_FAIL);
         }
