@@ -31,7 +31,7 @@ public class ExhibitionReqDTO {
 
 
             @Schema(description = "운영 시작 시간", example = "월-금 10:00~19:00 / 주말 휴무")
-            @NotNull(message = BLANK_EXHIBITION_OPERATING_HOURS)
+            @NotBlank(message = BLANK_EXHIBITION_OPERATING_HOURS)
             String operatingHours,
 
             String websiteUrl,

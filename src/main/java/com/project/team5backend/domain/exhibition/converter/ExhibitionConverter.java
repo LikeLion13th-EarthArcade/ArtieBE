@@ -5,23 +5,26 @@ import com.project.team5backend.domain.exhibition.dto.response.ExhibitionResDTO;
 import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.facility.entity.ExhibitionFacility;
 import com.project.team5backend.domain.facility.entity.Facility;
-import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.global.entity.embedded.Address;
+import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.global.util.PageResponse;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ExhibitionConverter {
 
-    public static Exhibition toEntity(ExhibitionReqDTO.ExhibitionCreateReqDTO createReqDTO, User user, String imageUrls, Address address) {
+    public static Exhibition toExhibition(ExhibitionReqDTO.ExhibitionCreateReqDTO createReqDTO, User user, String imageUrls, Address address) {
         return Exhibition.builder()
+                .portalExhibitionId(null)
                 .title(createReqDTO.title())
                 .description(createReqDTO.description())
                 .startDate(createReqDTO.startDate())
@@ -189,6 +192,33 @@ public class ExhibitionConverter {
                 .reviewAvg(avg)
                 .reviewCount(e.getReviewCount())
                 .isLiked(isLiked)
+                .build();
+    }
+
+    // 크롤링 전용 dto
+    public static Exhibition toExhibitionCrawl(ExhibitionResDTO.ExhibitionCrawlResDto exhibitionCrawlResDto, Address address, ExhibitionResDTO.ExhibitionEnumResDTO exhibitionEnumResDTO) {
+        DateTimeFormatter formatter = DateTimeFormatter.BASIC_ISO_DATE;
+        return Exhibition.builder()
+                .portalExhibitionId(Long.valueOf(exhibitionCrawlResDto.portalExhibitionId()))
+                .title(exhibitionCrawlResDto.title())
+                .description(null)
+                .startDate(LocalDate.parse(exhibitionCrawlResDto.startDate(), formatter))
+                .endDate(LocalDate.parse(exhibitionCrawlResDto.endDate(), formatter))
+                .operatingHours(null)
+                .price(null)
+                .websiteUrl(null)
+                .status(Status.PENDING)
+                .exhibitionCategory(exhibitionEnumResDTO.exhibitionCategory())
+                .exhibitionType(exhibitionEnumResDTO.exhibitionType())
+                .exhibitionMood(exhibitionEnumResDTO.exhibitionMood())
+                .isDeleted(false)
+                .ratingAvg(0.0)
+                .likeCount(0)
+                .reviewCount(0)
+                .reviewSum(0)
+                .thumbnail(exhibitionCrawlResDto.thumbnail())
+                .address(address)
+                .user(null)
                 .build();
     }
 }

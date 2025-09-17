@@ -28,7 +28,8 @@ public class AddressResDTO {
                 String address_name,
                 String region_1depth_name, // 시/도
                 String region_2depth_name, // 시/군/구
-                String region_3depth_name  // 동/로/가
+                String region_3depth_name,  // 동/로/가
+                String zone_no
         ) {}
 
         public record Address(

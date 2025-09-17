@@ -49,4 +49,22 @@ public class RestClientConfig {
                 .defaultHeader(HttpHeaders.ACCEPT, MediaType.APPLICATION_JSON_VALUE)
                 .build();
     }
+    @Bean(name = "openAiRestClient")
+    public RestClient openAiRestClient(
+            RestClient.Builder builder,
+            @Value("${openai.api.key}") String openAiApiKey
+    ) {
+        return builder
+                .baseUrl("https://api.openai.com/v1")
+                .defaultHeader(HttpHeaders.AUTHORIZATION, "Bearer " + openAiApiKey)
+                .defaultHeader(HttpHeaders.CONTENT_TYPE, MediaType.APPLICATION_JSON_VALUE)
+                .build();
+    }
+
+    @Bean(name = "culturePortalRestClient")
+    public RestClient culturePortalRestClient(RestClient.Builder builder) {
+        return builder
+                .baseUrl("https://apis.data.go.kr/B553457/cultureinfo")
+                .build();
+    }
 }

@@ -27,6 +27,8 @@ public class Exhibition extends BaseTimeEntity {
     @Column(name = "exhibition_id")
     private Long id;
 
+    private Long portalExhibitionId; // 문화포털에서 가져온 전시 객체 구분용
+
     private String title;
 
     private String description;
@@ -39,7 +41,6 @@ public class Exhibition extends BaseTimeEntity {
 
     private LocalDate endDate;
 
-    @Column(nullable = false)
     private String operatingHours; // 운영 시간
 
     private String websiteUrl;

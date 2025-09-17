@@ -1,7 +1,7 @@
 // src/main/java/com/project/team5backend/global/address/service/AddressService.java
 package com.project.team5backend.global.address.service;
 
-import com.project.team5backend.global.address.client.KakaoLocalClient;
+import com.project.team5backend.global.client.kakao.KakaoLocalClient;
 import com.project.team5backend.global.address.converter.AddressConverter;
 import com.project.team5backend.global.address.dto.request.AddressReqDTO;
 import com.project.team5backend.global.address.dto.response.AddressResDTO;
@@ -90,6 +90,43 @@ public class AddressService {
             throw new AddressException(AddressErrorCode.ADDRESS_KAKAO_API_ERROR);
         }
     }
+
+    public AddressResDTO.AddressCreateResDTO resolveByCoordinates(Double lng, Double lat) {
+        try {
+            AddressResDTO.KakaoAddressResDTO res = kakaoLocalClient.reverseGeocode(lng, lat);
+            if (res.documents() == null || res.documents().isEmpty()) {
+                throw new AddressException(AddressErrorCode.ADDRESS_GEOCODE_NOT_FOUND);
+            }
+
+            var doc = res.documents().get(0);
+            var road = doc.road_address();
+
+            String city = (road != null) ? road.region_1depth_name() : doc.address().region_1depth_name();
+            String district = (road != null) ? road.region_2depth_name() : doc.address().region_2depth_name();
+            String neighborhood = (road != null) ? road.region_3depth_name() : doc.address().region_3depth_name();
+            String roadName = (road != null) ? road.address_name() : null;
+
+            city = normalizeCity(city);
+            district = normalizeDistrict(district, roadName);
+
+            if (!"서울특별시".equals(city)) {
+                throw new AddressException(AddressErrorCode.ADDRESS_OUT_OF_REGION);
+            }
+
+            return AddressConverter.toCreateAddressResDTO(
+                    city, district, neighborhood,
+                    roadName, null, road != null ? road.zone_no() : null,
+                    lat, lng
+            );
+
+        } catch (AddressException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("[AddressService] 좌표 기반 카카오 역지오코딩 오류 (lat: {}, lng: {})", lat, lng, e);
+            throw new AddressException(AddressErrorCode.ADDRESS_KAKAO_API_ERROR);
+        }
+    }
+
 
     private static Double parseDoubleSafe(String n) {
         try { return (n == null || n.isBlank()) ? null : Double.parseDouble(n); }

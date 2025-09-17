@@ -20,6 +20,7 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
     //삭제되지 않았고, 승인된 전시
     @Query("""
         select e from Exhibition e
+        join fetch e.user
         where e.id = :exhibitionId
         and e.isDeleted = false
         and e.status =:status
@@ -138,5 +139,7 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
     order by e.createdAt desc
     """)
     List<ExhibitionSummaryResDTO> findTop3ByStatus(@Param("status") Status status);
+
+    boolean existsByPortalExhibitionId(@Param("portalExhibitionId") Long portalExhibitionId);
 }
 
