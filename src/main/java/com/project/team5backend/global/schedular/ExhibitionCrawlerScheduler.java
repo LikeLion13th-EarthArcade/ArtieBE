@@ -12,7 +12,7 @@ public class ExhibitionCrawlerScheduler {
     private final ExhibitionCrawlerService exhibitionCrawlerService;
 
     // 매일 새벽 1시에 실행
-    @Scheduled(cron = "0 */1 * * * *")
+    @Scheduled(cron = "0 0 1 * * *")
     public void crawlDaily() {
         exhibitionCrawlerService.crawlFromPortal();
     }
