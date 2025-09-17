@@ -96,7 +96,7 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
         User user = userRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(()-> new UserException(UserErrorCode.USER_NOT_FOUND));
 
-        Exhibition exhibition = exhibitionRepository.findByIdAndIsDeletedFalseAndStatusApprove(exhibitionId, Status.APPROVED)
+        Exhibition exhibition = exhibitionRepository.findByIdAndIsDeletedFalseAndStatusApproved(exhibitionId, Status.APPROVED)
                 .orElseThrow(()-> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
 
         boolean alreadyLiked = exhibitionLikeRepository.existsByUserIdAndExhibitionId(user.getId(), exhibitionId);
@@ -105,7 +105,7 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
 
     @Override
     public void deleteExhibition(Long exhibitionId, Long userId) {
-        Exhibition exhibition = exhibitionRepository.findByIdAndIsDeletedFalseAndStatusApprove(exhibitionId, Status.APPROVED)
+        Exhibition exhibition = exhibitionRepository.findByIdAndIsDeletedFalseAndStatusApprovedWithUser(exhibitionId, Status.APPROVED)
                 .orElseThrow(() -> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
 
         if (!exhibition.getUser().getId().equals(userId)) {

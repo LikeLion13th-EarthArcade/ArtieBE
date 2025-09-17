@@ -24,6 +24,28 @@ public interface SpaceRepository extends JpaRepository<Space, Long>,SpaceReposit
     Optional<Space> findByIdAndIsDeletedFalseAndStatusApproved(@Param("spaceId") long spaceId,@Param("status") Status status);
 
     @Query("""
+    select distinct s
+    from Space s
+    join fetch s.user
+    where s.id = :spaceId
+      and s.isDeleted = false
+      and s.status = :status
+""")
+    Optional<Space> findByIdAndIsDeletedFalseAndStatusApprovedWithUser(@Param("spaceId") long spaceId, @Param("status") Status status);
+
+    @Query("""
+    select distinct s
+    from Space s
+    join fetch s.user
+    join fetch s.spaceFacilities sf
+    join fetch sf.facility
+    where s.id = :spaceId
+      and s.isDeleted = false
+      and s.status = :status
+""")
+    Optional<Space> findByIdAndIsDeletedFalseAndStatusApprovedWithUserAndFacilities(@Param("spaceId") long spaceId, @Param("status") Status status);
+
+    @Query("""
         select s
         from Space s
         where s.id =:spaceId

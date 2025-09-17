@@ -42,7 +42,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
     //전시 공간 상세 조회
     @Override
     public SpaceResDTO.SpaceDetailResDTO getSpaceDetail(long spaceId) {
-        Space space = spaceRepository.findByIdAndIsDeletedFalseAndStatusApproved(spaceId, Status.APPROVED)
+        Space space = spaceRepository.findByIdAndIsDeletedFalseAndStatusApprovedWithUserAndFacilities(spaceId, Status.APPROVED)
                 .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
 
         List<String> imageUrls = spaceImageRepository.findImageUrlsBySpaceId(spaceId);

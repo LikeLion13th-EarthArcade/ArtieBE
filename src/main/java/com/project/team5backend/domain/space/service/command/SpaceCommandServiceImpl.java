@@ -3,11 +3,11 @@ package com.project.team5backend.domain.space.service.command;
 import com.project.team5backend.domain.facility.entity.Facility;
 import com.project.team5backend.domain.facility.entity.SpaceFacility;
 import com.project.team5backend.domain.facility.repository.FacilityRepository;
-import com.project.team5backend.domain.image.entity.SpaceImage;
-import com.project.team5backend.domain.image.repository.SpaceImageRepository;
 import com.project.team5backend.domain.image.converter.ImageConverter;
+import com.project.team5backend.domain.image.entity.SpaceImage;
 import com.project.team5backend.domain.image.exception.ImageErrorCode;
 import com.project.team5backend.domain.image.exception.ImageException;
+import com.project.team5backend.domain.image.repository.SpaceImageRepository;
 import com.project.team5backend.domain.image.service.command.ImageCommandService;
 import com.project.team5backend.domain.recommendation.service.InteractLogService;
 import com.project.team5backend.domain.review.space.repository.SpaceReviewRepository;
@@ -20,7 +20,6 @@ import com.project.team5backend.domain.space.exception.SpaceErrorCode;
 import com.project.team5backend.domain.space.exception.SpaceException;
 import com.project.team5backend.domain.space.repository.SpaceLikeRepository;
 import com.project.team5backend.domain.space.repository.SpaceRepository;
-
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.user.exception.UserErrorCode;
 import com.project.team5backend.domain.user.exception.UserException;
@@ -104,8 +103,11 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
 
     @Override
     public void deleteSpace(long spaceId, long userId) {
-        Space space = spaceRepository.findByIdAndIsDeletedFalseAndStatusApproved(spaceId, Status.APPROVED)
+        Space space = spaceRepository.findByIdAndIsDeletedFalseAndStatusApprovedWithUser(spaceId, Status.APPROVED)
                 .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
+        if (!space.getUser().getId().equals(userId)) {
+            throw new SpaceException(SpaceErrorCode.SPACE_FORBIDDEN);
+        }
         space.softDelete();
 
         List<String> imageUrls = deleteSpaceImage(spaceId);
