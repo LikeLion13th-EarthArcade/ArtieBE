@@ -17,7 +17,7 @@ public class SpaceReviewImage extends BaseCreateDeleteEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String imageUrl;
+    private String fileKey;
 
     private boolean isDeleted;
 

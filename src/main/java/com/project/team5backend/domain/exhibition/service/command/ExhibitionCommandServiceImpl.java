@@ -32,7 +32,7 @@ import com.project.team5backend.global.apiPayload.exception.CustomException;
 import com.project.team5backend.global.entity.embedded.Address;
 import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.global.util.ImageUtils;
-import com.project.team5backend.global.util.S3Uploader;
+import com.project.team5backend.global.infra.s3.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -113,7 +113,7 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
         }
         exhibition.softDelete();
 
-        List<String> imageUrls = deleteExhibitionImage(exhibitionId); // 전시이미지 소프트 삭제
+        List<String> fileKeys = deleteExhibitionImage(exhibitionId); // 전시이미지 소프트 삭제
 
         exhibitionLikeRepository.deleteByExhibitionId(exhibitionId); // 좋아요 하드 삭제 (벌크)
         exhibitionReviewRepository.softDeleteByExhibitionId(exhibitionId); // 리뷰 소프트 삭제 (벌크)
@@ -121,7 +121,7 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
         exhibition.resetCount(); // 집계 초기화
 
         if (exhibition.getPortalExhibitionId() == null) {
-            moveImagesToTrash(imageUrls); // 크롤링 하지 않은 전시의 사진만 s3 보존 휴지통 prefix로 이동시키기
+            moveImagesToTrash(fileKeys); // 크롤링 하지 않은 전시의 사진만 s3 보존 휴지통 prefix로 이동시키기
         }
     }
     private ExhibitionResDTO.ExhibitionLikeResDTO cancelLike(User user, Exhibition exhibition) {
@@ -141,13 +141,13 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
         List<ExhibitionImage> images = exhibitionImageRepository.findByExhibitionId(exhibitionId);
         images.forEach(ExhibitionImage::deleteImage);
         return images.stream()
-                .map(ExhibitionImage::getImageUrl)
+                .map(ExhibitionImage::getFileKey)
                 .toList();
     }
 
-    private void moveImagesToTrash(List<String> imageUrls) {
+    private void moveImagesToTrash(List<String> fileKeys) {
         try {
-            imageCommandService.moveToTrashPrefix(imageUrls);
+            imageCommandService.moveToTrashPrefix(fileKeys);
         } catch (ImageException e) {
             throw new ImageException(ImageErrorCode.S3_MOVE_TRASH_FAIL);
         }

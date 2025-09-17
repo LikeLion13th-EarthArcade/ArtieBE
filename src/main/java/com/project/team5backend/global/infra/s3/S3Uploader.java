@@ -1,4 +1,4 @@
-package com.project.team5backend.global.util;
+package com.project.team5backend.global.infra.s3;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
@@ -24,12 +24,12 @@ public class S3Uploader {
     private String region;
 
     public String upload(MultipartFile file, String dirName) {
-        String fileName = dirName + "/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
+        String fileKey = dirName + "/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
 
         try {
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucket)
-                    .key(fileName)
+                    .key(fileKey)
                     .contentType(file.getContentType())
                     .build();
 
@@ -39,9 +39,6 @@ public class S3Uploader {
             throw new RuntimeException("S3 업로드 실패", e);
         }
 
-        return String.format("https://%s.s3.%s.amazonaws.com/%s",
-                bucket,
-                region,
-                fileName);
+        return fileKey;
     }
 }

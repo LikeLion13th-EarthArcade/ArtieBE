@@ -1,7 +1,6 @@
 package com.project.team5backend.domain.review.space.service.command;
 
 import com.project.team5backend.domain.image.converter.ImageConverter;
-import com.project.team5backend.domain.image.entity.ExhibitionReviewImage;
 import com.project.team5backend.domain.image.entity.SpaceReviewImage;
 import com.project.team5backend.domain.image.exception.ImageErrorCode;
 import com.project.team5backend.domain.image.exception.ImageException;
@@ -23,13 +22,12 @@ import com.project.team5backend.domain.user.exception.UserErrorCode;
 import com.project.team5backend.domain.user.exception.UserException;
 import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.entity.enums.Status;
-import com.project.team5backend.global.util.S3Uploader;
+import com.project.team5backend.global.infra.s3.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -70,9 +68,9 @@ public class SpaceReviewCommandServiceImpl implements SpaceReviewCommandService 
             throw new SpaceReviewException(SpaceReviewErrorCode.SPACE_REVIEW_FORBIDDEN);
         }
         spaceReview.softDelete();
-        List<String> imageUrls = deleteSpaceReviewImage(spaceReviewId); // 이미지 삭제
+        List<String> fileKeys = deleteSpaceReviewImage(spaceReviewId); // 이미지 삭제
         spaceRepository.applySpaceReviewDeleted(spaceReview.getSpace().getId(), spaceReview.getRate());  // 리뷰 평균/카운트 갱신
-        moveImagesToTrash(imageUrls);
+        moveImagesToTrash(fileKeys);
     }
 
     private void saveReviewImages(List<MultipartFile> images, SpaceReview spaceReview) {
@@ -94,13 +92,13 @@ public class SpaceReviewCommandServiceImpl implements SpaceReviewCommandService 
         List<SpaceReviewImage> images = spaceReviewImageRepository.findBySpaceReviewId(spaceReviewId);
         images.forEach(SpaceReviewImage::deleteImage);
         return images.stream()
-                .map(SpaceReviewImage::getImageUrl)
+                .map(SpaceReviewImage::getFileKey)
                 .toList();
     }
 
-    private void moveImagesToTrash(List<String> imageUrls) {
+    private void moveImagesToTrash(List<String> fileKeys) {
         try {
-            imageCommandService.moveToTrashPrefix(imageUrls);
+            imageCommandService.moveToTrashPrefix(fileKeys);
         } catch (ImageException e) {
             throw new ImageException(ImageErrorCode.S3_MOVE_TRASH_FAIL);
         }

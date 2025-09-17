@@ -18,7 +18,7 @@ public class SpaceImage extends BaseCreateDeleteEntity {
     @Column(name = "space_image_id")
     private Long id;
 
-    private String imageUrl;
+    private String fileKey;
 
     private boolean isDeleted;
 

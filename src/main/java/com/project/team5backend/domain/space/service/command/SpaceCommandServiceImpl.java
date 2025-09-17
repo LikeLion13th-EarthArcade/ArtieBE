@@ -30,7 +30,7 @@ import com.project.team5backend.global.address.service.AddressService;
 import com.project.team5backend.global.entity.embedded.Address;
 import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.global.util.ImageUtils;
-import com.project.team5backend.global.util.S3Uploader;
+import com.project.team5backend.global.infra.s3.S3Uploader;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -110,13 +110,13 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
         }
         space.softDelete();
 
-        List<String> imageUrls = deleteSpaceImage(spaceId);
+        List<String> fileKeys = deleteSpaceImage(spaceId);
 
         spaceLikeRepository.deleteBySpaceId(spaceId); // 좋아요 하드 삭제 (벌크)
         spaceReviewRepository.softDeleteBySpaceId(spaceId); // 리뷰 소프트 삭제 (벌크)
 
         space.resetCount();
-        moveImagesToTrash(imageUrls); // s3 보존 휴지통 prefix로 이동시키기
+        moveImagesToTrash(fileKeys); // s3 보존 휴지통 prefix로 이동시키기
     }
 
     private SpaceResDTO.SpaceLikeResDTO cancelLike(User user, Space space) {
@@ -137,13 +137,13 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
         images.forEach(SpaceImage::deleteImage);
         return images.stream()
                 .peek(SpaceImage::deleteImage)
-                .map(SpaceImage::getImageUrl)
+                .map(SpaceImage::getFileKey)
                 .toList();
     }
 
-    private void moveImagesToTrash(List<String> imageUrls) {
+    private void moveImagesToTrash(List<String> fileKeys) {
         try {
-            imageCommandService.moveToTrashPrefix(imageUrls);
+            imageCommandService.moveToTrashPrefix(fileKeys);
         } catch (ImageException e) {
             throw new ImageException(ImageErrorCode.S3_MOVE_TRASH_FAIL);
         }
