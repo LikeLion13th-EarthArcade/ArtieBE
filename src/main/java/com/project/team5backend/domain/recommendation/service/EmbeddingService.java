@@ -5,6 +5,7 @@ import com.project.team5backend.domain.recommendation.entity.ExhibitionEmbedding
 import com.project.team5backend.domain.recommendation.repository.ExhibitionEmbeddingRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -16,6 +17,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class EmbeddingService {
 
+    @Qualifier("openAiRestClient")
     private final RestClient openaiRestClient;
     private final ExhibitionEmbeddingRepository embRepo;
 

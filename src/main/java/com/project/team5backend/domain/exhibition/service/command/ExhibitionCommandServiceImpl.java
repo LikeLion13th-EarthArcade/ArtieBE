@@ -74,7 +74,7 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
                 .toList();
 
         // 전시 엔티티 먼저 저장
-        Exhibition exhibition = ExhibitionConverter.toEntity(exhibitionCreateReqDTO, user, imageUrls.get(0),address);
+        Exhibition exhibition = ExhibitionConverter.toExhibition(exhibitionCreateReqDTO, user, imageUrls.get(0),address);
         exhibitionRepository.save(exhibition);
 
         // 시설 매핑 (문자열 → Facility 엔티티 조회 → ExhibitionFacility 생성)
@@ -96,7 +96,7 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
         User user = userRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(()-> new UserException(UserErrorCode.USER_NOT_FOUND));
 
-        Exhibition exhibition = exhibitionRepository.findByIdAndIsDeletedFalseAndStatusApprove(exhibitionId, Status.APPROVED)
+        Exhibition exhibition = exhibitionRepository.findByIdAndIsDeletedFalseAndStatusApproved(exhibitionId, Status.APPROVED)
                 .orElseThrow(()-> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
 
         boolean alreadyLiked = exhibitionLikeRepository.existsByUserIdAndExhibitionId(user.getId(), exhibitionId);
@@ -105,9 +105,12 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
 
     @Override
     public void deleteExhibition(Long exhibitionId, Long userId) {
-        Exhibition exhibition = exhibitionRepository.findByIdAndIsDeletedFalseAndStatusApprove(exhibitionId, Status.APPROVED)
+        Exhibition exhibition = exhibitionRepository.findByIdAndIsDeletedFalseAndStatusApprovedWithUser(exhibitionId, Status.APPROVED)
                 .orElseThrow(() -> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
 
+        if (!exhibition.getUser().getId().equals(userId)) {
+            throw new ExhibitionException(ExhibitionErrorCode.EXHIBITION_FORBIDDEN);
+        }
         exhibition.softDelete();
 
         List<String> imageUrls = deleteExhibitionImage(exhibitionId); // 전시이미지 소프트 삭제
@@ -117,7 +120,9 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
 
         exhibition.resetCount(); // 집계 초기화
 
-        moveImagesToTrash(imageUrls); // s3 보존 휴지통 prefix로 이동시키기
+        if (exhibition.getPortalExhibitionId() == null) {
+            moveImagesToTrash(imageUrls); // 크롤링 하지 않은 전시의 사진만 s3 보존 휴지통 prefix로 이동시키기
+        }
     }
     private ExhibitionResDTO.ExhibitionLikeResDTO cancelLike(User user, Exhibition exhibition) {
         exhibitionLikeRepository.deleteByUserIdAndExhibitionId(user.getId(), exhibition.getId());

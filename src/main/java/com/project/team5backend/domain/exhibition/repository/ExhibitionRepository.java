@@ -5,7 +5,6 @@ import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionCategory;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionMood;
 import com.project.team5backend.global.entity.enums.Status;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -24,7 +23,27 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
         and e.isDeleted = false
         and e.status =:status
     """)
-    Optional<Exhibition> findByIdAndIsDeletedFalseAndStatusApprove(@Param("exhibitionId") Long exhibitionId, @Param("status") Status status);
+    Optional<Exhibition> findByIdAndIsDeletedFalseAndStatusApproved(@Param("exhibitionId") Long exhibitionId, @Param("status") Status status);
+
+    @Query("""
+        select e from Exhibition e
+        join fetch e.user
+        where e.id = :exhibitionId
+        and e.isDeleted = false
+        and e.status =:status
+    """)
+    Optional<Exhibition> findByIdAndIsDeletedFalseAndStatusApprovedWithUser(@Param("exhibitionId") Long exhibitionId, @Param("status") Status status);
+
+    @Query("""
+        select distinct e
+        from Exhibition e
+        join fetch e.user
+        join fetch e.exhibitionFacilities
+        where e.id = :exhibitionId
+        and e.isDeleted = false
+        and e.status =:status
+    """)
+    Optional<Exhibition> findByIdAndIsDeletedFalseAndStatusApprovedWithUserAndExhibitionFacilities(@Param("exhibitionId") Long exhibitionId, @Param("status") Status status);
 
     @Query("""
         select e from Exhibition e
@@ -138,5 +157,7 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
     order by e.createdAt desc
     """)
     List<ExhibitionSummaryResDTO> findTop3ByStatus(@Param("status") Status status);
+
+    boolean existsByPortalExhibitionId(@Param("portalExhibitionId") Long portalExhibitionId);
 }
 

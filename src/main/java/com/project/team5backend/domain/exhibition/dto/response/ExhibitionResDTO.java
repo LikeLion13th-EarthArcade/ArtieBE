@@ -1,5 +1,6 @@
 package com.project.team5backend.domain.exhibition.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionCategory;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionMood;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionType;
@@ -156,4 +157,26 @@ public class ExhibitionResDTO {
             int reviewCount,
             Boolean isLiked
     ){}
+
+    public record ExhibitionCrawlResDto(
+            @JsonProperty("serviceName") String serviceName,
+            @JsonProperty("seq") String portalExhibitionId,
+            @JsonProperty("title") String title,
+            @JsonProperty("startDate") String startDate,
+            @JsonProperty("endDate") String endDate,
+            @JsonProperty("place") String place,
+            @JsonProperty("realmName") String realmName,
+            @JsonProperty("area") String area,
+            @JsonProperty("sigungu") String sigungu,
+            @JsonProperty("thumbnail") String thumbnail,
+            @JsonProperty("gpsX") Double gpsX,
+            @JsonProperty("gpsY") Double gpsY
+    ) {}
+
+    public record ExhibitionEnumResDTO(
+            ExhibitionCategory exhibitionCategory,
+            ExhibitionType exhibitionType,
+            ExhibitionMood exhibitionMood
+    ) {}
+
 }
