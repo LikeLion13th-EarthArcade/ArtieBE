@@ -82,11 +82,11 @@ public class SpaceConverter {
                 .build();
     }
 
-    public static SpaceResDTO.SpaceSearchResDTO toSpaceSearchResDTO(Space space){
+    public static SpaceResDTO.SpaceSearchResDTO toSpaceSearchResDTO(Space space, String thumbnail){
         return SpaceResDTO.SpaceSearchResDTO.builder()
                 .spaceId(space.getId())
                 .name(space.getName())
-                .thumbnail(space.getThumbnail())
+                .thumbnail(thumbnail)
                 .operatingHours(space.getOperatingHours())
                 .address(space.getAddress().getRoadAddress() + " " + space.getAddress().getDetail())
                 .latitude(space.getAddress().getLatitude())

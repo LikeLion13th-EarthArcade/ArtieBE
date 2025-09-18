@@ -13,7 +13,7 @@ import com.project.team5backend.domain.space.exception.SpaceException;
 import com.project.team5backend.domain.space.repository.SpaceRepository;
 import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.global.util.PageResponse;
-import com.project.team5backend.global.util.S3UrlUtils;
+import com.project.team5backend.global.util.S3UrlResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -34,7 +34,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
 
     private final SpaceRepository spaceRepository;
     private final SpaceImageRepository spaceImageRepository;
-    private final S3UrlUtils s3UrlUtils;
+    private final S3UrlResolver s3UrlResolver;
 
     private static final int PAGE_SIZE = 4;
     private static final double SEOUL_CENTER_LAT = 37.5665;
@@ -48,7 +48,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
                 .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
 
         List<String> imageUrls = spaceImageRepository.findImageUrlsBySpaceId(spaceId).stream()
-                .map(s3UrlUtils::toImageUrl)
+                .map(s3UrlResolver::toImageUrl)
                 .toList();
 
         return SpaceConverter.toSpaceDetailResDTO(space, imageUrls);
@@ -65,7 +65,10 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
         Page<Space> spacePage = spaceRepository.findSpacesWithFilters(
                 requestedStartDate, requestedEndDate, district, size, type, mood, facilities, sort, pageable);
         Page<SpaceResDTO.SpaceSearchResDTO> spaceSearchResDTOPage = spacePage
-                .map(SpaceConverter::toSpaceSearchResDTO);
+                .map(space -> {
+                    String thumbnail = s3UrlResolver.toImageUrl(space.getThumbnail());
+                    return SpaceConverter.toSpaceSearchResDTO(space, thumbnail);
+                });
 
         return SpaceConverter.toSpaceSearchPageResDTO(PageResponse.of(spaceSearchResDTOPage), SEOUL_CENTER_LAT, SEOUL_CENTER_LNG);
     }

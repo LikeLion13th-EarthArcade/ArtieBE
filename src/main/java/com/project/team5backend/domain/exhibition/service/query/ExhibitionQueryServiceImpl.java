@@ -11,11 +11,10 @@ import com.project.team5backend.domain.exhibition.repository.ExhibitionLikeRepos
 import com.project.team5backend.domain.exhibition.repository.ExhibitionRepository;
 import com.project.team5backend.domain.image.repository.ExhibitionImageRepository;
 import com.project.team5backend.domain.recommendation.service.InteractLogService;
-import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.global.util.PageResponse;
-import com.project.team5backend.global.util.S3UrlUtils;
+import com.project.team5backend.global.util.S3UrlResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -43,7 +42,7 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
     private final ExhibitionImageRepository exhibitionImageRepository;
     private final InteractLogService interactLogService;
     private final ExhibitionLikeRepository exhibitionLikeRepository;
-    private final S3UrlUtils s3UrlUtils;
+    private final S3UrlResolver s3UrlResolver;
 
     @Override
     public ExhibitionResDTO.ExhibitionDetailResDTO findExhibitionDetail(Long exhibitionId) {
@@ -54,7 +53,7 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
         interactLogService.logClick(1L, exhibitionId);
         // 전시 이미지들의 fileKey만 조회
         List<String> imageUrls = exhibitionImageRepository.findImageUrlsByExhibitionId(exhibitionId).stream()
-                .map(s3UrlUtils::toImageUrl)
+                .map(s3UrlResolver::toImageUrl)
                 .toList();
 
         return ExhibitionConverter.toExhibitionDetailResDTO(exhibition, imageUrls);
@@ -69,7 +68,10 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
         Page<Exhibition> exhibitionPage = exhibitionRepository.findExhibitionsWithFilters(
                 exhibitionCategory, district, exhibitionMood, localDate, sort, pageable);
         Page<ExhibitionResDTO.ExhibitionSearchResDTO> exhibitionSearchResDTOPage = exhibitionPage
-                .map(ExhibitionConverter::toExhibitionSearchResDTO);
+                .map(exhibition -> {
+                    String thumbnail = s3UrlResolver.toImageUrl(exhibition.getThumbnail());
+                    return ExhibitionConverter.toExhibitionSearchResDTO(exhibition, thumbnail);
+                });
 
         return ExhibitionConverter.toExhibitionSearchPageResDTO(PageResponse.of(exhibitionSearchResDTOPage), SEOUL_CITY_HALL_LAT, SEOUL_CITY_HALL_LNG);
     }
@@ -84,7 +86,12 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
             throw new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND);
         }
         return exhibitions.stream()
-                .map(exhibition -> ExhibitionConverter.toExhibitionHotNowResDTO(exhibition, isExhibitionLiked(userId, exhibition.getId())))
+                .map(exhibition ->
+                {
+                    String thumbnail = s3UrlResolver.toImageUrl(exhibition.getThumbnail());
+                    boolean liked = isExhibitionLiked(userId, exhibition.getId());
+                    return ExhibitionConverter.toExhibitionHotNowResDTO(exhibition, liked, thumbnail);
+                })
                 .toList();
     }
 
@@ -99,7 +106,7 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
         }
         Exhibition upcomingEx = exhibitions.get(0);
         List<String> imageUrls = exhibitionImageRepository.findImageUrlsByExhibitionId(upcomingEx.getId()).stream()
-                .map(s3UrlUtils::toImageUrl)
+                .map(s3UrlResolver::toImageUrl)
                 .toList();
         return ExhibitionConverter.toUpcomingPopularExhibitionResDTO(upcomingEx.getId(), upcomingEx.getTitle(), imageUrls);
     }
@@ -119,7 +126,10 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
         }
         return ExhibitionConverter.toRegionalPopularExhibitionListResDTO(
                 exhibitions.stream()
-                        .map(ExhibitionConverter::toRegionalPopularExhibitionResDTO)
+                        .map(exhibition -> {
+                            String thumbnail = s3UrlResolver.toImageUrl(exhibition.getThumbnail());
+                            return ExhibitionConverter.toRegionalPopularExhibitionResDTO(exhibition, thumbnail);
+                        })
                         .toList()
         );
     }
@@ -133,7 +143,12 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
 
         return candidates.stream()
                 .limit(4)
-                .map(exhibition -> ExhibitionConverter.toArtieRecommendationResDTO(exhibition, isExhibitionLiked(userId, exhibition.getId())))
+                .map(exhibition ->
+                {
+                    String thumbnail = s3UrlResolver.toImageUrl(exhibition.getThumbnail());
+                    boolean liked = isExhibitionLiked(userId, exhibition.getId());
+                    return ExhibitionConverter.toArtieRecommendationResDTO(exhibition, liked, thumbnail);
+                })
                 .toList();
     }
 
