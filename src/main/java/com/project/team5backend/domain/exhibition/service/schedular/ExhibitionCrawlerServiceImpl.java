@@ -79,11 +79,10 @@ public class ExhibitionCrawlerServiceImpl implements ExhibitionCrawlerService {
             Address address = AddressConverter.toAddressCrawl(addressDto, exhibitionCrawlResDto.place());
             // 2. OpenAI 분류
             ExhibitionResDTO.ExhibitionEnumResDTO enums = openAiEnumService.classify(exhibitionCrawlResDto.title(), exhibitionCrawlResDto.place());
-            // 3. DB 저장
-            String thumbnail = s3UrlResolver.toFileKey(exhibitionCrawlResDto.thumbnail());
-            Exhibition exhibition = ExhibitionConverter.toExhibitionCrawl(exhibitionCrawlResDto, thumbnail, address, enums);
+            // 3. DB 저장;
+            Exhibition exhibition = ExhibitionConverter.toExhibitionCrawl(exhibitionCrawlResDto, address, enums);
             exhibitionRepository.save(exhibition);
-            exhibitionImageRepository.save(ImageConverter.toExhibitionImage(exhibition, thumbnail));
+            exhibitionImageRepository.save(ImageConverter.toExhibitionImage(exhibition, exhibition.getThumbnail()));
 
             log.info("전시 저장 성공: {}", exhibitionCrawlResDto.title());
         } catch (Exception e) {
