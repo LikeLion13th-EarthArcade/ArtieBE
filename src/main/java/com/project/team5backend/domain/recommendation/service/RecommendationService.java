@@ -12,6 +12,7 @@ import com.project.team5backend.domain.recommendation.dto.response.RecommendResD
 import com.project.team5backend.domain.recommendation.entity.ExhibitionEmbedding;
 import com.project.team5backend.domain.recommendation.repository.ExhibitionEmbeddingRepository;
 import com.project.team5backend.domain.recommendation.repository.ExhibitionInteractLogRepository;
+import com.project.team5backend.global.util.S3UrlResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -32,6 +33,7 @@ public class RecommendationService {
     private final ExhibitionRepository exhibitionRepo;
     private final ExhibitionEmbeddingRepository embRepo;
     private final ExhibitionLikeRepository likeRepo;
+    private final S3UrlResolver s3UrlResolver;
 
     private static final int LIMIT = 4;
     private static final int WINDOW_DAYS = 90;
@@ -98,7 +100,10 @@ public class RecommendationService {
 
         // 메서드 참조 대신 람다로 isLiked 전달
         var items = top.stream()
-                .map(e -> ExhibitionConverter.toCard(e, liked.contains(e.getId())))
+                .map(e -> {
+                    String thumbnail = s3UrlResolver.toImageUrl(e.getThumbnail());
+                    return ExhibitionConverter.toCard(e, liked.contains(e.getId()), thumbnail);
+                })
                 .toList();
 
         return new RecommendResDTO.PersonalizedDetailResDTO(

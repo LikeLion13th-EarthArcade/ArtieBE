@@ -8,6 +8,10 @@ import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.exhibition.repository.ExhibitionRepository;
 import com.project.team5backend.domain.image.converter.ImageConverter;
 import com.project.team5backend.domain.image.repository.ExhibitionImageRepository;
+import com.project.team5backend.domain.user.entity.User;
+import com.project.team5backend.domain.user.exception.UserErrorCode;
+import com.project.team5backend.domain.user.exception.UserException;
+import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.address.converter.AddressConverter;
 import com.project.team5backend.global.address.dto.response.AddressResDTO;
 import com.project.team5backend.global.address.service.AddressService;
@@ -35,6 +39,7 @@ public class ExhibitionCrawlerServiceImpl implements ExhibitionCrawlerService {
     private final ExhibitionImageRepository exhibitionImageRepository;
     private final AddressService addressService;
     private final OpenAiEnumService openAiEnumService;
+    private final UserRepository userRepository;
 
     @Value("${culture.portal.service-key}")
     private String serviceKey;
@@ -77,10 +82,12 @@ public class ExhibitionCrawlerServiceImpl implements ExhibitionCrawlerService {
             Address address = AddressConverter.toAddressCrawl(addressDto, exhibitionCrawlResDto.place());
             // 2. OpenAI 분류
             ExhibitionResDTO.ExhibitionEnumResDTO enums = openAiEnumService.classify(exhibitionCrawlResDto.title(), exhibitionCrawlResDto.place());
-            // 3. DB 저장
-            Exhibition exhibition = ExhibitionConverter.toExhibitionCrawl(exhibitionCrawlResDto, address, enums);
+            // 3. DB 저장;
+            User user = userRepository.findById(1L)
+                    .orElseThrow(()-> new UserException(UserErrorCode.USER_NOT_FOUND));
+            Exhibition exhibition = ExhibitionConverter.toExhibitionCrawl(exhibitionCrawlResDto, address, enums, user);
             exhibitionRepository.save(exhibition);
-            exhibitionImageRepository.save(ImageConverter.toExhibitionImage(exhibition, exhibitionCrawlResDto.thumbnail()));
+            exhibitionImageRepository.save(ImageConverter.toExhibitionImage(exhibition, exhibition.getThumbnail()));
 
             log.info("전시 저장 성공: {}", exhibitionCrawlResDto.title());
         } catch (Exception e) {

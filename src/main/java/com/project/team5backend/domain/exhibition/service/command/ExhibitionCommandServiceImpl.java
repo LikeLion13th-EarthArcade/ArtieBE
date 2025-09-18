@@ -9,7 +9,6 @@ import com.project.team5backend.domain.exhibition.exception.ExhibitionErrorCode;
 import com.project.team5backend.domain.exhibition.exception.ExhibitionException;
 import com.project.team5backend.domain.exhibition.repository.ExhibitionLikeRepository;
 import com.project.team5backend.domain.exhibition.repository.ExhibitionRepository;
-import com.project.team5backend.domain.review.exhibition.repository.ExhibitionReviewRepository;
 import com.project.team5backend.domain.facility.entity.ExhibitionFacility;
 import com.project.team5backend.domain.facility.entity.Facility;
 import com.project.team5backend.domain.facility.repository.FacilityRepository;
@@ -20,6 +19,7 @@ import com.project.team5backend.domain.image.exception.ImageException;
 import com.project.team5backend.domain.image.repository.ExhibitionImageRepository;
 import com.project.team5backend.domain.image.service.command.ImageCommandService;
 import com.project.team5backend.domain.recommendation.service.InteractLogService;
+import com.project.team5backend.domain.review.exhibition.repository.ExhibitionReviewRepository;
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.user.exception.UserErrorCode;
 import com.project.team5backend.domain.user.exception.UserException;
@@ -31,8 +31,9 @@ import com.project.team5backend.global.apiPayload.code.GeneralErrorCode;
 import com.project.team5backend.global.apiPayload.exception.CustomException;
 import com.project.team5backend.global.entity.embedded.Address;
 import com.project.team5backend.global.entity.enums.Status;
+import com.project.team5backend.global.infra.s3.S3FileStorageAdapter;
 import com.project.team5backend.global.util.ImageUtils;
-import com.project.team5backend.global.util.S3Uploader;
+import com.project.team5backend.global.util.S3UrlResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -56,7 +57,8 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
     private final ImageCommandService imageCommandService;
     private final AddressService addressService;
     private final InteractLogService interactLogService;
-    private final S3Uploader s3Uploader;
+    private final S3FileStorageAdapter s3FileStorageAdapter;
+    private final S3UrlResolver s3UrlResolver;
 
     @Override
     public ExhibitionResDTO.ExhibitionCreateResDTO createExhibition(ExhibitionReqDTO.ExhibitionCreateReqDTO exhibitionCreateReqDTO, Long userId, List<MultipartFile> images) {
@@ -64,20 +66,18 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
 
         User user = userRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new CustomException(GeneralErrorCode.NOT_FOUND_404));
-        // 주소 변환
+
         AddressResDTO.AddressCreateResDTO addressResDTO = addressService.resolve(exhibitionCreateReqDTO.address());
         Address address = AddressConverter.toAddress(addressResDTO);
 
-        // 업로드 및 image 획득
         List<String> imageUrls = images.stream()
-                .map(file -> s3Uploader.upload(file, "exhibitions"))
+                .map(file -> s3FileStorageAdapter.upload(file, "exhibitions"))
                 .toList();
 
-        // 전시 엔티티 먼저 저장
-        Exhibition exhibition = ExhibitionConverter.toExhibition(exhibitionCreateReqDTO, user, imageUrls.get(0),address);
+        String thumbnail = s3UrlResolver.toFileKey(imageUrls.get(0));
+        Exhibition exhibition = ExhibitionConverter.toExhibition(exhibitionCreateReqDTO, user, thumbnail, address);
         exhibitionRepository.save(exhibition);
 
-        // 시설 매핑 (문자열 → Facility 엔티티 조회 → ExhibitionFacility 생성)
         List<Facility> facilities = facilityRepository.findByNameIn(exhibitionCreateReqDTO.facilities());
         facilities.forEach(facility -> {
             ExhibitionFacility ef = ExhibitionConverter.toCreateExhibitionFacility(exhibition, facility);
@@ -113,7 +113,7 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
         }
         exhibition.softDelete();
 
-        List<String> imageUrls = deleteExhibitionImage(exhibitionId); // 전시이미지 소프트 삭제
+        List<String> fileKeys = deleteExhibitionImage(exhibitionId); // 전시이미지 소프트 삭제
 
         exhibitionLikeRepository.deleteByExhibitionId(exhibitionId); // 좋아요 하드 삭제 (벌크)
         exhibitionReviewRepository.softDeleteByExhibitionId(exhibitionId); // 리뷰 소프트 삭제 (벌크)
@@ -121,7 +121,7 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
         exhibition.resetCount(); // 집계 초기화
 
         if (exhibition.getPortalExhibitionId() == null) {
-            moveImagesToTrash(imageUrls); // 크롤링 하지 않은 전시의 사진만 s3 보존 휴지통 prefix로 이동시키기
+            moveImagesToTrash(fileKeys); // 크롤링 하지 않은 전시의 사진만 s3 보존 휴지통 prefix로 이동시키기
         }
     }
     private ExhibitionResDTO.ExhibitionLikeResDTO cancelLike(User user, Exhibition exhibition) {
@@ -141,13 +141,13 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
         List<ExhibitionImage> images = exhibitionImageRepository.findByExhibitionId(exhibitionId);
         images.forEach(ExhibitionImage::deleteImage);
         return images.stream()
-                .map(ExhibitionImage::getImageUrl)
+                .map(ExhibitionImage::getFileKey)
                 .toList();
     }
 
-    private void moveImagesToTrash(List<String> imageUrls) {
+    private void moveImagesToTrash(List<String> fileKeys) {
         try {
-            imageCommandService.moveToTrashPrefix(imageUrls);
+            imageCommandService.deleteImages(fileKeys);
         } catch (ImageException e) {
             throw new ImageException(ImageErrorCode.S3_MOVE_TRASH_FAIL);
         }

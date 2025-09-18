@@ -8,12 +8,10 @@ import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.global.entity.embedded.Address;
 import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.global.util.PageResponse;
-import org.springframework.stereotype.Component;
 import com.project.team5backend.domain.space.dto.request.SpaceReqDTO;
 
 import java.util.List;
 
-@Component
 public class SpaceConverter {
     public static Space toSpace(SpaceReqDTO.SpaceCreateReqDTO spaceCreateReqDTO, User user, String thumbnail, Address address){
 
@@ -84,11 +82,11 @@ public class SpaceConverter {
                 .build();
     }
 
-    public static SpaceResDTO.SpaceSearchResDTO toSpaceSearchResDTO(Space space){
+    public static SpaceResDTO.SpaceSearchResDTO toSpaceSearchResDTO(Space space, String thumbnail){
         return SpaceResDTO.SpaceSearchResDTO.builder()
                 .spaceId(space.getId())
                 .name(space.getName())
-                .thumbnail(space.getThumbnail())
+                .thumbnail(thumbnail)
                 .operatingHours(space.getOperatingHours())
                 .address(space.getAddress().getRoadAddress() + " " + space.getAddress().getDetail())
                 .latitude(space.getAddress().getLatitude())

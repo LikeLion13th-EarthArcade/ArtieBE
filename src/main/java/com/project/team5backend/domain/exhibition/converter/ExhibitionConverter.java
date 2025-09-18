@@ -92,11 +92,11 @@ public class ExhibitionConverter {
                 .build();
     }
 
-    public static ExhibitionResDTO.ExhibitionSearchResDTO toExhibitionSearchResDTO(Exhibition exhibition) {
+    public static ExhibitionResDTO.ExhibitionSearchResDTO toExhibitionSearchResDTO(Exhibition exhibition, String thumbnail) {
         return ExhibitionResDTO.ExhibitionSearchResDTO.builder()
                 .exhibitionId(exhibition.getId())
                 .title(exhibition.getTitle())
-                .thumbnail(exhibition.getThumbnail())
+                .thumbnail(thumbnail)
                 .startDate(exhibition.getStartDate())
                 .endDate(exhibition.getEndDate())
                 .address(exhibition.getAddress().getRoadAddress() + " " + exhibition.getAddress().getDetail())
@@ -112,12 +112,12 @@ public class ExhibitionConverter {
                 .build();
     }
 
-    public static ExhibitionResDTO.ExhibitionHotNowResDTO toExhibitionHotNowResDTO(Exhibition exhibition, boolean isLiked) {
+    public static ExhibitionResDTO.ExhibitionHotNowResDTO toExhibitionHotNowResDTO(Exhibition exhibition, boolean isLiked, String thumbnail) {
         return ExhibitionResDTO.ExhibitionHotNowResDTO.builder()
                 .exhibitionId(exhibition.getId())
                 .title(exhibition.getTitle())
                 .description(exhibition.getDescription())
-                .thumbnail(exhibition.getThumbnail())
+                .thumbnail(thumbnail)
                 .category(String.valueOf(exhibition.getExhibitionCategory()))
                 .mood(String.valueOf(exhibition.getExhibitionMood()))
                 .location(exhibition.getAddress().getRoadAddress() + exhibition.getAddress().getDetail())
@@ -147,21 +147,21 @@ public class ExhibitionConverter {
                 .build();
     }
 
-    public static ExhibitionResDTO.RegionalPopularExhibitionResDTO toRegionalPopularExhibitionResDTO(Exhibition exhibition) {
+    public static ExhibitionResDTO.RegionalPopularExhibitionResDTO toRegionalPopularExhibitionResDTO(Exhibition exhibition, String thumbnail) {
         return ExhibitionResDTO.RegionalPopularExhibitionResDTO.builder()
                 .exhibitionId(exhibition.getId())
                 .district(exhibition.getAddress().getDistrict())
                 .title(exhibition.getTitle())
-                .thumbnail(exhibition.getThumbnail())
+                .thumbnail(thumbnail)
                 .build();
     }
 
-    public static ExhibitionResDTO.ArtieRecommendationResDTO toArtieRecommendationResDTO(Exhibition exhibition,boolean isLiked) {
+    public static ExhibitionResDTO.ArtieRecommendationResDTO toArtieRecommendationResDTO(Exhibition exhibition,boolean isLiked, String thumbnail) {
         return ExhibitionResDTO.ArtieRecommendationResDTO.builder()
                 .exhibitionId(exhibition.getId())
                 .title(exhibition.getTitle())
                 .description(exhibition.getDescription())
-                .thumbnail(exhibition.getThumbnail())
+                .thumbnail(thumbnail)
                 .category(String.valueOf(exhibition.getExhibitionCategory()))
                 .mood(String.valueOf(exhibition.getExhibitionMood()))
                 .location(exhibition.getAddress().getRoadAddress() + exhibition.getAddress().getDetail())
@@ -174,7 +174,7 @@ public class ExhibitionConverter {
     }
 
     //ai 추천 결과 관련 컨버터
-    public static ExhibitionResDTO.ExhibitionCardResDTO toCard(Exhibition e, boolean isLiked) {
+    public static ExhibitionResDTO.ExhibitionCardResDTO toCard(Exhibition e, boolean isLiked, String thumbnail) {
         double avg = BigDecimal.valueOf(e.getRatingAvg())
                 .setScale(1, RoundingMode.HALF_UP)
                 .doubleValue();
@@ -183,7 +183,7 @@ public class ExhibitionConverter {
                 .exhibitionId(e.getId())
                 .title(e.getTitle())
                 .description(e.getDescription()) // description 필드가 따로 있으면 교체
-                .thumbnail(e.getThumbnail())
+                .thumbnail(thumbnail)
                 .category(e.getExhibitionCategory().name())
                 .mood(e.getExhibitionMood().name())
                 .location(e.getAddress().getRoadAddress())
@@ -196,7 +196,7 @@ public class ExhibitionConverter {
     }
 
     // 크롤링 전용 dto
-    public static Exhibition toExhibitionCrawl(ExhibitionResDTO.ExhibitionCrawlResDto exhibitionCrawlResDto, Address address, ExhibitionResDTO.ExhibitionEnumResDTO exhibitionEnumResDTO) {
+    public static Exhibition toExhibitionCrawl(ExhibitionResDTO.ExhibitionCrawlResDto exhibitionCrawlResDto, Address address, ExhibitionResDTO.ExhibitionEnumResDTO exhibitionEnumResDTO, User user) {
         DateTimeFormatter formatter = DateTimeFormatter.BASIC_ISO_DATE;
         return Exhibition.builder()
                 .portalExhibitionId(Long.valueOf(exhibitionCrawlResDto.portalExhibitionId()))
@@ -218,7 +218,7 @@ public class ExhibitionConverter {
                 .reviewSum(0)
                 .thumbnail(exhibitionCrawlResDto.thumbnail())
                 .address(address)
-                .user(null)
+                .user(user)
                 .build();
     }
 }

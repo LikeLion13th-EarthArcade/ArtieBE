@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface ExhibitionImageRepository extends JpaRepository<ExhibitionImage, Long> {
 
-    @Query("select ei.imageUrl from ExhibitionImage ei where ei.exhibition.id =:exhibitionId")
+    @Query("select ei.fileKey from ExhibitionImage ei where ei.exhibition.id =:exhibitionId")
     List<String> findImageUrlsByExhibitionId(@Param("exhibitionId") Long exhibitionId);
 
     List<ExhibitionImage> findByExhibitionId(long exhibitionId);

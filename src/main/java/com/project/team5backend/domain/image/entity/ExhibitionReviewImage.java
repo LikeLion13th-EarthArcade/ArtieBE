@@ -16,7 +16,7 @@ public class ExhibitionReviewImage extends BaseCreateDeleteEntity {
     @Column(name = "exhibition_review_image_id")
     private Long id;
 
-    private String imageUrl;
+    private String fileKey;
 
     private boolean isDeleted;
 
