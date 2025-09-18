@@ -37,8 +37,8 @@ public interface SpaceRepository extends JpaRepository<Space, Long>,SpaceReposit
     select distinct s
     from Space s
     join fetch s.user
-    join fetch s.spaceFacilities sf
-    join fetch sf.facility
+    left join fetch s.spaceFacilities sf
+    left join fetch sf.facility
     where s.id = :spaceId
       and s.isDeleted = false
       and s.status = :status

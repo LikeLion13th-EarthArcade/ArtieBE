@@ -38,7 +38,8 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
         select distinct e
         from Exhibition e
         join fetch e.user
-        join fetch e.exhibitionFacilities
+        left join fetch e.exhibitionFacilities ef
+        left join fetch ef.facility
         where e.id = :exhibitionId
         and e.isDeleted = false
         and e.status =:status

@@ -8,11 +8,14 @@ import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.exhibition.repository.ExhibitionRepository;
 import com.project.team5backend.domain.image.converter.ImageConverter;
 import com.project.team5backend.domain.image.repository.ExhibitionImageRepository;
+import com.project.team5backend.domain.user.entity.User;
+import com.project.team5backend.domain.user.exception.UserErrorCode;
+import com.project.team5backend.domain.user.exception.UserException;
+import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.address.converter.AddressConverter;
 import com.project.team5backend.global.address.dto.response.AddressResDTO;
 import com.project.team5backend.global.address.service.AddressService;
 import com.project.team5backend.global.entity.embedded.Address;
-import com.project.team5backend.global.util.S3UrlResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Value;
@@ -36,7 +39,7 @@ public class ExhibitionCrawlerServiceImpl implements ExhibitionCrawlerService {
     private final ExhibitionImageRepository exhibitionImageRepository;
     private final AddressService addressService;
     private final OpenAiEnumService openAiEnumService;
-    private final S3UrlResolver s3UrlResolver;
+    private final UserRepository userRepository;
 
     @Value("${culture.portal.service-key}")
     private String serviceKey;
@@ -80,7 +83,9 @@ public class ExhibitionCrawlerServiceImpl implements ExhibitionCrawlerService {
             // 2. OpenAI 분류
             ExhibitionResDTO.ExhibitionEnumResDTO enums = openAiEnumService.classify(exhibitionCrawlResDto.title(), exhibitionCrawlResDto.place());
             // 3. DB 저장;
-            Exhibition exhibition = ExhibitionConverter.toExhibitionCrawl(exhibitionCrawlResDto, address, enums);
+            User user = userRepository.findById(1L)
+                    .orElseThrow(()-> new UserException(UserErrorCode.USER_NOT_FOUND));
+            Exhibition exhibition = ExhibitionConverter.toExhibitionCrawl(exhibitionCrawlResDto, address, enums, user);
             exhibitionRepository.save(exhibition);
             exhibitionImageRepository.save(ImageConverter.toExhibitionImage(exhibition, exhibition.getThumbnail()));
 
