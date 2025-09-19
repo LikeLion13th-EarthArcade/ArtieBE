@@ -88,16 +88,16 @@ public class SecurityConfig {
                 // TODO : CSRF 토큰 + SameSite + Origin 검증
                 // CSRF 설정 (JWT를 헤더에 넣으면 필요 없는데 쿠키는 해야함)
                 // CSRF: 쿠키<->헤더 일치(Double Submit Cookie)
-//                .csrf(csrf -> csrf
-//                        .csrfTokenRepository(customCookieCsrfTokenRepository)
-//                        // 로그인/회원가입/문서 등 최소 범위만 예외. 이후 프론트가 헤더 붙이면 예외 줄여도 됨.
-//                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
-//                        .ignoringRequestMatchers(
-//                                "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**",
-//                                "/actuator/**"
-//                        )
-//                )
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(csrf -> csrf
+                        .csrfTokenRepository(customCookieCsrfTokenRepository)
+                        // 로그인/회원가입/문서 등 최소 범위만 예외. 이후 프론트가 헤더 붙이면 예외 줄여도 됨.
+                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                        .ignoringRequestMatchers(
+                                "/swagger-ui/**", "/v3/api-docs/**", "/swagger-resources/**", "/webjars/**",
+                                "/actuator/**"
+                        )
+                )
+//                .csrf(AbstractHttpConfigurer::disable)
 
                 // logout
                 .logout(logout -> logout
