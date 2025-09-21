@@ -1,17 +1,18 @@
 package com.project.team5backend.domain.recommendation.service;
 
-import com.project.team5backend.domain.exhibition.exhibition.converter.ExhibitionConverter;
-import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Category;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Mood;
-import com.project.team5backend.domain.exhibition.exhibition.entity.enums.Status;
-import com.project.team5backend.domain.exhibition.exhibition.repository.ExhibitionLikeRepository;
-import com.project.team5backend.domain.exhibition.exhibition.repository.ExhibitionRepository;
+import com.project.team5backend.domain.exhibition.converter.ExhibitionConverter;
+import com.project.team5backend.domain.exhibition.entity.Exhibition;
+import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionCategory;
+import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionMood;
+import com.project.team5backend.global.entity.enums.Status;
+import com.project.team5backend.domain.exhibition.repository.ExhibitionLikeRepository;
+import com.project.team5backend.domain.exhibition.repository.ExhibitionRepository;
 import com.project.team5backend.domain.recommendation.dto.KeyScoreRow;
 import com.project.team5backend.domain.recommendation.dto.response.RecommendResDTO;
 import com.project.team5backend.domain.recommendation.entity.ExhibitionEmbedding;
 import com.project.team5backend.domain.recommendation.repository.ExhibitionEmbeddingRepository;
 import com.project.team5backend.domain.recommendation.repository.ExhibitionInteractLogRepository;
+import com.project.team5backend.global.util.S3UrlResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
@@ -32,11 +33,12 @@ public class RecommendationService {
     private final ExhibitionRepository exhibitionRepo;
     private final ExhibitionEmbeddingRepository embRepo;
     private final ExhibitionLikeRepository likeRepo;
+    private final S3UrlResolver s3UrlResolver;
 
     private static final int LIMIT = 4;
     private static final int WINDOW_DAYS = 90;
 
-    private record Keys(Category cat, Mood mood, boolean eligible) {}
+    private record Keys(ExhibitionCategory cat, ExhibitionMood exhibitionMood, boolean eligible) {}
 
     private Keys computeKeys(Long userId){
         if (userId == null) return new Keys(null,null,false);
@@ -47,18 +49,18 @@ public class RecommendationService {
         KeyScoreRow mRow = logRepo.topMood(userId, since);
         if (cRow == null && mRow == null) return new Keys(null,null,false);
 
-        Category cat = (cRow != null) ? Category.valueOf(cRow.getKeyName()) : null;
-        Mood mood = (mRow != null) ? Mood.valueOf(mRow.getKeyName()) : null;
-        return new Keys(cat, mood, true);
+        ExhibitionCategory cat = (cRow != null) ? ExhibitionCategory.valueOf(cRow.getKeyName()) : null;
+        ExhibitionMood exhibitionMood = (mRow != null) ? ExhibitionMood.valueOf(mRow.getKeyName()) : null;
+        return new Keys(cat, exhibitionMood, true);
     }
 
     // 홈 요약(프리뷰 1개)
     public RecommendResDTO.PersonalizedSummaryResDTO summary(Long userId) {
         var k = computeKeys(userId);
-        if (!k.eligible()) return new RecommendResDTO.PersonalizedSummaryResDTO(false, null, null, null,null,null,null,null,null,null,null,0,null);
+        if (!k.eligible()) return new RecommendResDTO.PersonalizedSummaryResDTO(false, null, null, null,null,null,null,null,null,null,0.0,0,null);
 
         List<Exhibition> top4 = recommendWithEmbedding(userId, k, 4);
-        if (top4.isEmpty()) return new RecommendResDTO.PersonalizedSummaryResDTO(false, null, null, null,null,null,null,null,null,null,null,0,null);
+        if (top4.isEmpty()) return new RecommendResDTO.PersonalizedSummaryResDTO(false, null, null, null,null,null,null,null,null,null,0.0,0,null);
 
         Exhibition e = top4.get(0);
 
@@ -69,8 +71,8 @@ public class RecommendationService {
                 e.getTitle(),
                 e.getDescription(),
                 e.getThumbnail(),
-                String.valueOf(e.getCategory()),
-                String.valueOf(e.getMood()),
+                String.valueOf(e.getExhibitionCategory()),
+                String.valueOf(e.getExhibitionMood()),
                 e.getAddress().getRoadAddress(),
                 e.getStartDate(),
                 e.getEndDate(),
@@ -98,12 +100,15 @@ public class RecommendationService {
 
         // 메서드 참조 대신 람다로 isLiked 전달
         var items = top.stream()
-                .map(e -> ExhibitionConverter.toCard(e, liked.contains(e.getId())))
+                .map(e -> {
+                    String thumbnail = s3UrlResolver.toImageUrl(e.getThumbnail());
+                    return ExhibitionConverter.toCard(e, liked.contains(e.getId()), thumbnail);
+                })
                 .toList();
 
         return new RecommendResDTO.PersonalizedDetailResDTO(
                 k.cat(),
-                k.mood(),
+                k.exhibitionMood(),
                 items
         );
     }
@@ -113,7 +118,7 @@ public class RecommendationService {
         var today = LocalDate.now();
         // 후보는 넉넉히 (최소 100~200) 뽑아야 리랭킹이 작동합니다.
         var candidates = exhibitionRepo.recommendByKeywords(
-                k.cat(), k.mood(), Status.APPROVED, today, PageRequest.of(0, 200)
+                k.cat(), k.exhibitionMood(), Status.APPROVED, today, PageRequest.of(0, 200)
         );
         if (candidates.isEmpty()) return List.of();
 
@@ -123,11 +128,11 @@ public class RecommendationService {
         if (userVec == null) {
             // 유저 벡터 없으면 기본 정렬로 후처리만 적용
             List<Exhibition> sortedByDefault = candidates; // 이미 repo가 정렬해 주는 경우
-            if (k.cat() != null && k.mood() != null) {
+            if (k.cat() != null && k.exhibitionMood() != null) {
                 return Reranker.enforceAtLeastNAndMatches(
                         sortedByDefault, topK, 2,
-                        Exhibition::getId, Exhibition::getCategory, Exhibition::getMood,
-                        k.cat(), k.mood()
+                        Exhibition::getId, Exhibition::getExhibitionCategory, Exhibition::getExhibitionMood,
+                        k.cat(), k.exhibitionMood()
                 );
             }
             return sortedByDefault.stream().limit(topK).toList();
@@ -141,8 +146,7 @@ public class RecommendationService {
         double minR = Double.POSITIVE_INFINITY, maxR = Double.NEGATIVE_INFINITY;
         Map<Long, Double> rScore = new HashMap<>();
         for (var e : candidates) {
-            double r = (e.getReviewCount()==null?0:e.getReviewCount())
-                    + (e.getTotalReviewScore()==null?0:e.getTotalReviewScore());
+            double r = e.getReviewCount() + e.getReviewSum();
             rScore.put(e.getId(), r);
             if (r < minR) minR = r;
             if (r > maxR) maxR = r;
@@ -165,12 +169,12 @@ public class RecommendationService {
                 .map(Map.Entry::getKey)
                 .toList();
 
-        // 2) 리랭킹 적용: 4개 중 ≥2개는 (topCategory AND topMood)
-        if (k.cat() != null && k.mood() != null) {
+        // 2) 리랭킹 적용: 4개 중 ≥2개는 (topExhibitionCategory AND topExhibitionMood)
+        if (k.cat() != null && k.exhibitionMood() != null) {
             return Reranker.enforceAtLeastNAndMatches(
                     sortedByScoreDesc, topK, 2,
-                    Exhibition::getId, Exhibition::getCategory, Exhibition::getMood,
-                    k.cat(), k.mood()
+                    Exhibition::getId, Exhibition::getExhibitionCategory, Exhibition::getExhibitionMood,
+                    k.cat(), k.exhibitionMood()
             );
         }
 

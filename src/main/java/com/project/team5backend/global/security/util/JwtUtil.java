@@ -118,7 +118,7 @@ public class JwtUtil {
 
         return Jwts.builder()
                 .header() //헤더 부분
-                .add("typ", "JWT") // JWT type
+                .add("typ", "JWT") // JWT exhibitionType
                 .and()
                 .id(jti)
                 .subject(customUserDetails.getUsername()) //Subject 에 username (email) 추가

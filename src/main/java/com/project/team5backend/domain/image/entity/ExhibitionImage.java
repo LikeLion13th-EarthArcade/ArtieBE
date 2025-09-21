@@ -1,31 +1,24 @@
 package com.project.team5backend.domain.image.entity;
 
-import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
-import com.project.team5backend.global.entity.BaseOnlyCreateTimeEntity;
+import com.project.team5backend.domain.exhibition.entity.Exhibition;
+import com.project.team5backend.global.entity.BaseCreateDeleteEntity;
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.time.LocalDateTime;
 
 @Entity
 @Getter
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-public class ExhibitionImage extends BaseOnlyCreateTimeEntity {
+public class ExhibitionImage extends BaseCreateDeleteEntity {
 
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "exhibition_image_id")
     private Long id;
 
-    @Column(name = "image_url")
     private String fileKey;
 
-    @Column(name = "is_deleted")
     private boolean isDeleted;
-
-    @Column(name = "deleted_at")
-    private LocalDateTime deletedAt;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "exhibition_id")
@@ -33,6 +26,6 @@ public class ExhibitionImage extends BaseOnlyCreateTimeEntity {
 
     public void deleteImage() {
         isDeleted = true;
-        deletedAt = LocalDateTime.now();
+        markDeleted(); // 삭제 시간 정보 생성
     }
 }

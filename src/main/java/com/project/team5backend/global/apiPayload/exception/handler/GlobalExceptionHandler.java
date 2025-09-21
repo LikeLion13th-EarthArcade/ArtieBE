@@ -7,14 +7,20 @@ import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.global.apiPayload.code.BaseErrorCode;
 import com.project.team5backend.global.apiPayload.code.GeneralErrorCode;
 import com.project.team5backend.global.apiPayload.exception.CustomException;
+import com.project.team5backend.global.security.exception.SecurityErrorCode;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.authorization.AuthorizationDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -73,6 +79,7 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<CustomResponse<String>> handleHttpMessageNotReadable(HttpMessageNotReadableException ex) {
         log.warn("[ HttpMessageNotReadableException ]: {}", ex.getMessage());
+
         BaseErrorCode errorCode = getBaseErrorCode(ex);
         CustomResponse<String> errorResponse = CustomResponse.onFailure(
                 errorCode.getCode(),
@@ -81,6 +88,30 @@ public class GlobalExceptionHandler {
         );
         return ResponseEntity
                 .status(errorCode.getHttpStatus())
+                .body(errorResponse);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<CustomResponse<String>> handleAuthorizationDenied(AccessDeniedException ex) {
+        log.warn("[ AccessDeniedException ]: {}", ex.getMessage());
+        BaseErrorCode errorCode;
+        String code;
+        String message;
+
+        if (ex instanceof AuthorizationDeniedException) {
+            code = SecurityErrorCode.ROLE_ACCESS_DENIED.getCode();
+            message = SecurityErrorCode.ROLE_ACCESS_DENIED.getMessage();
+        } else {
+            code = "AccessDeniedException";
+            message = ex.getMessage();
+        }
+        CustomResponse<String> errorResponse = CustomResponse.onFailure(
+                code,
+                message,
+                null
+        );
+        return ResponseEntity
+                .status(HttpStatus.FORBIDDEN)
                 .body(errorResponse);
     }
 
@@ -107,8 +138,24 @@ public class GlobalExceptionHandler {
             errorCode = GeneralErrorCode.INVALID_JSON_SYNTAX;
         }
         // 2) 타입/형식이 맞지 않음 (ex: string → int)
-        else if (cause instanceof InvalidFormatException) {
-            errorCode = GeneralErrorCode.INVALID_FIELD_FORMAT;
+        else if (cause instanceof InvalidFormatException e) {
+            Class<?> targetType = e.getTargetType();
+            if (targetType.equals(LocalDate.class)) {
+                errorCode = GeneralErrorCode.INVALID_LOCAL_DATE;
+            }
+            else if (targetType.equals(LocalTime.class)) {
+                errorCode = GeneralErrorCode.INVALID_LOCAL_TIME;
+            }
+            else if (targetType.isEnum()) {
+                errorCode = GeneralErrorCode.INVALID_ENUM;
+            }
+            // 숫자 필드 잘못된 형식
+            else if (targetType.equals(Integer.class)) {
+                errorCode = GeneralErrorCode.INVALID_INTEGER;
+            }
+            else {
+                errorCode = GeneralErrorCode.INVALID_FIELD_FORMAT;
+            }
         }
         // 3) 필수 필드 누락 등 바인딩 실패
         else if (cause instanceof MismatchedInputException) {

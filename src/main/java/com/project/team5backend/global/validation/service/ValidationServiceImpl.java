@@ -1,10 +1,14 @@
 package com.project.team5backend.global.validation.service;
 
 import com.project.team5backend.domain.user.repository.UserRepository;
+import com.project.team5backend.global.biznumber.client.BizNumberClient;
+import com.project.team5backend.global.biznumber.dto.response.BizNumberResDTO;
 import com.project.team5backend.global.mail.MailType;
 import com.project.team5backend.global.mail.service.MailService;
 import com.project.team5backend.global.util.RedisUtils;
+import com.project.team5backend.global.validation.converter.ValidationConverter;
 import com.project.team5backend.global.validation.dto.request.ValidationReqDTO;
+import com.project.team5backend.global.validation.dto.response.ValidationResDTO;
 import com.project.team5backend.global.validation.exception.ValidationErrorCode;
 import com.project.team5backend.global.validation.exception.ValidationException;
 import jakarta.transaction.Transactional;
@@ -19,6 +23,8 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import static com.project.team5backend.global.constant.redis.RedisConstant.*;
+import static com.project.team5backend.global.constant.valid.MessageConstant.BIZ_NUMBER_IS_NOT_REGISTERED;
+import static com.project.team5backend.global.constant.valid.MessageConstant.BLANK;
 
 @Slf4j
 @Service
@@ -29,6 +35,7 @@ public class ValidationServiceImpl implements ValidationService {
     private final UserRepository userRepository;
     private final MailService mailService;
     private final RedisUtils<String> redisUtils;
+    private final BizNumberClient bizNumberClient;
 
     @Override
     public String sendCode(MailType mailType, String scope, ValidationReqDTO.EmailCodeReqDTO emailCodeReqDTO) {
@@ -36,10 +43,9 @@ public class ValidationServiceImpl implements ValidationService {
         final String email = emailCodeReqDTO.email();
         // 6자리 난수 코드
         final String code = createVerificationCode();
-
-        boolean isEmailAlreadyExist = userRepository.findByEmail(email).isPresent();
+        boolean isEmailAlreadyExist = userRepository.findByEmail(email).isPresent() || redisUtils.hasKey(email + KEY_CODE_SUFFIX);
         boolean isEmailVerification = Objects.equals(mailType, MailType.SIGNUP_VERIFICATION);
-        // 회원 가입 이메일 인증인데, 이미 존재하는 이메일로 인증을 한 경우
+        // 회원 가입 이메일 인증인데, 이미 존재하는 이메일이거나, 누군가 인증 확인을 받아 가입을 진행중인 이메일로 인증을 한 경우
         if (isEmailAlreadyExist && isEmailVerification) {
             throw new ValidationException(ValidationErrorCode.ALREADY_USED_EMAIL);
         }
@@ -90,6 +96,16 @@ public class ValidationServiceImpl implements ValidationService {
 
         // 해당 스코프에서 사용할 인증이 완료되었음을 레디스에 저장
         redisUtils.save(email + KEY_SCOPE_SUFFIX, scope, SCOPE_EXP_TIME, TimeUnit.MILLISECONDS);
+    }
+
+    @Override
+    public ValidationResDTO.BizNumberValidationResDTO verifyBizNumber(ValidationReqDTO.BizNumberValidationReqDTO bizNumberValidationReqDTO) {
+        BizNumberResDTO.BizInfo.InfoItem infoItem = bizNumberClient.verifyBizNumber(bizNumberValidationReqDTO.bizNumber()).getInfoItem();
+        ValidationResDTO.BizNumberValidationResDTO.Info info = ValidationConverter.toInfo(infoItem);
+        boolean isValid = !Objects.equals(info.taxType(), BIZ_NUMBER_IS_NOT_REGISTERED);
+        boolean isExpired = !Objects.equals(info.endAt(), BLANK);
+
+        return ValidationConverter.toBizNumberValidationResDTO(info, isValid, isExpired);
     }
 
     // 6자리 난수 생성기

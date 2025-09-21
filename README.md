@@ -1,4 +1,4 @@
-# Team4-BackEnd
+# Team5-BackEnd
 
 ### ⚙️ 기술 스택
 - Java 17

@@ -1,8 +1,6 @@
 package com.project.team5backend.global.config;
 
-import com.project.team5backend.global.security.exception.CsrfAccessDeniedHandler;
-import com.project.team5backend.global.security.exception.JwtAccessDeniedHandler;
-import com.project.team5backend.global.security.exception.JwtAuthenticationEntryPoint;
+import com.project.team5backend.global.security.exception.*;
 import com.project.team5backend.global.security.filter.CustomLoginFilter;
 import com.project.team5backend.global.security.filter.JwtAuthorizationFilter;
 import com.project.team5backend.global.security.handler.CustomLogoutHandler;
@@ -34,12 +32,11 @@ public class SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtUtil jwtUtil;
-    private final JwtAccessDeniedHandler jwtAccessDeniedHandler;
-    private final JwtAuthenticationEntryPoint jwtAuthenticationEntryPoint;
     private final RedisUtils<String> redisUtils;
     private final CustomLogoutHandler jwtLogoutHandler;
     private final CustomLogoutSuccessHandler jwtLogoutSuccessHandler;
-    private final CsrfAccessDeniedHandler csrfAccessDeniedHandler;
+    private final CustomAccessDeniedHandler customAccessDeniedHandler;
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomCookieCsrfTokenRepository customCookieCsrfTokenRepository;
 
 
@@ -100,6 +97,7 @@ public class SecurityConfig {
                                 "/actuator/**"
                         )
                 )
+//                .csrf(AbstractHttpConfigurer::disable)
 
                 // logout
                 .logout(logout -> logout
@@ -110,12 +108,10 @@ public class SecurityConfig {
 
                 // 예외 처리 핸들러 설정
                 .exceptionHandling(exceptionHandling -> exceptionHandling
-                        // 인증은 되었지만 권한이 없을 때 (403)
-                        .accessDeniedHandler(jwtAccessDeniedHandler)
                         // 인증 자체가 안 된 경우 (401)
-                        .authenticationEntryPoint(jwtAuthenticationEntryPoint)
-                        // CSRF 예외 (403)
-                        .accessDeniedHandler(csrfAccessDeniedHandler)
+                        .authenticationEntryPoint(customAuthenticationEntryPoint)
+                        // 인증은 되었지만 권한이 없을 때 (403)
+                        .accessDeniedHandler(customAccessDeniedHandler)
                 )
         ;
 

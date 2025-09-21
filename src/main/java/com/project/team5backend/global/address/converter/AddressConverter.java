@@ -10,9 +10,6 @@ import java.math.BigDecimal;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class AddressConverter {
     public static Address toAddress(AddressResDTO.AddressCreateResDTO dto) {
-        BigDecimal lat = dto.latitude() != null ? BigDecimal.valueOf(dto.latitude()) : null;
-        BigDecimal lng = dto.longitude() != null ? BigDecimal.valueOf(dto.longitude()) : null;
-
         return new Address(
                 dto.city(),
                 dto.district(),
@@ -20,8 +17,8 @@ public class AddressConverter {
                 dto.roadNameAddress(),
                 dto.detail(),
                 dto.postalCode(),
-                lat,  // ← 숫자 타입
-                lng   // ← 숫자 타입
+                dto.latitude() != null ? BigDecimal.valueOf(dto.latitude()) : null,
+                dto.longitude() != null ? BigDecimal.valueOf(dto.longitude()) : null
         );
     }
 
@@ -37,5 +34,18 @@ public class AddressConverter {
                 .latitude(latitude)
                 .longitude(longitude)
                 .build();
+    }
+
+    public static Address toAddressCrawl(AddressResDTO.AddressCreateResDTO dto, String place) {
+        return new Address(
+                dto.city(),
+                dto.district(),
+                dto.neighborhood(),
+                dto.roadNameAddress(),
+                place,
+                dto.postalCode(),
+                dto.latitude() != null ? BigDecimal.valueOf(dto.latitude()) : null,
+                dto.longitude() != null ? BigDecimal.valueOf(dto.longitude()) : null
+        );
     }
 }

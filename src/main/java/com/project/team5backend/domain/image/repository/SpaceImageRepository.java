@@ -9,7 +9,7 @@ import java.util.List;
 public interface SpaceImageRepository extends JpaRepository<SpaceImage, Long> {
 
     @Query("select si.fileKey from SpaceImage si where si.space.id = :spaceId")
-    List<String> findFileKeysBySpaceId(@Param("spaceId") Long spaceId);
+    List<String> findImageUrlsBySpaceId(@Param("spaceId") Long spaceId);
 
     List<SpaceImage> findBySpaceId(long spaceId);
 }

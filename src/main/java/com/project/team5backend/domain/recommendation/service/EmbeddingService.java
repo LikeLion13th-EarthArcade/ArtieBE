@@ -1,10 +1,11 @@
 package com.project.team5backend.domain.recommendation.service;
 
-import com.project.team5backend.domain.exhibition.exhibition.entity.Exhibition;
+import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.recommendation.entity.ExhibitionEmbedding;
 import com.project.team5backend.domain.recommendation.repository.ExhibitionEmbeddingRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
@@ -16,6 +17,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class EmbeddingService {
 
+    @Qualifier("openAiRestClient")
     private final RestClient openaiRestClient;
     private final ExhibitionEmbeddingRepository embRepo;
 
@@ -23,8 +25,8 @@ public class EmbeddingService {
         // 승인된 것만 생성하도록 호출부에서 보장
         String input = String.join("\n",
                 "title: " + ns(e.getTitle()),
-                "category: " + ns(String.valueOf(e.getCategory())),
-                "mood: " + ns(String.valueOf(e.getMood())),
+                "exhibitionCategory: " + ns(String.valueOf(e.getExhibitionCategory())),
+                "exhibitionMood: " + ns(String.valueOf(e.getExhibitionMood())),
                 "location: " + ns(e.getAddress().getRoadAddress()),      // ← venue 대신 location
                 "description: " + ns(e.getDescription()) // ← summary 대신 description
         );

@@ -1,6 +1,8 @@
 package com.project.team5backend.global.security.filter;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.project.team5backend.domain.user.entity.Role;
+import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.global.security.userdetails.CustomUserDetails;
 import com.project.team5backend.global.security.util.JwtUtil;
 import com.project.team5backend.global.util.RedisUtils;
@@ -79,9 +81,14 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
 
         } catch (ExpiredJwtException e) {
-            response.setStatus(HttpStatus.UNAUTHORIZED.value());
+            response.setContentType("application/json;charset=UTF-8");
             response.setCharacterEncoding("UTF-8");
-            response.getWriter().write("Access Token 이 만료되었습니다.");
+            CustomResponse<Object> errorResponse = CustomResponse.onFailure(
+                    String.valueOf(HttpStatus.UNAUTHORIZED.value()),
+                    "Access Token이 만료되었습니다.",
+                    null
+            );
+            new ObjectMapper().writeValue(response.getWriter(), errorResponse);
         }
     }
 
