@@ -34,7 +34,7 @@ public class Exhibition extends BaseTimeEntity {
     @Column(name = "title", nullable = false)
     private String title;
 
-    @Column(name = "description", nullable = false)
+    @Column(name = "description")
     private String description;
 
     @Column(name = "thumbnail", nullable = false)

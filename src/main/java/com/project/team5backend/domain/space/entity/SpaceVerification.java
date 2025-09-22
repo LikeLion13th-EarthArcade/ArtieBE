@@ -14,7 +14,7 @@ public class SpaceVerification {
     private Long id;
 
     @Column(name = "biz_number", nullable = false)
-    private String biz_number;
+    private String bizNumber;
 
     @Column(name = "business_license_key", nullable = false)
     private String businessLicenseKey;

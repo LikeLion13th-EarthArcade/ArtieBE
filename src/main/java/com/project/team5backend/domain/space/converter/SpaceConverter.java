@@ -46,9 +46,9 @@ public class SpaceConverter {
                 .build();
     }
 
-    public static SpaceVerification toSpaceVerification(String businessNumber, String businessLicenseFileUrl, String buildingRegisterFileUrl){
+    public static SpaceVerification toSpaceVerification(String bizNumber, String businessLicenseFileUrl, String buildingRegisterFileUrl){
         return SpaceVerification.builder()
-                .businessNumber(businessNumber)
+                .bizNumber(bizNumber)
                 .businessLicenseKey(businessLicenseFileUrl)
                 .buildingRegisterKey(buildingRegisterFileUrl)
                 .build();
