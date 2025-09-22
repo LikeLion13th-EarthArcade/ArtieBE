@@ -23,6 +23,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import static com.project.team5backend.global.constant.redis.RedisConstant.*;
+import static com.project.team5backend.global.constant.scope.ScopeConstant.SCOPE_BIZ_NUMBER;
 import static com.project.team5backend.global.constant.valid.MessageConstant.BIZ_NUMBER_IS_NOT_REGISTERED;
 import static com.project.team5backend.global.constant.valid.MessageConstant.BLANK;
 
@@ -104,6 +105,12 @@ public class ValidationServiceImpl implements ValidationService {
         ValidationResDTO.BizNumberValidationResDTO.Info info = ValidationConverter.toInfo(infoItem);
         boolean isValid = !Objects.equals(info.taxType(), BIZ_NUMBER_IS_NOT_REGISTERED);
         boolean isExpired = !Objects.equals(info.endAt(), BLANK);
+
+        // 성공시 성공 정보를 redis에 저장
+        if (isValid && !isExpired) {
+            String bizNumber = bizNumberValidationReqDTO.bizNumber();
+            redisUtils.save(bizNumber + KEY_SCOPE_SUFFIX, SCOPE_BIZ_NUMBER, SCOPE_EXP_TIME, TimeUnit.MILLISECONDS);
+        }
 
         return ValidationConverter.toBizNumberValidationResDTO(info, isValid, isExpired);
     }

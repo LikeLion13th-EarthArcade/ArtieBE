@@ -52,7 +52,8 @@ public class ValidationController {
         return CustomResponse.onSuccess("이메일 인증 성공!");
     }
 
-    @Operation(summary = "사업자 번호 검증")
+    @Operation(summary = "사업자 번호 검증",
+            description = "사업자 등록이 유효한 경우 isValid = true, 만료된 경우 isExpired = true")
     @PostMapping("/biz-number/confirmation")
     public CustomResponse<ValidationResDTO.BizNumberValidationResDTO> verifyBizNumber(
             @RequestBody @Valid ValidationReqDTO.BizNumberValidationReqDTO bizNumberValidationReqDTO
