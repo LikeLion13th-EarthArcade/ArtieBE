@@ -2,9 +2,11 @@ package com.project.team5backend.domain.admin.exhibition.converter;
 
 import com.project.team5backend.domain.admin.exhibition.dto.response.AdminExhibitionResDTO;
 import com.project.team5backend.domain.exhibition.entity.Exhibition;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
-
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class AdminExhibitionConverter {
     public static AdminExhibitionResDTO.ExhibitionSummaryResDTO toExhibitionSummaryResDTO(Exhibition exhibition){
         return AdminExhibitionResDTO.ExhibitionSummaryResDTO.builder()

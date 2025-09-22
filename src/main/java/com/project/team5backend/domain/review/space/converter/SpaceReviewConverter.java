@@ -5,11 +5,12 @@ import com.project.team5backend.domain.review.space.dto.response.SpaceReviewResD
 import com.project.team5backend.domain.review.space.entity.SpaceReview;
 import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.user.entity.User;
-import org.springframework.stereotype.Component;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
-@Component
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class SpaceReviewConverter {
 
     public static SpaceReview toSpaceReview(SpaceReviewReqDTO.SpaceReviewCreateReqDTO spaceReviewCreateReqDTO, Space space, User use) {

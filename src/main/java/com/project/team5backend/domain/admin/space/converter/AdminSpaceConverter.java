@@ -3,9 +3,12 @@ package com.project.team5backend.domain.admin.space.converter;
 import com.project.team5backend.domain.admin.space.dto.response.AdminSpaceResDTO;
 import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.space.entity.SpaceVerification;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class AdminSpaceConverter {
 
 

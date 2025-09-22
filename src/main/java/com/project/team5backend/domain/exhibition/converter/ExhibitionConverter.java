@@ -20,6 +20,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ExhibitionConverter {
 
     public static Exhibition toExhibition(ExhibitionReqDTO.ExhibitionCreateReqDTO createReqDTO, User user, String imageUrls, Address address) {
