@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ExhibitionConverter {
@@ -71,24 +72,14 @@ public class ExhibitionConverter {
                 .operatingHours(exhibition.getOperatingHours())
                 .imageUrls(imageUrls)
                 .websiteUrl(exhibition.getWebsiteUrl())
-                .address(
-                        exhibition.getAddress() != null
-                                ? String.format("%s %s",
-                                exhibition.getAddress().getRoadAddress(),
-                                exhibition.getAddress().getDetail() != null ? exhibition.getAddress().getDetail() : "")
-                                : null
-                )
+                .address(formatAddress(exhibition.getAddress()))
                 .latitude(exhibition.getAddress().getLatitude())
                 .longitude(exhibition.getAddress().getLongitude())
                 .exhibitionCategory(exhibition.getExhibitionCategory())
                 .exhibitionType(exhibition.getExhibitionType())
                 .exhibitionMood(exhibition.getExhibitionMood())
                 .price(exhibition.getPrice())
-                .facilities(
-                        exhibition.getExhibitionFacilities().stream()
-                                .map(ef -> ef.getFacility().getName()) // Facility 엔티티의 name 사용
-                                .toList()
-                )
+                .facilities(extractFacility(exhibition))
                 .build();
     }
 
@@ -220,5 +211,22 @@ public class ExhibitionConverter {
                 .address(address)
                 .user(user)
                 .build();
+    }
+
+    private static List<String> extractFacility(Exhibition exhibition) {
+        if (exhibition.getExhibitionFacilities() == null) {
+            return List.of(); // null-safe
+        }
+        return exhibition.getExhibitionFacilities().stream()
+                .map(ef -> ef.getFacility().getName())
+                .toList();
+    }
+
+    private static String formatAddress(Address address) {
+        if (address == null) return null;
+        return String.format("%s %s",
+                Objects.toString(address.getRoadAddress(), ""),
+                Objects.toString(address.getDetail(), "")
+        ).trim();
     }
 }

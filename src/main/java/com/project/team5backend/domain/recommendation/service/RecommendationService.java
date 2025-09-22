@@ -101,7 +101,7 @@ public class RecommendationService {
         // 메서드 참조 대신 람다로 isLiked 전달
         var items = top.stream()
                 .map(e -> {
-                    String thumbnail = s3UrlResolver.toImageUrl(e.getThumbnail());
+                    String thumbnail = s3UrlResolver.toFileUrl(e.getThumbnail());
                     return ExhibitionConverter.toCard(e, liked.contains(e.getId()), thumbnail);
                 })
                 .toList();
