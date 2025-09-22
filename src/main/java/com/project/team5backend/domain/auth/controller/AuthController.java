@@ -28,6 +28,12 @@ public class AuthController {
         return null;
     }
 
+    @Operation(summary = "로그아웃")
+    @PostMapping("/logout")
+    public CustomResponse<?> logout() {
+        return null;
+    }
+
     @Operation(summary = "비밀번호 변경")
     @PatchMapping("/me/password")
     public CustomResponse<String> changePassword(
