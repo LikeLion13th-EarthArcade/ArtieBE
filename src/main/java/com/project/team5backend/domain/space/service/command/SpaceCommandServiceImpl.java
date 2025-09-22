@@ -16,10 +16,12 @@ import com.project.team5backend.domain.space.converter.SpaceLikeConverter;
 import com.project.team5backend.domain.space.dto.request.SpaceReqDTO;
 import com.project.team5backend.domain.space.dto.response.SpaceResDTO;
 import com.project.team5backend.domain.space.entity.Space;
+import com.project.team5backend.domain.space.entity.SpaceVerification;
 import com.project.team5backend.domain.space.exception.SpaceErrorCode;
 import com.project.team5backend.domain.space.exception.SpaceException;
 import com.project.team5backend.domain.space.repository.SpaceLikeRepository;
 import com.project.team5backend.domain.space.repository.SpaceRepository;
+import com.project.team5backend.domain.space.repository.SpaceVerificationRepository;
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.user.exception.UserErrorCode;
 import com.project.team5backend.domain.user.exception.UserException;
@@ -49,6 +51,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
 
     private final SpaceRepository spaceRepository;
     private final SpaceLikeRepository spaceLikeRepository;
+    private final SpaceVerificationRepository spaceVerificationRepository;
     private final UserRepository userRepository;
     private final SpaceImageRepository spaceImageRepository;
     private final SpaceReviewRepository spaceReviewRepository;
@@ -60,7 +63,11 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
     private final S3UrlResolver s3UrlResolver;
 
     @Override
-    public SpaceResDTO.SpaceCreateResDTO createSpace(SpaceReqDTO.SpaceCreateReqDTO spaceCreateReqDTO, long userId, List<MultipartFile> images) {
+    public SpaceResDTO.SpaceCreateResDTO createSpace(SpaceReqDTO.SpaceCreateReqDTO spaceCreateReqDTO,
+                                                     long userId,
+                                                     MultipartFile businessLicenseFile,
+                                                     MultipartFile buildingRegisterFile,
+                                                     List<MultipartFile> images) {
 
         ImageUtils.validateImages(images); // 이미지 검증 (개수, null 여부)
 
@@ -70,13 +77,18 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
         AddressResDTO.AddressCreateResDTO addressResDTO = addressService.resolve(spaceCreateReqDTO.address());
         Address address = AddressConverter.toAddress(addressResDTO);
 
+        String businessLicenseFileUrl = s3FileStorageAdapter.upload(businessLicenseFile,"businessLicenseFile");
+        String buildingRegisterFileUrl = s3FileStorageAdapter.upload(buildingRegisterFile,"buildingRegister");
+
         List<String> imageUrls = images.stream()
                 .map(file -> s3FileStorageAdapter.upload(file, "spaces"))
                 .toList();
 
         String thumbnail = s3UrlResolver.toFileKey(imageUrls.get(0));
         Space space = SpaceConverter.toSpace(spaceCreateReqDTO, user, thumbnail, address);
+        SpaceVerification spaceVerification = SpaceConverter.toSpaceVerification(spaceCreateReqDTO.businessNumber(), businessLicenseFileUrl, buildingRegisterFileUrl);
         spaceRepository.save(space);
+        spaceVerificationRepository.save(spaceVerification);
 
         List<Facility> facilities = facilityRepository.findByNameIn(spaceCreateReqDTO.facilities());
         facilities.forEach(facility -> {

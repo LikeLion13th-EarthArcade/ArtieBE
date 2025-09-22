@@ -51,9 +51,11 @@ public class SpaceController {
     public CustomResponse<SpaceResDTO.SpaceCreateResDTO> createSpace(
             @AuthenticationPrincipal CurrentUser currentUser,
             @RequestPart("request") @Valid SpaceReqDTO.SpaceCreateReqDTO spaceCreateReqDTO,
+            @RequestParam(value = "businessLicenseFile") MultipartFile businessLicenseFile,
+            @RequestParam(value = "buildingRegisterFile") MultipartFile buildingRegisterFile,
             @RequestPart(value = "images", required = false) List<MultipartFile> images
     ) {
-        return CustomResponse.onSuccess(spaceCommandService.createSpace(spaceCreateReqDTO, currentUser.getId(), images));
+        return CustomResponse.onSuccess(spaceCommandService.createSpace(spaceCreateReqDTO, currentUser.getId(), businessLicenseFile, buildingRegisterFile, images));
     }
 
     @PostMapping("/{spaceId}/like")
