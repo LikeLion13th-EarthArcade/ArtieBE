@@ -11,15 +11,14 @@ import lombok.*;
 public class SpaceVerification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "space_verification_id")
     private Long id;
 
-    @Column(nullable = false)
-    private String businessNumber;
+    @Column(name = "biz_number", nullable = false)
+    private String biz_number;
 
-    @Column(nullable = false)
+    @Column(name = "business_license_key", nullable = false)
     private String businessLicenseKey;
 
-    @Column(nullable = false)
+    @Column(name = "building_register_key", nullable = false)
     private String buildingRegisterKey;
 }

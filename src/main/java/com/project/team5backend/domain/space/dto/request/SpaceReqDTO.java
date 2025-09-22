@@ -1,7 +1,6 @@
 package com.project.team5backend.domain.space.dto.request;
 
 
-import com.project.team5backend.domain.space.entity.SpaceVerification;
 import com.project.team5backend.domain.space.entity.enums.SpaceMood;
 import com.project.team5backend.domain.space.entity.enums.SpaceSize;
 import com.project.team5backend.domain.space.entity.enums.SpaceType;
@@ -16,7 +15,7 @@ public class SpaceReqDTO {
     // 전시 공간 등록 요청 DTO
     public record SpaceCreateReqDTO(
             @NotBlank
-            String businessNumber,
+            String bizNumber,
             @NotNull
             AddressReqDTO.AddressCreateReqDTO address,
             @NotNull
