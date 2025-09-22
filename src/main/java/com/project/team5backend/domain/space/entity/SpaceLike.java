@@ -17,11 +17,11 @@ public class SpaceLike extends BaseOnlyCreateTimeEntity {
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "space_id")
+    @JoinColumn(name = "space_id", nullable = false)
     private Space space;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private User user;
 }
 

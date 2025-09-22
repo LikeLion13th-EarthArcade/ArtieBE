@@ -24,55 +24,62 @@ public class Space extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(name = "name", nullable = false)
     private String name; // 공간 이름
 
-    @Column(nullable = false, length = 500)
+    @Column(name = "description", nullable = false)
     private String description; // 공간 설명
 
-    @Column(nullable = false)
+    @Column(name = "thumbnail", nullable = false)
     private String thumbnail; // 썸네일
 
-    @Column(nullable = false)
+    @Column(name = "operating_hours", nullable = false)
     private String operatingHours; // 운영 시간
 
+    @Column(name = "website_url")
     private String websiteUrl; // 웹사이트 url
 
-    @Column(length = 20)
+    @Column(name = "phone_number", nullable = false)
     private String phoneNumber; // 전화번호
 
-    @Column(length = 100)
+    @Column(name = "email", nullable = false)
     private String email; // 이메일
 
+    @Column(name = "sns_url")
     private String snsUrl; // SNS 주소
 
+    @Column(name = "rating_avg", nullable = false)
     private double ratingAvg;
 
+    @Column(name = "reveiw_count", nullable = false)
     private int reviewCount;
 
+    @Column(name = "like_count", nullable = false)
     private int likeCount;
 
+    @Column(name = "review_sum", nullable = false)
     private int reviewSum;
 
+    @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted;
 
     @Embedded
     private Address address; // 공간 주소 (위도, 경도 포함)
 
+    @Column(name = "space_type", nullable = false)
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private SpaceType spaceType;     // 공간 유형
 
+    @Column(name = "space_size", nullable = false)
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private SpaceSize spaceSize;     // 공간 크기
 
+    @Column(name = "space_mood", nullable = false)
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private SpaceMood spaceMood;     // 공간 분위기
 
+    @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    @Column(nullable = false)
     private Status status; // 승인 상태
 
     @OneToMany(mappedBy = "space", cascade = CascadeType.ALL, orphanRemoval = true)

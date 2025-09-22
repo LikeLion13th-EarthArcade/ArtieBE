@@ -16,13 +16,13 @@ public class SpaceVerification {
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "space_id")
     private Space space;
+  
+    @Column(name = "biz_number", nullable = false)
+    private String bizNumber;
 
-    @Column(nullable = false)
-    private String businessNumber;
-
-    @Column(nullable = false)
+    @Column(name = "business_license_key", nullable = false)
     private String businessLicenseKey;
 
-    @Column(nullable = false)
+    @Column(name = "building_register_key", nullable = false)
     private String buildingRegisterKey;
 }
