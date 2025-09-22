@@ -3,18 +3,11 @@ package com.project.team5backend.domain.admin.space.converter;
 import com.project.team5backend.domain.admin.space.dto.response.AdminSpaceResDTO;
 import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.space.entity.SpaceVerification;
-import com.project.team5backend.global.util.S3UrlResolver;
-import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-
-@Component
-@RequiredArgsConstructor
 public class AdminSpaceConverter {
 
-    private final S3UrlResolver s3UrlResolver;
 
     public static AdminSpaceResDTO.SpaceSummaryResDTO toSpaceSummaryResDTO(Space space){
         return AdminSpaceResDTO.SpaceSummaryResDTO.builder()

@@ -1,7 +1,6 @@
 package com.project.team5backend.domain.space.dto.request;
 
 
-import com.project.team5backend.domain.space.entity.SpaceVerification;
 import com.project.team5backend.domain.space.entity.enums.SpaceMood;
 import com.project.team5backend.domain.space.entity.enums.SpaceSize;
 import com.project.team5backend.domain.space.entity.enums.SpaceType;

@@ -5,7 +5,6 @@ import com.project.team5backend.domain.exhibition.dto.response.ExhibitionResDTO;
 import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.facility.entity.ExhibitionFacility;
 import com.project.team5backend.domain.facility.entity.Facility;
-import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.global.entity.embedded.Address;
 import com.project.team5backend.global.entity.enums.Status;
@@ -21,7 +20,6 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Objects;
 
-@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ExhibitionConverter {
 
     public static Exhibition toExhibition(ExhibitionReqDTO.ExhibitionCreateReqDTO createReqDTO, User user, String imageUrls, Address address) {

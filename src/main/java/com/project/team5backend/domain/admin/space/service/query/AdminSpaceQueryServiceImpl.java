@@ -8,7 +8,6 @@ import com.project.team5backend.domain.space.entity.SpaceVerification;
 import com.project.team5backend.domain.space.exception.SpaceErrorCode;
 import com.project.team5backend.domain.space.exception.SpaceException;
 import com.project.team5backend.domain.space.repository.SpaceRepository;
-import com.project.team5backend.domain.space.repository.SpaceVerificationRepository;
 import com.project.team5backend.global.entity.enums.StatusGroup;
 import com.project.team5backend.global.util.S3UrlResolver;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +26,6 @@ import java.util.List;
 public class AdminSpaceQueryServiceImpl implements AdminSpaceQueryService {
 
     private final SpaceRepository spaceRepository;
-    private final SpaceVerificationRepository spaceVerificationRepository;
     private final SpaceImageRepository spaceImageRepository;
     private final S3UrlResolver s3UrlResolver;
 

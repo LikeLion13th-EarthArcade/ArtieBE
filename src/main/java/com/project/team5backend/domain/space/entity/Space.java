@@ -1,5 +1,6 @@
 package com.project.team5backend.domain.space.entity;
 
+import com.project.team5backend.domain.facility.entity.SpaceFacility;
 import com.project.team5backend.domain.space.entity.enums.SpaceMood;
 import com.project.team5backend.domain.space.entity.enums.SpaceSize;
 import com.project.team5backend.domain.space.entity.enums.SpaceType;
@@ -7,12 +8,9 @@ import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.global.entity.BaseTimeEntity;
 import com.project.team5backend.global.entity.embedded.Address;
 import com.project.team5backend.global.entity.enums.Status;
-import com.project.team5backend.domain.facility.entity.SpaceFacility;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
