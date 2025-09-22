@@ -12,10 +12,8 @@ import lombok.*;
 @AllArgsConstructor(access = AccessLevel.PROTECTED)
 @NoArgsConstructor
 public class SpaceLike extends BaseOnlyCreateTimeEntity {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "space_like_id")
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

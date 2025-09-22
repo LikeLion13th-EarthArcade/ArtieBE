@@ -4,10 +4,13 @@ import com.project.team5backend.domain.admin.space.converter.AdminSpaceConverter
 import com.project.team5backend.domain.admin.space.dto.response.AdminSpaceResDTO;
 import com.project.team5backend.domain.image.repository.SpaceImageRepository;
 import com.project.team5backend.domain.space.entity.Space;
+import com.project.team5backend.domain.space.entity.SpaceVerification;
 import com.project.team5backend.domain.space.exception.SpaceErrorCode;
 import com.project.team5backend.domain.space.exception.SpaceException;
 import com.project.team5backend.domain.space.repository.SpaceRepository;
+import com.project.team5backend.domain.space.repository.SpaceVerificationRepository;
 import com.project.team5backend.global.entity.enums.StatusGroup;
+import com.project.team5backend.global.util.S3UrlResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -24,7 +27,9 @@ import java.util.List;
 public class AdminSpaceQueryServiceImpl implements AdminSpaceQueryService {
 
     private final SpaceRepository spaceRepository;
+    private final SpaceVerificationRepository spaceVerificationRepository;
     private final SpaceImageRepository spaceImageRepository;
+    private final S3UrlResolver s3UrlResolver;
 
     private static final int PAGE_SIZE = 10;
 
@@ -42,8 +47,12 @@ public class AdminSpaceQueryServiceImpl implements AdminSpaceQueryService {
         Space space = spaceRepository.findByIdAndIsDeletedFalse(spaceId)
                 .orElseThrow(() -> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
 
-        List<String> imageUrls = spaceImageRepository.findImageUrlsBySpaceId(spaceId);
-
-        return AdminSpaceConverter.toSpaceDetailResDTO(space, imageUrls);
+        List<String> imageUrls = spaceImageRepository.findImageUrlsBySpaceId(spaceId).stream()
+                .map(s3UrlResolver::toFileUrl)
+                .toList();
+        SpaceVerification spaceVerification = space.getSpaceVerification();
+        String businessLicenseFile = s3UrlResolver.toFileUrl(spaceVerification.getBusinessLicenseKey());
+        String buildingRegisterFile = s3UrlResolver.toFileUrl(spaceVerification.getBuildingRegisterKey());
+        return AdminSpaceConverter.toSpaceDetailResDTO(space, spaceVerification, imageUrls, businessLicenseFile, buildingRegisterFile);
     }
 }

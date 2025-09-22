@@ -46,11 +46,12 @@ public class SpaceConverter {
                 .build();
     }
 
-    public static SpaceVerification toSpaceVerification(String businessNumber, String businessLicenseFileUrl, String buildingRegisterFileUrl){
+    public static SpaceVerification toSpaceVerification(Space space, String businessNumber, String businessLicenseFileUrl, String buildingRegisterFileUrl){
         return SpaceVerification.builder()
                 .businessNumber(businessNumber)
                 .businessLicenseKey(businessLicenseFileUrl)
                 .buildingRegisterKey(buildingRegisterFileUrl)
+                .space(space)
                 .build();
     }
 
@@ -79,11 +80,7 @@ public class SpaceConverter {
                 .spaceSize(space.getSpaceSize())
                 .spaceMood(space.getSpaceMood())
                 .description(space.getDescription())
-                .facilities(
-                        space.getSpaceFacilities().stream()
-                                .map(sf -> sf.getFacility().getName())
-                                .toList()
-                )
+                .facilities(extractFacility(space))
                 .phoneNumber(space.getPhoneNumber())
                 .email(space.getEmail())
                 .websiteUrl(space.getWebsiteUrl())
@@ -108,5 +105,14 @@ public class SpaceConverter {
                 .page(page)
                 .map(new SpaceResDTO.SpaceSearchPageResDTO.MapInfo(lat, lon))
                 .build();
+    }
+
+    private static List<String> extractFacility(Space space) {
+        if (space.getSpaceFacilities() == null) {
+            return List.of(); // null-safe
+        }
+        return space.getSpaceFacilities().stream()
+                .map(sf -> sf.getFacility().getName())
+                .toList();
     }
 }

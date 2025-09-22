@@ -24,7 +24,6 @@ import java.util.List;
 public class Space extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "space_id")
     private Long id;
 
     @Column(nullable = false)
@@ -85,6 +84,9 @@ public class Space extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @OneToOne(mappedBy = "space", cascade = CascadeType.ALL, orphanRemoval = true)
+    private SpaceVerification spaceVerification;
 
     public void softDelete() {
         this.isDeleted = true;

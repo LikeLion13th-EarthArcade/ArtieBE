@@ -11,8 +11,11 @@ import lombok.*;
 public class SpaceVerification {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "space_verification_id")
     private Long id;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "space_id")
+    private Space space;
 
     @Column(nullable = false)
     private String businessNumber;

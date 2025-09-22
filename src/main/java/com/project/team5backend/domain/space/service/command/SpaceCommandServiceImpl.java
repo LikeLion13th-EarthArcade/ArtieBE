@@ -86,7 +86,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
 
         String thumbnail = s3UrlResolver.toFileKey(imageUrls.get(0));
         Space space = SpaceConverter.toSpace(spaceCreateReqDTO, user, thumbnail, address);
-        SpaceVerification spaceVerification = SpaceConverter.toSpaceVerification(spaceCreateReqDTO.businessNumber(), businessLicenseFileUrl, buildingRegisterFileUrl);
+        SpaceVerification spaceVerification = SpaceConverter.toSpaceVerification(space, spaceCreateReqDTO.businessNumber(), businessLicenseFileUrl, buildingRegisterFileUrl);
         spaceRepository.save(space);
         spaceVerificationRepository.save(spaceVerification);
 
