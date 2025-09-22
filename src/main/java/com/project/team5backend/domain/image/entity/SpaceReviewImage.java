@@ -17,12 +17,14 @@ public class SpaceReviewImage extends BaseCreateDeleteEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @Column(name = "file_key")
     private String fileKey;
 
+    @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "review_id")
+    @JoinColumn(name = "review_id", nullable = false)
     private SpaceReview spaceReview;
 
     public void deleteImage() {
