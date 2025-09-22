@@ -1,10 +1,8 @@
 package com.project.team5backend.domain.admin.space.converter;
 
 import com.project.team5backend.domain.admin.space.dto.response.AdminSpaceResDTO;
-import com.project.team5backend.domain.facility.entity.SpaceFacility;
 import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.space.entity.SpaceVerification;
-import com.project.team5backend.global.entity.embedded.Address;
 import com.project.team5backend.global.util.S3UrlResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;

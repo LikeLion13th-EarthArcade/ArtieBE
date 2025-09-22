@@ -5,7 +5,7 @@ import com.project.team5backend.global.entity.enums.StatusGroup;
 import org.springframework.data.domain.Page;
 
 public interface AdminSpaceQueryService {
-    Page<AdminSpaceResDTO.SpaceSummaryResDTO> getSummarySpaceList(StatusGroup status, int page);
+    Page<AdminSpaceResDTO.SpaceSummaryResDTO> getSpaceList(StatusGroup status, int page);
 
     AdminSpaceResDTO.SpaceDetailResDTO getDetailSpace(long spaceId);
 }

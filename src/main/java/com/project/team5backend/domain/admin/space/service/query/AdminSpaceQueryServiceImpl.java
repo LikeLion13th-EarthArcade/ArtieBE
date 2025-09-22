@@ -34,7 +34,7 @@ public class AdminSpaceQueryServiceImpl implements AdminSpaceQueryService {
     private static final int PAGE_SIZE = 10;
 
     @Override
-    public Page<AdminSpaceResDTO.SpaceSummaryResDTO> getSummarySpaceList(StatusGroup status, int page){
+    public Page<AdminSpaceResDTO.SpaceSummaryResDTO> getSpaceList(StatusGroup status, int page){
         Pageable pageable = PageRequest.of(page, PAGE_SIZE, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt"));
 
         Page<Space> spacePage = spaceRepository.findAdminSpacesByStatus(status, pageable);
@@ -50,9 +50,11 @@ public class AdminSpaceQueryServiceImpl implements AdminSpaceQueryService {
         List<String> imageUrls = spaceImageRepository.findImageUrlsBySpaceId(spaceId).stream()
                 .map(s3UrlResolver::toFileUrl)
                 .toList();
+
         SpaceVerification spaceVerification = space.getSpaceVerification();
         String businessLicenseFile = s3UrlResolver.toFileUrl(spaceVerification.getBusinessLicenseKey());
         String buildingRegisterFile = s3UrlResolver.toFileUrl(spaceVerification.getBuildingRegisterKey());
+
         return AdminSpaceConverter.toSpaceDetailResDTO(space, spaceVerification, imageUrls, businessLicenseFile, buildingRegisterFile);
     }
 }

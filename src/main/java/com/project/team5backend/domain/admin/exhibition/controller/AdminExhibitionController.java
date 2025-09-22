@@ -36,10 +36,15 @@ public class AdminExhibitionController {
         return CustomResponse.onSuccess(adminExhibitionCommandService.rejectExhibition(exhibitionId));
     }
 
-    @Operation(summary = "전시등록 관리 ")
+    @Operation(summary = "전시등록 관리 ",
+            description = "현재 서비스에서 생성된 모든 전시를 검색합니다. <br> " +
+                    "[RequestParam statusGroup] : [ALL], [PENDING], [DONE] 3가지 선택<br><br>" +
+                    "ALL : 모든 상태의 전시 <br><br>" +
+                    "PENDING : 진행중 <br>PENDING(호스트의 확정 대기) <br><br>" +
+                    "DONE : 완료됨 <br>APPROVED(호스트의 전시 승인 확정), REJECTED(호스트의 전시 거절 확정), <br>")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public CustomResponse<PageResponse<AdminExhibitionResDTO.ExhibitionSummaryResDTO>> getSummaryExhibitionList(
+    public CustomResponse<PageResponse<AdminExhibitionResDTO.ExhibitionSummaryResDTO>> getExhibitionList(
             @RequestParam(name = "status", required = false, defaultValue = "ALL") StatusGroup status,
             @RequestParam(name = "page", defaultValue = "0") int page
     ) {

@@ -12,6 +12,7 @@ import com.project.team5backend.global.util.PageResponse;
 import com.project.team5backend.domain.space.dto.request.SpaceReqDTO;
 
 import java.util.List;
+import java.util.Objects;
 
 public class SpaceConverter {
     public static Space toSpace(SpaceReqDTO.SpaceCreateReqDTO spaceCreateReqDTO, User user, String thumbnail, Address address){
@@ -67,13 +68,7 @@ public class SpaceConverter {
                 .spaceId(space.getId())
                 .name(space.getName())
                 .imageUrls(imageUrls)
-                .address(
-                        space.getAddress() != null
-                                ? String.format("%s %s",
-                                space.getAddress().getRoadAddress(),
-                                space.getAddress().getDetail() != null ? space.getAddress().getDetail() : "")
-                                : null
-                )
+                .address(formatAddress(space.getAddress()))
                 .latitude(space.getAddress().getLatitude())
                 .longitude(space.getAddress().getLongitude())
                 .operatingHours(space.getOperatingHours())
@@ -115,4 +110,13 @@ public class SpaceConverter {
                 .map(sf -> sf.getFacility().getName())
                 .toList();
     }
+
+    private static String formatAddress(Address address) {
+        if (address == null) return null;
+        return String.format("%s %s",
+                Objects.toString(address.getRoadAddress(), ""),
+                Objects.toString(address.getDetail(), "")
+        ).trim();
+    }
+
 }
