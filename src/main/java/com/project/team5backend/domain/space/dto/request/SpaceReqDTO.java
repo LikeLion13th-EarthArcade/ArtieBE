@@ -30,6 +30,7 @@ public class SpaceReqDTO {
             String name,
             @NotBlank
             String operatingHours,
+
             String description,
             List<String> facilities,
             String phoneNumber,

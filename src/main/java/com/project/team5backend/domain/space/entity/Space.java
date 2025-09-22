@@ -24,6 +24,7 @@ import java.util.List;
 public class Space extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "space_id")
     private Long id;
 
     @Column(nullable = false)
