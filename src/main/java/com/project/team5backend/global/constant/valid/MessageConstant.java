@@ -20,12 +20,14 @@ public class MessageConstant {
     public static final String BLANK_EXHIBITION_TITLE = "전시 제목 누락";
     public static final String BLANK_EXHIBITION_START_DATE = "전시 시작일 누락";
     public static final String BLANK_EXHIBITION_END_DATE = "전시 종료일 누락";
-    public static final String BLANK_EXHIBITION_OPERATING_HOURS = "운영 시간 누락";
+    public static final String BLANK_EXHIBITION_OPERATING_HOURS = "전시 운영 시간 누락";
     public static final String BLANK_EXHIBITION_CATEGORY = "전시 카테고리 누락";
     public static final String BLANK_EXHIBITION_TYPE = "전시 유형 누락";
     public static final String BLANK_EXHIBITION_MOOD = "전시 분위기 누락";
     public static final String BLANK_EXHIBITION_ADDRESS = "전시 장소 누락";
     public static final String BLANK_EXHIBITION_PRICE = "전시 가격 누락";
+    // SPACE
+    public static final String BLANK_SPACE_OPERATING_HOURS = "공간 운영 시간 누락";
 
 
 

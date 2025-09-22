@@ -15,15 +15,16 @@ public class SpaceImage extends BaseCreateDeleteEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "space_image_id")
     private Long id;
 
+    @Column(name = "file_key")
     private String fileKey;
 
+    @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "space_id")
+    @JoinColumn(name = "space_id", nullable = false)
     private Space space;
 
     public void deleteImage() {
