@@ -8,4 +8,6 @@ public interface AuthCommandService {
     void savePassword(User user, String encodedPassword);
 
     void changePassword(long id, AuthReqDTO.AuthPasswordChangeReqDTO authPasswordChangeReqDTO);
+
+    String tempPassword(AuthReqDTO.AuthTempPasswordReqDTO authTempPasswordReqDTO);
 }

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.project.team5backend.global.constant.scope.ScopeConstant.SCOPE_SIGNUP;
+import static com.project.team5backend.global.constant.scope.ScopeConstant.SCOPE_TEMP_PASSWORD;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,10 +41,19 @@ public class ValidationController {
         return CustomResponse.onSuccess("메일 발송 성공! code: " + code);
     }
 
+    @Operation(summary = "임시 비밀번호 발급 이메일 인증 코드 발송")
+    @PostMapping("/code/temp-password")
+    public CustomResponse<String> sendTempPasswordCode(
+            @RequestBody @Valid ValidationReqDTO.EmailCodeReqDTO emailCodeReqDTO
+    ) {
+        String code = validationService.sendCode(MailType.TEMP_PASSWORD_VERIFICATION, SCOPE_TEMP_PASSWORD, emailCodeReqDTO);
+        return CustomResponse.onSuccess("메일 발송 성공! code: " + code);
+    }
+
     @Operation(summary = "이메일 인증 코드 검증",
             description = "각 코드 요청에 따른 인증 정보를 서버에 15분간 저장<br>" +
                     "15분이 지나면 재인증 필요 -> 코드 인증을 필요로 하는 모든 서비스 이용 불가<br>" +
-                    "인증 코드는 정수 6자리 and 적절한 이메일 형식 -> 아닐시 예외")
+                    "인증 코드는 정수 6자리이며, 적절한 이메일 형식 -> 아닐시 예외")
     @PostMapping("/code/confirmation")
     public CustomResponse<String> verifyCode(
             @RequestBody @Valid ValidationReqDTO.EmailCodeValidationReqDTO emailCodeValidationReqDTO
