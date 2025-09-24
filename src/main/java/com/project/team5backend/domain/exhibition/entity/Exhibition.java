@@ -46,8 +46,8 @@ public class Exhibition extends BaseTimeEntity {
     @Column(name = "end_date", nullable = false)
     private LocalDate endDate;
 
-    @Column(name = "operating_hours", nullable = false)
-    private String operatingHours; // 운영 시간
+    @Column(name = "operating_info", nullable = false)
+    private String operatingInfo; // 운영 시간
 
     @Embedded
     private Address address;

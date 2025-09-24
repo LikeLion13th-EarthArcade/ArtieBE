@@ -40,7 +40,7 @@ public class AdminSpaceConverter {
                 .name(space.getName())
                 .spaceVerificationResDTO(toVerificationResDTO(spaceVerification, businessLicenseFile, buildingRegisterFile))
                 .address(space.getAddress().getRoadAddress())
-                .operatingHours(space.getOperatingHours())
+                .operatingInfo(space.getOperatingInfo())
                 .spaceSize(space.getSpaceSize())
                 .spaceMood(space.getSpaceMood())
                 .description(space.getDescription())
@@ -54,7 +54,7 @@ public class AdminSpaceConverter {
     }
     private static AdminSpaceResDTO.SpaceDetailResDTO.SpaceVerificationResDTO toVerificationResDTO(SpaceVerification verification, String businessLicenseFile, String buildingRegisterFile) {
         return AdminSpaceResDTO.SpaceDetailResDTO.SpaceVerificationResDTO.builder()
-                .businessNumber(verification.getBusinessNumber())
+                .bizNumber(verification.getBizNumber())
                 .businessLicenseFile(businessLicenseFile)
                 .buildingRegisterFile(buildingRegisterFile)
                 .build();

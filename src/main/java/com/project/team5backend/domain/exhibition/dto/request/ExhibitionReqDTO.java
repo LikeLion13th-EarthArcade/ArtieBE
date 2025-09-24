@@ -6,12 +6,12 @@ import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionCategor
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionMood;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionType;
 import com.project.team5backend.global.address.dto.request.AddressReqDTO;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 
 import static com.project.team5backend.global.constant.valid.MessageConstant.*;
@@ -29,10 +29,13 @@ public class ExhibitionReqDTO {
             @NotNull(message = BLANK_EXHIBITION_END_DATE)
             LocalDate endDate,
 
+            @NotNull(message = BLANK_EXHIBITION_OPERATING_HOURS)
+            LocalTime operatingStartHour,
 
-            @Schema(description = "운영 시작 시간", example = "월-금 10:00~19:00 / 주말 휴무")
-            @NotBlank(message = BLANK_EXHIBITION_OPERATING_HOURS)
-            String operatingHours,
+            @NotNull(message = BLANK_EXHIBITION_OPERATING_HOURS)
+            LocalTime operatingEndHour,
+
+            String operatingOption,
 
             String websiteUrl,
 

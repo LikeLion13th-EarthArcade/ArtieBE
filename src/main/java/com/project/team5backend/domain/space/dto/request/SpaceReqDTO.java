@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
+import java.time.LocalTime;
 import java.util.List;
 
 import static com.project.team5backend.global.constant.valid.MessageConstant.*;
@@ -40,8 +41,13 @@ public class SpaceReqDTO {
             @NotBlank(message = BLANK_NAME)
             String name,
 
-            @NotBlank(message = BLANK_SPACE_OPERATING_HOURS)
-            String operatingHours,
+            @NotNull(message = BLANK_EXHIBITION_OPERATING_HOURS)
+            LocalTime operatingStartHour,
+
+            @NotNull(message = BLANK_EXHIBITION_OPERATING_HOURS)
+            LocalTime operatingEndHour,
+
+            String operatingOption,
 
             String description,
 
