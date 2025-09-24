@@ -1,6 +1,9 @@
 package com.project.team5backend.domain.exhibition.repository;
 
+import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.exhibition.entity.ExhibitionLike;
+import com.project.team5backend.domain.user.entity.User;
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -25,5 +28,7 @@ public interface ExhibitionLikeRepository extends JpaRepository<ExhibitionLike, 
             "where el.user.id = :userId and el.exhibition.id in :ids")
     List<Long> findLikedExhibitionIds(@Param("userId") Long userId,
                                       @Param("ids") Collection<Long> ids);
-    List<ExhibitionLike> findByUser_Id(Long userId);
+
+    @Query("select el.exhibition.id from ExhibitionLike el where el.user = :user")
+    List<Long> findExhibitionIdsByInterestedUser(@Param("user") User user);
 }

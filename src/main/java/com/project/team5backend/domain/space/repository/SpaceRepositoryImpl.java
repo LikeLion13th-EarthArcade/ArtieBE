@@ -3,14 +3,17 @@ package com.project.team5backend.domain.space.repository;
 import com.project.team5backend.domain.facility.entity.QFacility;
 import com.project.team5backend.domain.facility.entity.QSpaceFacility;
 import com.project.team5backend.domain.reservation.entity.QReservation;
+import com.project.team5backend.domain.reservation.entity.Reservation;
 import com.project.team5backend.domain.space.entity.QSpace;
 import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.space.entity.enums.SpaceMood;
 import com.project.team5backend.domain.space.entity.enums.SpaceSize;
 import com.project.team5backend.domain.space.entity.enums.SpaceType;
+import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.global.entity.enums.StatusGroup;
+import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
@@ -24,6 +27,9 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
+
+import static com.project.team5backend.domain.reservation.entity.QReservation.reservation;
+import static com.project.team5backend.domain.space.entity.QSpace.space;
 
 @Repository
 @RequiredArgsConstructor
@@ -102,6 +108,55 @@ public class SpaceRepositoryImpl implements SpaceRepositoryCustom {
                 .fetch();
 
         return new PageImpl<>(content, pageable, total != null ? total : 0L);
+    }
+
+    @Override
+    public Page<Space> findByUserWithFilters(User user, StatusGroup statusGroup, Pageable pageable) {
+        QSpace space = QSpace.space;
+
+        BooleanBuilder builder = new BooleanBuilder()
+                .and(space.user.eq(user))
+                .and(statusGroupCondition(statusGroup));
+
+        List<Space> content = findSpaces(space, builder, pageable);
+
+        Long total = countSpace(space, builder);
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0L);
+    }
+
+    private BooleanExpression statusGroupCondition(StatusGroup statusGroup) {
+        if (statusGroup == null || statusGroup == StatusGroup.ALL) {
+            return null;
+        }
+        return switch (statusGroup) {
+            case PENDING -> space.status.in(
+                    Status.PENDING
+            );
+            case DONE -> space.status.in(
+                    Status.APPROVED,
+                    Status.REJECTED
+            );
+            default -> null;
+        };
+    }
+
+    private List<Space> findSpaces(QSpace space, BooleanBuilder builder, Pageable pageable) {
+        return queryFactory
+                .selectFrom(space)
+                .where(builder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(space.createdAt.desc())
+                .fetch();
+    }
+
+    private Long countSpace(QSpace space, BooleanBuilder builder) {
+        return queryFactory
+                .select(space.count())
+                .from(space)
+                .where(builder)
+                .fetchOne();
     }
 
     private BooleanExpression noOverlappingReservation(
