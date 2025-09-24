@@ -33,6 +33,7 @@ import com.project.team5backend.global.entity.embedded.Address;
 import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.global.infra.s3.S3FileStorageAdapter;
 import com.project.team5backend.global.util.ImageUtils;
+import com.project.team5backend.global.util.RedisUtils;
 import com.project.team5backend.global.util.S3UrlResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +42,10 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Objects;
+
+import static com.project.team5backend.global.constant.redis.RedisConstant.KEY_SCOPE_SUFFIX;
+import static com.project.team5backend.global.constant.scope.ScopeConstant.SCOPE_BIZ_NUMBER;
 
 
 @Service
@@ -61,6 +66,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
     private final S3FileStorageAdapter s3FileStorageAdapter;
     private final ImageCommandService imageCommandService;
     private final S3UrlResolver s3UrlResolver;
+    private final RedisUtils<String> redisUtils;
 
     @Override
     public SpaceResDTO.SpaceCreateResDTO createSpace(SpaceReqDTO.SpaceCreateReqDTO spaceCreateReqDTO,
@@ -68,6 +74,12 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
                                                      MultipartFile businessLicenseFile,
                                                      MultipartFile buildingRegisterFile,
                                                      List<MultipartFile> images) {
+
+        // 사업자 번호 검증을 완료 했는지?
+        final String bizNumber = spaceCreateReqDTO.bizNumber();
+        if (!Objects.equals(redisUtils.get(bizNumber + KEY_SCOPE_SUFFIX), SCOPE_BIZ_NUMBER)) {
+            throw new SpaceException(SpaceErrorCode.BIZ_NUMBER_VALIDATION_DOES_NOT_EXIST);
+        }
 
         ImageUtils.validateImages(images); // 이미지 검증 (개수, null 여부)
 
@@ -99,6 +111,9 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
         for (String url : imageUrls) {
             spaceImageRepository.save(ImageConverter.toSpaceImage(space, url));
         }
+
+        redisUtils.delete(bizNumber + KEY_SCOPE_SUFFIX);
+
         return SpaceConverter.toSpaceCreateResDTO(space);
     }
 
