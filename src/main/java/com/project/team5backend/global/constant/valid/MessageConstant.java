@@ -28,7 +28,8 @@ public class MessageConstant {
     public static final String BLANK_EXHIBITION_PRICE = "전시 가격 누락";
     // SPACE
     public static final String BLANK_SPACE_OPERATING_HOURS = "공간 운영 시간 누락";
-
+    //REVIEW
+    public static final String BLANK_REVIEW_RATE = "리뷰 점수 누락";
 
 
     // PATTERN EXCEPTION
