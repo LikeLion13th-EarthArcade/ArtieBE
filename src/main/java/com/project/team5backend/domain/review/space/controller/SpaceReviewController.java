@@ -8,16 +8,13 @@ import com.project.team5backend.domain.review.space.service.query.SpaceReviewQue
 import com.project.team5backend.global.SwaggerBody;
 import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.global.security.userdetails.CurrentUser;
+import com.project.team5backend.global.util.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -42,7 +39,7 @@ public class SpaceReviewController {
     @PostMapping(
             value = "/{spaceId}/reviews",
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    @Operation(summary = "공간 리뷰 생성")
+    @Operation(summary = "공간 리뷰 생성", description = "공간 리뷰 생성 API - 이미지 선택 안해도 생성 가능")
     public CustomResponse<SpaceReviewResDTO.SpaceReviewCreateResDTO> createSpaceReview(
             @AuthenticationPrincipal CurrentUser currentUser,
             @PathVariable Long spaceId,
@@ -54,11 +51,11 @@ public class SpaceReviewController {
 
     @Operation(summary = "공간 리뷰 목록 조회")
     @GetMapping("{spaceId}/reviews")
-    public CustomResponse<Page<SpaceReviewResDTO.SpaceReviewDetailResDTO>> getSpaceReviewList(
+    public CustomResponse<PageResponse<SpaceReviewResDTO.SpaceReviewDetailResDTO>> getSpaceReviewList(
             @PathVariable Long spaceId,
             @RequestParam(defaultValue = "0") int page
     ) {
-        return CustomResponse.onSuccess(spaceReviewQueryService.getSpaceReviewList(spaceId, page));
+        return CustomResponse.onSuccess(PageResponse.of(spaceReviewQueryService.getSpaceReviewList(spaceId, page)));
     }
 
     @Operation(summary = "공간 리뷰 상세 조회")

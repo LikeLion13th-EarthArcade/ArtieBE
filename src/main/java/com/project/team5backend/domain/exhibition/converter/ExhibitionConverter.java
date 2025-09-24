@@ -18,6 +18,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Objects;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ExhibitionConverter {
@@ -29,7 +30,7 @@ public class ExhibitionConverter {
                 .description(createReqDTO.description())
                 .startDate(createReqDTO.startDate())
                 .endDate(createReqDTO.endDate())
-                .operatingHours(createReqDTO.operatingHours())
+                .operatingInfo(createReqDTO.operatingStartHour() + "/" + createReqDTO.operatingEndHour() + "/" + createReqDTO.operatingOption())
                 .price(createReqDTO.price())
                 .websiteUrl(createReqDTO.websiteUrl())
                 .status(Status.PENDING)
@@ -54,7 +55,7 @@ public class ExhibitionConverter {
                 .build();
     }
 
-    public static ExhibitionFacility toCreateExhibitionFacility(Exhibition exhibition, Facility facility){
+    public static ExhibitionFacility toCreateExhibitionFacility(Exhibition exhibition, Facility facility) {
         return ExhibitionFacility.builder()
                 .exhibition(exhibition)
                 .facility(facility)
@@ -68,27 +69,17 @@ public class ExhibitionConverter {
                 .description(exhibition.getDescription())
                 .startDate(exhibition.getStartDate())
                 .endDate(exhibition.getEndDate())
-                .operatingHours(exhibition.getOperatingHours())
+                .operatingInfo(exhibition.getOperatingInfo())
                 .imageUrls(imageUrls)
                 .websiteUrl(exhibition.getWebsiteUrl())
-                .address(
-                        exhibition.getAddress() != null
-                                ? String.format("%s %s",
-                                exhibition.getAddress().getRoadAddress(),
-                                exhibition.getAddress().getDetail() != null ? exhibition.getAddress().getDetail() : "")
-                                : null
-                )
+                .address(formatAddress(exhibition.getAddress()))
                 .latitude(exhibition.getAddress().getLatitude())
                 .longitude(exhibition.getAddress().getLongitude())
                 .exhibitionCategory(exhibition.getExhibitionCategory())
                 .exhibitionType(exhibition.getExhibitionType())
                 .exhibitionMood(exhibition.getExhibitionMood())
                 .price(exhibition.getPrice())
-                .facilities(
-                        exhibition.getExhibitionFacilities().stream()
-                                .map(ef -> ef.getFacility().getName()) // Facility 엔티티의 name 사용
-                                .toList()
-                )
+                .facilities(extractFacility(exhibition))
                 .build();
     }
 
@@ -156,7 +147,7 @@ public class ExhibitionConverter {
                 .build();
     }
 
-    public static ExhibitionResDTO.ArtieRecommendationResDTO toArtieRecommendationResDTO(Exhibition exhibition,boolean isLiked, String thumbnail) {
+    public static ExhibitionResDTO.ArtieRecommendationResDTO toArtieRecommendationResDTO(Exhibition exhibition, boolean isLiked, String thumbnail) {
         return ExhibitionResDTO.ArtieRecommendationResDTO.builder()
                 .exhibitionId(exhibition.getId())
                 .title(exhibition.getTitle())
@@ -204,7 +195,7 @@ public class ExhibitionConverter {
                 .description(null)
                 .startDate(LocalDate.parse(exhibitionCrawlResDto.startDate(), formatter))
                 .endDate(LocalDate.parse(exhibitionCrawlResDto.endDate(), formatter))
-                .operatingHours(null)
+                .operatingInfo(null)
                 .price(null)
                 .websiteUrl(null)
                 .status(Status.PENDING)
@@ -220,5 +211,22 @@ public class ExhibitionConverter {
                 .address(address)
                 .user(user)
                 .build();
+    }
+
+    private static List<String> extractFacility(Exhibition exhibition) {
+        if (exhibition.getExhibitionFacilities() == null) {
+            return List.of(); // null-safe
+        }
+        return exhibition.getExhibitionFacilities().stream()
+                .map(ef -> ef.getFacility().getName())
+                .toList();
+    }
+
+    private static String formatAddress(Address address) {
+        if (address == null) return null;
+        return String.format("%s %s",
+                Objects.toString(address.getRoadAddress(), ""),
+                Objects.toString(address.getDetail(), "")
+        ).trim();
     }
 }

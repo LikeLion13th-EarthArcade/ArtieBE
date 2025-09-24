@@ -15,4 +15,9 @@ public class PatternConstant {
     // RESERVATION
     public static final String PHONE_NUMBER_PATTERN = "^\\d{11}$";
     public static final String RESERVATION_DATE_PATTERN = "^(19|20)\\d{2}-(0[1-9]|1[0-2])-(0[1-9]|[12]\\d|3[01])$";
+
+    // TEMP PASSWORD
+    public static final String LETTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
+    public static final String DIGITS = "0123456789";
+    public static final String SPECIALS = "!@#$%^*";
 }

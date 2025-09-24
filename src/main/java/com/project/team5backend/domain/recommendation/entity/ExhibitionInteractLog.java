@@ -3,7 +3,10 @@ package com.project.team5backend.domain.recommendation.entity;
 import com.project.team5backend.domain.recommendation.model.ActionType;
 import com.project.team5backend.global.entity.BaseOnlyCreateTimeEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name = "exhibition_interact_log")

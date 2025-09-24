@@ -8,9 +8,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
+import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Component;
 
-import static com.project.team5backend.global.constant.common.CommonConstant.*;
+import static com.project.team5backend.global.constant.common.CommonConstant.ACCESS_COOKIE_NAME;
+import static com.project.team5backend.global.constant.common.CommonConstant.REFRESH_COOKIE_NAME;
 import static com.project.team5backend.global.util.CookieUtils.createJwtCookies;
 import static com.project.team5backend.global.util.CookieUtils.getTokenFromCookies;
 
@@ -36,6 +38,11 @@ public class CustomLogoutHandler implements LogoutHandler {
         createJwtCookies(response, REFRESH_COOKIE_NAME, null, 0);
 
         customCookieCsrfTokenRepository.invalidateCsrfToken(response);
+
+        // 로그아웃 시 새로운 csrf 토큰 발급
+        CsrfToken csrfToken = customCookieCsrfTokenRepository.generateToken(request);
+        customCookieCsrfTokenRepository.saveToken(csrfToken, request, response);
+
         log.info("[ CustomLogoutHandler ] 쿠키 삭제 완료");
     }
 }

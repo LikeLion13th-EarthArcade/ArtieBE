@@ -33,7 +33,7 @@ public class SpaceReviewQueryServiceImpl implements SpaceReviewQueryService {
 
         List<String> imageUrls = spaceReview.getSpaceReviewImages().stream()
                 .map(SpaceReviewImage::getFileKey)
-                .map(s3UrlResolver::toImageUrl)
+                .map(s3UrlResolver::toFileUrl)
                 .toList();
         return SpaceReviewConverter.toSpaceReviewDetailResDTO(spaceReview, imageUrls);
     }
@@ -45,7 +45,7 @@ public class SpaceReviewQueryServiceImpl implements SpaceReviewQueryService {
         return spaceReviewPage.map(spaceReview -> {
             List<String> imageUrls = spaceReview.getSpaceReviewImages().stream()
                     .map(SpaceReviewImage::getFileKey)
-                    .map(s3UrlResolver::toImageUrl)
+                    .map(s3UrlResolver::toFileUrl)
                     .toList();
             return SpaceReviewConverter.toSpaceReviewDetailResDTO(spaceReview, imageUrls);
         });

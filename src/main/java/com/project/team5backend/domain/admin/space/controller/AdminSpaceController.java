@@ -9,7 +9,6 @@ import com.project.team5backend.global.util.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,14 +34,19 @@ public class AdminSpaceController {
         return CustomResponse.onSuccess(adminSpaceCommandService.rejectSpace(spaceId));
     }
 
-    @Operation(summary = "공간등록 관리 ")
+    @Operation(summary = "공간등록 관리 ",
+            description = "현재 서비스에서 생성된 모든 공간을 검색합니다. <br> " +
+            "[RequestParam statusGroup] : [ALL], [PENDING], [DONE] 3가지 선택<br><br>" +
+            "ALL : 모든 상태의 공간 <br><br>" +
+            "PENDING : 대기중 <br>PENDING(호스트의 확정 대기) <br><br>" +
+            "DONE : 완료됨 <br>APPROVED(호스트의 공간 승인 확정), REJECTED(호스트의 공간 거절 확정), <br>")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping
-    public CustomResponse<PageResponse<AdminSpaceResDTO.SpaceSummaryResDTO>> getAdminSpaceList(
+    public CustomResponse<PageResponse<AdminSpaceResDTO.SpaceSummaryResDTO>> getSpaceList(
             @RequestParam(name = "status", required = false, defaultValue = "ALL") StatusGroup status,
             @RequestParam(name = "page", defaultValue = "0") int page
     ) {
-        return CustomResponse.onSuccess(PageResponse.of(adminSpaceQueryService.getSummarySpaceList(status, page)));
+        return CustomResponse.onSuccess(PageResponse.of(adminSpaceQueryService.getSpaceList(status, page)));
     }
 
     @Operation(summary = "공간 상세 보기 (admin)", description = "상태에 상관없이 공간 상세 보기 가능")

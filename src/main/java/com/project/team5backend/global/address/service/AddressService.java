@@ -1,12 +1,12 @@
 // src/main/java/com/project/team5backend/global/address/service/AddressService.java
 package com.project.team5backend.global.address.service;
 
-import com.project.team5backend.global.client.kakao.KakaoLocalClient;
 import com.project.team5backend.global.address.converter.AddressConverter;
 import com.project.team5backend.global.address.dto.request.AddressReqDTO;
 import com.project.team5backend.global.address.dto.response.AddressResDTO;
 import com.project.team5backend.global.address.exception.AddressErrorCode;
 import com.project.team5backend.global.address.exception.AddressException;
+import com.project.team5backend.global.client.kakao.KakaoLocalClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;

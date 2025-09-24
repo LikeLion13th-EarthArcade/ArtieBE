@@ -20,7 +20,7 @@ public class AuthController {
 
     private final AuthCommandService authCommandService;
 
-    @Operation(summary = "로그인")
+    @Operation(summary = "로그인", description = "새로운 csrf 토큰이 발급됩니다")
     @PostMapping("/login")
     public CustomResponse<?> login(
             @RequestBody AuthReqDTO.AuthLoginReqDTO authLoginDTO
@@ -28,7 +28,14 @@ public class AuthController {
         return null;
     }
 
-    @Operation(summary = "비밀번호 변경")
+    @Operation(summary = "로그아웃", description = "모든 쿠키가 삭제되고, 새로운 csrf 토큰이 발급됩니다")
+    @PostMapping("/logout")
+    public CustomResponse<?> logout() {
+        return null;
+    }
+
+    @Operation(summary = "비밀번호 변경",
+            description = "현재 비밀번호와 다르거나, 비밀번호 확인이 일치하지 않거나, 바꾸려는 비밀번호가 현재 비밀번호와 일치할 경우 예외")
     @PatchMapping("/me/password")
     public CustomResponse<String> changePassword(
             @AuthenticationPrincipal CurrentUser currentUser,
@@ -37,4 +44,13 @@ public class AuthController {
         authCommandService.changePassword(currentUser.getId(), authPasswordChangeReqDTO);
         return CustomResponse.onSuccess("비밀번호 변경 완료");
     }
+
+//    @Operation(summary = "임시 비밀번호 발급", description = "비밀번호 변경 휴대폰 인증 완료 후 실행 <br> 이메일 전송 구현 완료했지만, 비밀번호는 일단 ResBody로 제공")
+//    @PostMapping("/temp-password")
+//    public CustomResponse<String> resetPassword(
+//            @RequestBody @Valid AuthReqDTO.AuthTempPasswordReqDTO authTempPasswordReqDto
+//    ) {
+//        String password = authCommandService.tempPassword(authTempPasswordReqDto);
+//        return CustomResponse.onSuccess("임시 비빌번호가 이메일로 발송되었습니다. " + password);
+//    }
 }

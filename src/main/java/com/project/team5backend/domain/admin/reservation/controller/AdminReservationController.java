@@ -29,9 +29,10 @@ public class AdminReservationController {
             description = "현재 서비스에서 생성된 모든 예약을 검색합니다. <br> " +
                     "[RequestParam statusGroup] : [ALL], [PENDING], [DONE] 3가지 선택<br><br>" +
                     "ALL : 모든 상태의 예약 <br><br>" +
-                    "PENDING : 진행중 <br>PENDING(호스트의 확정 대기), BOOKER_CANCEL_REQUESTED(예약자 취소 요청) <br><br>" +
-                    "DONE : 완료됨 <br>APPROVED(호스트의 예약 확정), CANCELED_BY_BOOKER(예약자 취소 요청 확정), <br>" +
-                    "BOOKER_CANCEL_REJECTED(예약자 취소 요청 거절), CANCELED_BY_HOST(호스트의 예약 거절(예약 확정됐는데, 호스트 책임의 거절))")
+                    "PENDING : 진행중 <br>PENDING(호스트 승인 대기), BOOKER_CANCEL_REQUESTED(예약자의 취소 요청됨) <br><br>" +
+                    "DONE : 완료됨 <br>APPROVED(호스트 예약 승인), REJECTED(PENDING 상태에서 호스트의 거절), CANCELED_BY_BOOKER(예약자 취소 요청 승인), <br>" +
+                    "BOOKER_CANCEL_REJECTED(예약자 취소 요청 거부), CANCELED_BY_HOST(호스트의 예약 거절(예약 확정됐는데, 호스트 책임의 거절))<br><br>" +
+                    "Reservation Status 참고 : https://www.notion.so/Reservation-2782a6b086de80ca8123d0ea8d57edbb")
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping()
     public CustomResponse<PageResponse<ReservationResDTO.ReservationDetailResDTO>> getReservationList(
@@ -40,6 +41,6 @@ public class AdminReservationController {
             @RequestParam(defaultValue = "10") int size
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        return CustomResponse.onSuccess(adminReservationQueryService.getReservationList(statusGroup, pageable));
+        return CustomResponse.onSuccess(PageResponse.of(adminReservationQueryService.getReservationList(statusGroup, pageable)));
     }
 }

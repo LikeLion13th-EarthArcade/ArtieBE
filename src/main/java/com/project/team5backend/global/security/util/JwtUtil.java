@@ -22,7 +22,8 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
-import static com.project.team5backend.global.constant.redis.RedisConstant.*;
+import static com.project.team5backend.global.constant.redis.RedisConstant.KEY_BLACK_LIST_SUFFIX;
+import static com.project.team5backend.global.constant.redis.RedisConstant.KEY_REFRESH_SUFFIX;
 
 @Slf4j
 @Component

@@ -27,8 +27,6 @@ import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.address.converter.AddressConverter;
 import com.project.team5backend.global.address.dto.response.AddressResDTO;
 import com.project.team5backend.global.address.service.AddressService;
-import com.project.team5backend.global.apiPayload.code.GeneralErrorCode;
-import com.project.team5backend.global.apiPayload.exception.CustomException;
 import com.project.team5backend.global.entity.embedded.Address;
 import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.global.infra.s3.S3FileStorageAdapter;
@@ -65,7 +63,7 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
         ImageUtils.validateImages(images); // 이미지 검증 (개수, null 여부)
 
         User user = userRepository.findByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new CustomException(GeneralErrorCode.NOT_FOUND_404));
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
         AddressResDTO.AddressCreateResDTO addressResDTO = addressService.resolve(exhibitionCreateReqDTO.address());
         Address address = AddressConverter.toAddress(addressResDTO);

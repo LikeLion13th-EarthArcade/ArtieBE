@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.services.s3.S3Client;
@@ -27,7 +28,9 @@ public class S3FileStorageAdapter implements FileStoragePort {
 
     @Override
     public String upload(MultipartFile file, String dirName) {
-        String fileKey = dirName + "/" + UUID.randomUUID() + "_" + file.getOriginalFilename();
+        String extension = StringUtils.getFilenameExtension(file.getOriginalFilename());
+        String fileKey = dirName + "/" + UUID.randomUUID() + (extension != null ? "." + extension : "");
+
         try {
             PutObjectRequest putObjectRequest = PutObjectRequest.builder()
                     .bucket(bucketName)

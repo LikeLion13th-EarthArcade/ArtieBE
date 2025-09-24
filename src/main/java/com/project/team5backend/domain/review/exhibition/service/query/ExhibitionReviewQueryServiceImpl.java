@@ -1,12 +1,12 @@
 package com.project.team5backend.domain.review.exhibition.service.query;
 
+import com.project.team5backend.domain.image.entity.ExhibitionReviewImage;
 import com.project.team5backend.domain.review.exhibition.converter.ExhibitionReviewConverter;
 import com.project.team5backend.domain.review.exhibition.dto.response.ExhibitionReviewResDTO;
 import com.project.team5backend.domain.review.exhibition.entity.ExhibitionReview;
 import com.project.team5backend.domain.review.exhibition.exception.ExhibitionReviewErrorCode;
 import com.project.team5backend.domain.review.exhibition.exception.ExhibitionReviewException;
 import com.project.team5backend.domain.review.exhibition.repository.ExhibitionReviewRepository;
-import com.project.team5backend.domain.image.entity.ExhibitionReviewImage;
 import com.project.team5backend.global.util.S3UrlResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +35,7 @@ public class ExhibitionReviewQueryServiceImpl implements ExhibitionReviewQuerySe
 
         List<String> imageUrls = exhibitionReview.getExhibitionReviewImages().stream()
                 .map(ExhibitionReviewImage::getFileKey)
-                .map(s3UrlResolver::toImageUrl)
+                .map(s3UrlResolver::toFileUrl)
                 .toList();
         return ExhibitionReviewConverter.toExReviewDetailResDTO(exhibitionReview, imageUrls);
     }
@@ -49,7 +49,7 @@ public class ExhibitionReviewQueryServiceImpl implements ExhibitionReviewQuerySe
         return reviewPage.map(review -> {
             List<String> imageUrls = review.getExhibitionReviewImages().stream()
                     .map(ExhibitionReviewImage::getFileKey)
-                    .map(s3UrlResolver::toImageUrl)
+                    .map(s3UrlResolver::toFileUrl)
                     .toList();
             return ExhibitionReviewConverter.toExReviewDetailResDTO(review, imageUrls);
         });

@@ -1,7 +1,6 @@
 package com.project.team5backend.domain.review.exhibition.repository;
 
 import com.project.team5backend.domain.review.exhibition.entity.ExhibitionReview;
-import com.project.team5backend.domain.review.space.entity.SpaceReview;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -9,7 +8,6 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-import java.util.List;
 import java.util.Optional;
 
 public interface ExhibitionReviewRepository extends JpaRepository<ExhibitionReview, Long> {

@@ -1,7 +1,6 @@
 package com.project.team5backend.global.validation.controller;
 
 import com.project.team5backend.global.apiPayload.CustomResponse;
-import com.project.team5backend.global.biznumber.dto.response.BizNumberResDTO;
 import com.project.team5backend.global.mail.MailType;
 import com.project.team5backend.global.validation.dto.request.ValidationReqDTO;
 import com.project.team5backend.global.validation.dto.response.ValidationResDTO;
@@ -40,10 +39,19 @@ public class ValidationController {
         return CustomResponse.onSuccess("메일 발송 성공! code: " + code);
     }
 
+//    @Operation(summary = "임시 비밀번호 발급 이메일 인증 코드 발송")
+//    @PostMapping("/code/temp-password")
+//    public CustomResponse<String> sendTempPasswordCode(
+//            @RequestBody @Valid ValidationReqDTO.EmailCodeReqDTO emailCodeReqDTO
+//    ) {
+//        String code = validationService.sendCode(MailType.TEMP_PASSWORD_VERIFICATION, SCOPE_TEMP_PASSWORD, emailCodeReqDTO);
+//        return CustomResponse.onSuccess("메일 발송 성공! code: " + code);
+//    }
+
     @Operation(summary = "이메일 인증 코드 검증",
             description = "각 코드 요청에 따른 인증 정보를 서버에 15분간 저장<br>" +
                     "15분이 지나면 재인증 필요 -> 코드 인증을 필요로 하는 모든 서비스 이용 불가<br>" +
-                    "인증 코드는 정수 6자리 and 적절한 이메일 형식 -> 아닐시 예외")
+                    "인증 코드는 정수 6자리이며, 적절한 이메일 형식 -> 아닐시 예외")
     @PostMapping("/code/confirmation")
     public CustomResponse<String> verifyCode(
             @RequestBody @Valid ValidationReqDTO.EmailCodeValidationReqDTO emailCodeValidationReqDTO
@@ -52,7 +60,8 @@ public class ValidationController {
         return CustomResponse.onSuccess("이메일 인증 성공!");
     }
 
-    @Operation(summary = "사업자 번호 검증")
+    @Operation(summary = "사업자 번호 검증",
+            description = "사업자 등록이 유효한 경우 isValid = true, 만료된 경우 isExpired = true")
     @PostMapping("/biz-number/confirmation")
     public CustomResponse<ValidationResDTO.BizNumberValidationResDTO> verifyBizNumber(
             @RequestBody @Valid ValidationReqDTO.BizNumberValidationReqDTO bizNumberValidationReqDTO

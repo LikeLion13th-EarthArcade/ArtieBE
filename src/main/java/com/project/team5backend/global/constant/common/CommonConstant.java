@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class CommonConstant {
 
+    // TEMP PASSWORD
+    public static final int PASSWORD_SIZE = 10;
+
     // COOKIE NAME
     public static final String ACCESS_COOKIE_NAME = "access-token";
     public static final String REFRESH_COOKIE_NAME = "refresh-token";

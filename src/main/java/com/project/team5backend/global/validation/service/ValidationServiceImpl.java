@@ -23,6 +23,7 @@ import java.util.Objects;
 import java.util.concurrent.TimeUnit;
 
 import static com.project.team5backend.global.constant.redis.RedisConstant.*;
+import static com.project.team5backend.global.constant.scope.ScopeConstant.SCOPE_BIZ_NUMBER;
 import static com.project.team5backend.global.constant.valid.MessageConstant.BIZ_NUMBER_IS_NOT_REGISTERED;
 import static com.project.team5backend.global.constant.valid.MessageConstant.BLANK;
 
@@ -48,6 +49,13 @@ public class ValidationServiceImpl implements ValidationService {
         // 회원 가입 이메일 인증인데, 이미 존재하는 이메일이거나, 누군가 인증 확인을 받아 가입을 진행중인 이메일로 인증을 한 경우
         if (isEmailAlreadyExist && isEmailVerification) {
             throw new ValidationException(ValidationErrorCode.ALREADY_USED_EMAIL);
+        }
+
+        boolean isTempPasswordVerification = Objects.equals(mailType, MailType.TEMP_PASSWORD_VERIFICATION);
+        boolean emailExists = userRepository.findByEmail(email).isPresent();
+        // 비밀번호 찾기 이메일 인증인데, 해당 이메일로 가입된 계정이 없는 경우
+        if (isTempPasswordVerification && !emailExists) {
+            throw new ValidationException(ValidationErrorCode.ACCOUNT_NOT_FOUND);
         }
 
         // 해당 이메일로 인증 번호를 보낸 적이 있다면 10초 대기
@@ -104,6 +112,12 @@ public class ValidationServiceImpl implements ValidationService {
         ValidationResDTO.BizNumberValidationResDTO.Info info = ValidationConverter.toInfo(infoItem);
         boolean isValid = !Objects.equals(info.taxType(), BIZ_NUMBER_IS_NOT_REGISTERED);
         boolean isExpired = !Objects.equals(info.endAt(), BLANK);
+
+        // 성공시 성공 정보를 redis에 저장
+        if (isValid && !isExpired) {
+            String bizNumber = bizNumberValidationReqDTO.bizNumber();
+            redisUtils.save(bizNumber + KEY_SCOPE_SUFFIX, SCOPE_BIZ_NUMBER, SCOPE_EXP_TIME, TimeUnit.MILLISECONDS);
+        }
 
         return ValidationConverter.toBizNumberValidationResDTO(info, isValid, isExpired);
     }

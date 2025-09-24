@@ -2,9 +2,11 @@ package com.project.team5backend.domain.admin.exhibition.converter;
 
 import com.project.team5backend.domain.admin.exhibition.dto.response.AdminExhibitionResDTO;
 import com.project.team5backend.domain.exhibition.entity.Exhibition;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
-
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class AdminExhibitionConverter {
     public static AdminExhibitionResDTO.ExhibitionSummaryResDTO toExhibitionSummaryResDTO(Exhibition exhibition){
         return AdminExhibitionResDTO.ExhibitionSummaryResDTO.builder()
@@ -29,7 +31,7 @@ public class AdminExhibitionConverter {
                 .title(exhibition.getTitle())
                 .imageUrls(imageUrls)
                 .description(exhibition.getDescription())
-                .operatingHours(exhibition.getOperatingHours())
+                .operatingInfo(exhibition.getOperatingInfo())
                 .startDate(exhibition.getStartDate())
                 .endDate(exhibition.getEndDate())
                 .detailAddress(exhibition.getAddress() != null ? exhibition.getAddress().getDetail() : null)

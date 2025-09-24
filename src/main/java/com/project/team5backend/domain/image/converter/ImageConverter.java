@@ -1,11 +1,11 @@
 package com.project.team5backend.domain.image.converter;
 
 import com.project.team5backend.domain.exhibition.entity.Exhibition;
-import com.project.team5backend.domain.review.exhibition.entity.ExhibitionReview;
 import com.project.team5backend.domain.image.entity.ExhibitionImage;
 import com.project.team5backend.domain.image.entity.ExhibitionReviewImage;
-import com.project.team5backend.domain.image.entity.SpaceReviewImage;
 import com.project.team5backend.domain.image.entity.SpaceImage;
+import com.project.team5backend.domain.image.entity.SpaceReviewImage;
+import com.project.team5backend.domain.review.exhibition.entity.ExhibitionReview;
 import com.project.team5backend.domain.review.space.entity.SpaceReview;
 import com.project.team5backend.domain.space.entity.Space;
 import lombok.AccessLevel;

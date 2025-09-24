@@ -1,6 +1,5 @@
 package com.project.team5backend.domain.space.service.query;
 
-import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.domain.image.repository.SpaceImageRepository;
 import com.project.team5backend.domain.space.converter.SpaceConverter;
 import com.project.team5backend.domain.space.dto.response.SpaceResDTO;
@@ -11,6 +10,7 @@ import com.project.team5backend.domain.space.entity.enums.SpaceType;
 import com.project.team5backend.domain.space.exception.SpaceErrorCode;
 import com.project.team5backend.domain.space.exception.SpaceException;
 import com.project.team5backend.domain.space.repository.SpaceRepository;
+import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.global.util.PageResponse;
 import com.project.team5backend.global.util.S3UrlResolver;
@@ -48,7 +48,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
                 .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
 
         List<String> imageUrls = spaceImageRepository.findImageUrlsBySpaceId(spaceId).stream()
-                .map(s3UrlResolver::toImageUrl)
+                .map(s3UrlResolver::toFileUrl)
                 .toList();
 
         return SpaceConverter.toSpaceDetailResDTO(space, imageUrls);
@@ -66,7 +66,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
                 requestedStartDate, requestedEndDate, district, size, type, mood, facilities, sort, pageable);
         Page<SpaceResDTO.SpaceSearchResDTO> spaceSearchResDTOPage = spacePage
                 .map(space -> {
-                    String thumbnail = s3UrlResolver.toImageUrl(space.getThumbnail());
+                    String thumbnail = s3UrlResolver.toFileUrl(space.getThumbnail());
                     return SpaceConverter.toSpaceSearchResDTO(space, thumbnail);
                 });
 

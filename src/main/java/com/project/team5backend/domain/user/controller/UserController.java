@@ -2,14 +2,12 @@ package com.project.team5backend.domain.user.controller;
 
 
 import com.project.team5backend.domain.user.dto.request.UserReqDTO;
-
 import com.project.team5backend.domain.user.dto.response.UserResDTO;
 import com.project.team5backend.domain.user.service.command.UserCommandService;
 import com.project.team5backend.domain.user.service.query.UserQueryService;
 import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.global.security.repository.CustomCookieCsrfTokenRepository;
 import com.project.team5backend.global.security.userdetails.CurrentUser;
-import com.project.team5backend.global.security.util.JwtUtil;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
@@ -50,7 +48,7 @@ public class UserController {
         return CustomResponse.onSuccess(HttpStatus.CREATED, "회원 가입 완료");
     }
 
-    @Operation(summary = "회원 정보 조회")
+    @Operation(summary = "회원 정보 조회", description = "이름과 이메일")
     @GetMapping("/me")
     public CustomResponse<UserResDTO.UserProfileResDTO> getUserProfile(
             @AuthenticationPrincipal CurrentUser currentUser
