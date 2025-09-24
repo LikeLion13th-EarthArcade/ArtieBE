@@ -214,10 +214,10 @@ public class ExhibitionConverter {
                 .build();
     }
 
-    public static ExhibitionResDTO.ExhibitionLikeSummaryResDTO toExhibitionLikeSummaryResDTO(Exhibition exhibition, String thumbnail, boolean isLiked) {
+    public static ExhibitionResDTO.ExhibitionLikeSummaryResDTO toExhibitionLikeSummaryResDTO(Exhibition exhibition, String thumbnail, boolean isLiked, boolean opening) {
         return ExhibitionResDTO.ExhibitionLikeSummaryResDTO.builder()
                 .exhibitionId(exhibition.getId())
-                .opening(exhibition.getStartDate())
+                .opening(opening)
                 .title(exhibition.getTitle())
                 .thumbnail(thumbnail)
                 .exhibitionCategory(exhibition.getExhibitionCategory())
