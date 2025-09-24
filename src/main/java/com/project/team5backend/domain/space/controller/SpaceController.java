@@ -78,8 +78,25 @@ public class SpaceController {
         return CustomResponse.onSuccess(spaceQueryService.getSpaceDetail(spaceId));
     }
 
-    @Operation(summary = "공간 검색", description = "공간 검색하면 한페이지에 4개의 전시와 서울 시청 중심의 위도 경도 반환")
-    @GetMapping("/search")
+    @Operation(
+            summary = "공간 검색",
+            description = "공간 검색 API입니다.\n"
+                    + "- 한 페이지에 **4개의 공간**이 반환됩니다.\n"
+                    + "- 기본 좌표는 서울시청을 중심으로 합니다.\n\n"
+                    + "- 요청 파라미터 설명\n"
+                    + "- `requestedStartDate` : 대여 시작일 (예: `2025-09-12`)\n"
+                    + "- `requestedEndDate` : 대여 종료일 (예: `2025-09-13`)\n"
+                    + "- `district` : 행정구역 (옵션)\n"
+                    + "- `size` : 공간 크기 (옵션)\n"
+                    + "- `type` : 공간 유형 (옵션)\n"
+                    + "- `mood` : 공간 분위기 (옵션)\n"
+                    + "- `facilities` : 시설 목록 (예: WIFI, RESTROOM, STROLLER_RENTAL)\n"
+                    + "- `sort` : 정렬 기준\n"
+                    + "    - `POPULAR` (기본값, 리뷰 많은 순)\n"
+                    + "    - `NEW` (최신순)\n"
+                    + "    - `OLD` (오래된순)\n"
+                    + "- `page` : 페이지 번호 (기본값 0)"
+    )    @GetMapping("/search")
     public CustomResponse<SpaceResDTO.SpaceSearchPageResDTO> searchSpaces(
             @Parameter(description = "대여 시작일", example = "2025-09-12")
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate requestedStartDate,
