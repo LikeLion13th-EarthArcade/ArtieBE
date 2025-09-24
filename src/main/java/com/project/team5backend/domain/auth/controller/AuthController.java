@@ -20,7 +20,7 @@ public class AuthController {
 
     private final AuthCommandService authCommandService;
 
-    @Operation(summary = "로그인")
+    @Operation(summary = "로그인", description = "새로운 csrf 토큰이 발급됩니다")
     @PostMapping("/login")
     public CustomResponse<?> login(
             @RequestBody AuthReqDTO.AuthLoginReqDTO authLoginDTO
@@ -28,13 +28,14 @@ public class AuthController {
         return null;
     }
 
-    @Operation(summary = "로그아웃")
+    @Operation(summary = "로그아웃", description = "모든 쿠키가 삭제되고, 새로운 csrf 토큰이 발급됩니다")
     @PostMapping("/logout")
     public CustomResponse<?> logout() {
         return null;
     }
 
-    @Operation(summary = "비밀번호 변경")
+    @Operation(summary = "비밀번호 변경",
+            description = "현재 비밀번호와 다르거나, 비밀번호 확인이 일치하지 않거나, 바꾸려는 비밀번호가 현재 비밀번호와 일치할 경우 예외")
     @PatchMapping("/me/password")
     public CustomResponse<String> changePassword(
             @AuthenticationPrincipal CurrentUser currentUser,
