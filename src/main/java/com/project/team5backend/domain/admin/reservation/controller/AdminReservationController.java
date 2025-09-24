@@ -41,6 +41,6 @@ public class AdminReservationController {
             @RequestParam(defaultValue = "10") int size
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        return CustomResponse.onSuccess(adminReservationQueryService.getReservationList(statusGroup, pageable));
+        return CustomResponse.onSuccess(PageResponse.of(adminReservationQueryService.getReservationList(statusGroup, pageable)));
     }
 }
