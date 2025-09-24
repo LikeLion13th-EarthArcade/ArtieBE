@@ -2,12 +2,10 @@ package com.project.team5backend.domain.exhibition.dto.request;
 
 
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionCategory;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionMood;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionType;
 import com.project.team5backend.global.address.dto.request.AddressReqDTO;
-import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
@@ -32,10 +30,10 @@ public class ExhibitionReqDTO {
             LocalDate endDate,
 
             @NotNull(message = BLANK_EXHIBITION_OPERATING_HOURS)
-            LocalTime operatingStartHours,
+            LocalTime operatingStartHour,
 
             @NotNull(message = BLANK_EXHIBITION_OPERATING_HOURS)
-            LocalTime operatingEndHours,
+            LocalTime operatingEndHour,
 
             String operatingOption,
 

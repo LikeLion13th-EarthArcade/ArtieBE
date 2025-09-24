@@ -30,7 +30,7 @@ public class AdminSpaceResDTO {
             String name,
             SpaceVerificationResDTO spaceVerificationResDTO,
             String address,
-            String operatingHours,
+            String operatingInfo,
             SpaceSize spaceSize,
             SpaceMood spaceMood,
             String description,

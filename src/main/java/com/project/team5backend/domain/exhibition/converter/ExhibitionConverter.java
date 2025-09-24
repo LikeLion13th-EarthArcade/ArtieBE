@@ -30,7 +30,7 @@ public class ExhibitionConverter {
                 .description(createReqDTO.description())
                 .startDate(createReqDTO.startDate())
                 .endDate(createReqDTO.endDate())
-                .operatingInfo(createReqDTO.operatingStartHours() + "/" + createReqDTO.operatingEndHours() + "/" + createReqDTO.operatingOption())
+                .operatingInfo(createReqDTO.operatingStartHour() + "/" + createReqDTO.operatingEndHour() + "/" + createReqDTO.operatingOption())
                 .price(createReqDTO.price())
                 .websiteUrl(createReqDTO.websiteUrl())
                 .status(Status.PENDING)

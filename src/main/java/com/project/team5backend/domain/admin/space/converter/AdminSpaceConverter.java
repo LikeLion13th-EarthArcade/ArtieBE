@@ -40,7 +40,7 @@ public class AdminSpaceConverter {
                 .name(space.getName())
                 .spaceVerificationResDTO(toVerificationResDTO(spaceVerification, businessLicenseFile, buildingRegisterFile))
                 .address(space.getAddress().getRoadAddress())
-                .operatingHours(space.getOperatingHours())
+                .operatingInfo(space.getOperatingInfo())
                 .spaceSize(space.getSpaceSize())
                 .spaceMood(space.getSpaceMood())
                 .description(space.getDescription())
