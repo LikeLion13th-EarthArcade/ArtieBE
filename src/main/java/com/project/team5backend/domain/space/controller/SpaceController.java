@@ -10,6 +10,7 @@ import com.project.team5backend.domain.space.service.query.SpaceQueryService;
 import com.project.team5backend.global.SwaggerBody;
 import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.global.entity.enums.Sort;
+import com.project.team5backend.global.entity.enums.StatusGroup;
 import com.project.team5backend.global.security.userdetails.CurrentUser;
 import com.project.team5backend.global.util.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -141,5 +142,17 @@ public class SpaceController {
     ) {
         Pageable pageable = PageRequest.of(page, size);
         return CustomResponse.onSuccess(PageResponse.of(spaceQueryService.getInterestedSpaces(currentUser.getId(), pageable)));
+    }
+
+    @Operation(summary = "내가 등록한 공간")
+    @GetMapping("/my")
+    public CustomResponse<PageResponse<SpaceResDTO.SpaceDetailResDTO>> getMySpaces(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @RequestParam(required = false) StatusGroup statusGroup,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, org.springframework.data.domain.Sort.by("createdAt").descending());
+        return CustomResponse.onSuccess(PageResponse.of(spaceQueryService.getMySpace(currentUser.getId(), statusGroup, pageable)));
     }
 }

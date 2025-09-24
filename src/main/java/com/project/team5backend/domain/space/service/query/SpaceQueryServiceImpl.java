@@ -1,7 +1,5 @@
 package com.project.team5backend.domain.space.service.query;
 
-import com.project.team5backend.domain.exhibition.converter.ExhibitionConverter;
-import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.image.repository.SpaceImageRepository;
 import com.project.team5backend.domain.space.converter.SpaceConverter;
 import com.project.team5backend.domain.space.dto.response.SpaceResDTO;
@@ -19,6 +17,7 @@ import com.project.team5backend.domain.user.exception.UserException;
 import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.global.entity.enums.Status;
+import com.project.team5backend.global.entity.enums.StatusGroup;
 import com.project.team5backend.global.util.PageResponse;
 import com.project.team5backend.global.util.S3UrlResolver;
 import lombok.RequiredArgsConstructor;
@@ -92,6 +91,22 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
         Page<Space> interestedSpaces = spaceRepository.findByIdIn(interestedSpaceIds, pageable);
 
         return interestedSpaces.map(space -> {
+            List<String> imageUrls = spaceImageRepository.findImageUrlsBySpaceId(space.getId())
+                    .stream()
+                    .map(s3UrlResolver::toFileUrl)
+                    .toList();
+
+            return SpaceConverter.toSpaceDetailResDTO(space, imageUrls);
+        });
+    }
+
+    public Page<SpaceResDTO.SpaceDetailResDTO> getMySpace(long userId, StatusGroup statusGroup, Pageable pageable) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+
+        Page<Space> spacePage = spaceRepository.findByUserWithFilters(user, statusGroup, pageable);
+
+        return spacePage.map(space -> {
             List<String> imageUrls = spaceImageRepository.findImageUrlsBySpaceId(space.getId())
                     .stream()
                     .map(s3UrlResolver::toFileUrl)

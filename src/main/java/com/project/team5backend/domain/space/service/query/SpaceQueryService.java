@@ -1,10 +1,12 @@
 package com.project.team5backend.domain.space.service.query;
 
 import com.project.team5backend.domain.space.dto.response.SpaceResDTO;
+import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.space.entity.enums.SpaceMood;
 import com.project.team5backend.domain.space.entity.enums.SpaceSize;
 import com.project.team5backend.domain.space.entity.enums.SpaceType;
 import com.project.team5backend.global.entity.enums.Sort;
+import com.project.team5backend.global.entity.enums.StatusGroup;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -17,4 +19,6 @@ public interface SpaceQueryService {
     SpaceResDTO.SpaceSearchPageResDTO searchSpace(LocalDate requestedStartDate, LocalDate requestedEndDate, String district, SpaceSize size, SpaceType type, SpaceMood mood, List<String> facilities, Sort sort, int page);
 
     Page<SpaceResDTO.SpaceDetailResDTO> getInterestedSpaces(long userId, Pageable pageable);
+
+    Page<SpaceResDTO.SpaceDetailResDTO> getMySpace(long userId, StatusGroup statusGroup, Pageable pageable);
 }
