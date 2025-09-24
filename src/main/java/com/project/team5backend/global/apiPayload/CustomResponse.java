@@ -13,7 +13,7 @@ import org.springframework.http.HttpStatus;
 public class CustomResponse<T> {
 
     @JsonProperty("isSuccess") // isSuccess라는 변수라는 것을 명시하는 Annotation
-    private boolean isSuccess;
+    private boolean success;
 
     @JsonProperty("code")
     private String code;
