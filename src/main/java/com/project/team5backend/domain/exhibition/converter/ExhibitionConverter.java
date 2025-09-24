@@ -30,7 +30,7 @@ public class ExhibitionConverter {
                 .description(createReqDTO.description())
                 .startDate(createReqDTO.startDate())
                 .endDate(createReqDTO.endDate())
-                .operatingHours(createReqDTO.operatingHours())
+                .operatingInfo(createReqDTO.operatingStartHours() + "/" + createReqDTO.operatingEndHours() + "/" + createReqDTO.operatingOption())
                 .price(createReqDTO.price())
                 .websiteUrl(createReqDTO.websiteUrl())
                 .status(Status.PENDING)
@@ -55,7 +55,7 @@ public class ExhibitionConverter {
                 .build();
     }
 
-    public static ExhibitionFacility toCreateExhibitionFacility(Exhibition exhibition, Facility facility){
+    public static ExhibitionFacility toCreateExhibitionFacility(Exhibition exhibition, Facility facility) {
         return ExhibitionFacility.builder()
                 .exhibition(exhibition)
                 .facility(facility)
@@ -69,7 +69,7 @@ public class ExhibitionConverter {
                 .description(exhibition.getDescription())
                 .startDate(exhibition.getStartDate())
                 .endDate(exhibition.getEndDate())
-                .operatingHours(exhibition.getOperatingHours())
+                .operatingInfo(exhibition.getOperatingInfo())
                 .imageUrls(imageUrls)
                 .websiteUrl(exhibition.getWebsiteUrl())
                 .address(formatAddress(exhibition.getAddress()))
@@ -147,7 +147,7 @@ public class ExhibitionConverter {
                 .build();
     }
 
-    public static ExhibitionResDTO.ArtieRecommendationResDTO toArtieRecommendationResDTO(Exhibition exhibition,boolean isLiked, String thumbnail) {
+    public static ExhibitionResDTO.ArtieRecommendationResDTO toArtieRecommendationResDTO(Exhibition exhibition, boolean isLiked, String thumbnail) {
         return ExhibitionResDTO.ArtieRecommendationResDTO.builder()
                 .exhibitionId(exhibition.getId())
                 .title(exhibition.getTitle())
@@ -195,7 +195,7 @@ public class ExhibitionConverter {
                 .description(null)
                 .startDate(LocalDate.parse(exhibitionCrawlResDto.startDate(), formatter))
                 .endDate(LocalDate.parse(exhibitionCrawlResDto.endDate(), formatter))
-                .operatingHours(null)
+                .operatingInfo(null)
                 .price(null)
                 .websiteUrl(null)
                 .status(Status.PENDING)

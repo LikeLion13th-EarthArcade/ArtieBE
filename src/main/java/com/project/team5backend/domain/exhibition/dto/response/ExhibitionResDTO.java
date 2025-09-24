@@ -28,7 +28,7 @@ public class ExhibitionResDTO {
             String description,
             LocalDate startDate,
             LocalDate endDate,
-            String operatingHours,
+            String operatingInfo,
             List<String> imageUrls,
             String websiteUrl,
             String address,

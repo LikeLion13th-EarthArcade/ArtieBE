@@ -31,7 +31,7 @@ public class AdminExhibitionConverter {
                 .title(exhibition.getTitle())
                 .imageUrls(imageUrls)
                 .description(exhibition.getDescription())
-                .operatingHours(exhibition.getOperatingHours())
+                .operatingInfo(exhibition.getOperatingInfo())
                 .startDate(exhibition.getStartDate())
                 .endDate(exhibition.getEndDate())
                 .detailAddress(exhibition.getAddress() != null ? exhibition.getAddress().getDetail() : null)
