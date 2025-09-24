@@ -37,5 +37,5 @@ public interface ExhibitionQueryService {
     ExhibitionResDTO.MyExhibitionDetailResDTO getMyDetailExhibition(Long userId, Long exhibitionId);
 
 
-    Page<ExhibitionResDTO.ExhibitionDetailResDTO> getInterestedExhibitions(Long userId, Pageable pageable);
+    Page<ExhibitionResDTO.ExhibitionLikeSummaryResDTO> getInterestedExhibitions(Long userId, Pageable pageable);
 }

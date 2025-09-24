@@ -172,7 +172,7 @@ public class ExhibitionController {
 
     @Operation(summary = "찜한 전시", description = "내가 찜한 전시의 정보를 보여준다")
     @GetMapping("/interest")
-    public CustomResponse<PageResponse<ExhibitionResDTO.ExhibitionDetailResDTO>> getInterestedExhibitions(
+    public CustomResponse<PageResponse<ExhibitionResDTO.ExhibitionLikeSummaryResDTO>> getInterestedExhibitions(
             @AuthenticationPrincipal CurrentUser currentUser,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
