@@ -54,7 +54,7 @@ public class AdminSpaceConverter {
     }
     private static AdminSpaceResDTO.SpaceDetailResDTO.SpaceVerificationResDTO toVerificationResDTO(SpaceVerification verification, String businessLicenseFile, String buildingRegisterFile) {
         return AdminSpaceResDTO.SpaceDetailResDTO.SpaceVerificationResDTO.builder()
-                .businessNumber(verification.getBusinessNumber())
+                .bizNumber(verification.getBizNumber())
                 .businessLicenseFile(businessLicenseFile)
                 .buildingRegisterFile(buildingRegisterFile)
                 .build();
