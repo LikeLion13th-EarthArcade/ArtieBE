@@ -30,7 +30,7 @@ public class AdminSpaceResDTO {
             String name,
             SpaceVerificationResDTO spaceVerificationResDTO,
             String address,
-            String operatingHours,
+            String operatingInfo,
             SpaceSize spaceSize,
             SpaceMood spaceMood,
             String description,
@@ -43,7 +43,7 @@ public class AdminSpaceResDTO {
     ){
         @Builder
         public record SpaceVerificationResDTO(
-                String businessNumber,
+                String bizNumber,
                 String businessLicenseFile,
                 String buildingRegisterFile
         ){}

@@ -32,7 +32,7 @@ public class SpaceResDTO {
             String address,
             BigDecimal latitude,
             BigDecimal longitude,
-            String operatingHours,
+            String operatingInfo,
             SpaceSize spaceSize,
             SpaceMood spaceMood,
             String description,
@@ -69,7 +69,7 @@ public class SpaceResDTO {
             String address,
             BigDecimal latitude,
             BigDecimal longitude,
-            String operatingHours,
+            String operatingInfo,
             String thumbnail
     ){}
 }

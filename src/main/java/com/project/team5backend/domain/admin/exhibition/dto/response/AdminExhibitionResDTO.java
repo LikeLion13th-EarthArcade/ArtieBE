@@ -9,7 +9,6 @@ import lombok.Builder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 public class AdminExhibitionResDTO {
@@ -36,7 +35,7 @@ public class AdminExhibitionResDTO {
             List<String> imageUrls,
             @Schema(example = "2025.06.30") @JsonFormat(pattern = "YYYY.MM.DD") LocalDate startDate,
             @Schema(example = "2025.06.30") @JsonFormat(pattern = "YYYY.MM.DD") LocalDate endDate,
-            String operatingHours,
+            String operatingInfo,
             String detailAddress,
             String address,
             ExhibitionCategory exhibitionCategory,

@@ -28,6 +28,12 @@ public class AuthController {
         return null;
     }
 
+    @Operation(summary = "로그아웃")
+    @PostMapping("/logout")
+    public CustomResponse<?> logout() {
+        return null;
+    }
+
     @Operation(summary = "비밀번호 변경")
     @PatchMapping("/me/password")
     public CustomResponse<String> changePassword(
@@ -37,4 +43,13 @@ public class AuthController {
         authCommandService.changePassword(currentUser.getId(), authPasswordChangeReqDTO);
         return CustomResponse.onSuccess("비밀번호 변경 완료");
     }
+
+//    @Operation(summary = "임시 비밀번호 발급", description = "비밀번호 변경 휴대폰 인증 완료 후 실행 <br> 이메일 전송 구현 완료했지만, 비밀번호는 일단 ResBody로 제공")
+//    @PostMapping("/temp-password")
+//    public CustomResponse<String> resetPassword(
+//            @RequestBody @Valid AuthReqDTO.AuthTempPasswordReqDTO authTempPasswordReqDto
+//    ) {
+//        String password = authCommandService.tempPassword(authTempPasswordReqDto);
+//        return CustomResponse.onSuccess("임시 비빌번호가 이메일로 발송되었습니다. " + password);
+//    }
 }
