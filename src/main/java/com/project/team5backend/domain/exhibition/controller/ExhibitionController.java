@@ -11,6 +11,7 @@ import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.global.security.userdetails.CurrentUser;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -70,12 +71,26 @@ public class ExhibitionController {
         return CustomResponse.onSuccess(exhibitionQueryService.findExhibitionDetail(exhibitionId));
     }
 
-    @Operation(summary = "전시 검색", description = "전시 검색하면 한페이지에 4개의 전시와 서울 시청 중심의 위도 경도 반환")
+    @Operation(summary = "전시 검색",
+            description = "전시 검색 API입니다.\n"
+                    + "- 한 페이지에 **4개의 전시**가 반환됩니다.\n"
+                    + "- 기본 좌표는 서울시청을 중심으로 합니다.\n\n"
+                    + "- 요청 파라미터 설명\n"
+                    + "- `exhibitionCategory` : 전시 카테고리 (옵션)\n"
+                    + "- `district` : 행정구역 (옵션)\n"
+                    + "- `exhibitionMood` : 전시 분위기 (옵션)\n"
+                    + "- `localDate` : 날짜 필터 (예: `2025-09-24`)\n"
+                    + "- `sort` : 정렬 기준\n"
+                    + "    - `POPULAR` (기본값, 리뷰 많은 순)\n"
+                    + "    - `NEW` (최신순)\n"
+                    + "    - `OLD` (오래된순)\n"
+                    + "- `page` : 페이지 번호 (기본값 0)")
     @GetMapping("/search")
     public CustomResponse<ExhibitionResDTO.ExhibitionSearchPageResDTO> searchExhibitions(
             @RequestParam(name = "exhibitionCategory", required = false) ExhibitionCategory exhibitionCategory,
             @RequestParam(name = "distinct", required = false) String district,
             @RequestParam(name = "exhibitionMood", required = false) ExhibitionMood exhibitionMood,
+            @Parameter(description = "날짜", example = "2025-09-13")
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate localDate,
             @RequestParam(defaultValue = "POPULAR") Sort sort,   // new | old | popular
             @RequestParam(name = "page", defaultValue = "0") int page
