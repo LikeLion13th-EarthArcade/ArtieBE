@@ -50,9 +50,11 @@ public class SpaceController {
     )
     @Operation(summary = "전시 공간 등록",
             description = "등록시 공간 객체가 심사 대상에 포함됩니다.<br>" +
-                    "사업자 인증 api가 선행되어야 함 -> 그렇지 않으면 예외<br>" +
-                    "operatingStartHour, operatingEndHour -> HH:mm 처럼 입력 (스웨거가 보여주는 모습이랑 다름)<br>" +
-                    "Facility -> 리스트 형태로 전달 RESTROOM(화장실), WIFI(와이파이), STROLLER_RENTAL(유모차 대여)")
+                    "사업자 인증 api가 선행되어 성공해야함 -> 그렇지 않으면 예외<br>" +
+                    "facilities -> [\"WIFI\", \"[RESTROOM]\", \"[STROLLER_RENTAL]\"]<br>" +
+                    "operatingStartHour, operatingEndHour -> \"12:34\" (스웨거 기본 형식 무시)<br>" +
+                    "spaceMood (WHITE_BOX, INDUSTRIAL, VINTAGE_CLASSIC, NATURE_LIGHT, FOCUSED_LIGHTING)<br>" +
+                    "spaceSize (SMALL(~10), MEDIUM_SMALL(~30), MEDIUM(~50), LARGE(50~)<br>")
     public CustomResponse<SpaceResDTO.SpaceCreateResDTO> createSpace(
             @AuthenticationPrincipal CurrentUser currentUser,
             @RequestPart("request") @Valid SpaceReqDTO.SpaceCreateReqDTO spaceCreateReqDTO,
@@ -70,7 +72,7 @@ public class SpaceController {
             @PathVariable Long spaceId
     ) {
         return CustomResponse.onSuccess(spaceCommandService.toggleLike(spaceId, currentUser.getId()));
-    }
+   }
 
     @Operation(summary = "전시 공간 상세 조회", description = "공간 id를 이용해 공간의 상세 정보 조회")
     @GetMapping("/{spaceId}")

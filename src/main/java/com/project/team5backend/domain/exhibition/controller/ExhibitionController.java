@@ -47,7 +47,15 @@ public class ExhibitionController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    @Operation(summary = "전시 생성", description = "전시 생성하면 전시 객체가 심사 대상에 포함됩니다.")
+    @Operation(summary = "전시 생성",
+            description = "전시 생성하면 전시 객체가 심사 대상에 포함됩니다.<br>" +
+                    "facilities -> [\"WIFI\", \"[RESTROOM]\", \"[STROLLER_RENTAL]\"]<br>" +
+                    "exhibitionMood (SOLO, DATE, TRENDY, FAMILY<br>" +
+                    "exhibitionCategory (PAINTING(회화), SCULPTURE_INSTALLATION(조각 설치), CRAFT_DESIGN(공예), PHOTO_MEDIA_ART(사진)<br>" +
+                    "exhibitionType (PERSON, GROUP)<br>" +
+                    "price -> 무료 0원 입력, 나머지 가격<br>" +
+                    "startDate, endDate -> 2025-09-24<br>" +
+                    "operatingStartHour, operatingEndHour -> \"12:34\" (스웨거 기본 형식 무시)<br>")
     public CustomResponse<ExhibitionResDTO.ExhibitionCreateResDTO> createExhibition(
             @AuthenticationPrincipal CurrentUser currentUser,
             @RequestPart("request") @Valid ExhibitionReqDTO.ExhibitionCreateReqDTO request,
