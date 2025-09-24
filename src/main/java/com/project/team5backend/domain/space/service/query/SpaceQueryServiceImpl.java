@@ -82,7 +82,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
     }
 
     @Override
-    public Page<SpaceResDTO.SpaceDetailResDTO> getInterestedSpaces(long userId, Pageable pageable) {
+    public Page<SpaceResDTO.SpaceLikeSummaryResDTO> getInterestedSpaces(long userId, Pageable pageable) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
@@ -91,12 +91,9 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
         Page<Space> interestedSpaces = spaceRepository.findByIdIn(interestedSpaceIds, pageable);
 
         return interestedSpaces.map(space -> {
-            List<String> imageUrls = spaceImageRepository.findImageUrlsBySpaceId(space.getId())
-                    .stream()
-                    .map(s3UrlResolver::toFileUrl)
-                    .toList();
-
-            return SpaceConverter.toSpaceDetailResDTO(space, imageUrls);
+            String thumbnail = s3UrlResolver.toFileUrl(space.getThumbnail());
+            boolean isLiked = interestedSpaceIds.contains(space.getId());
+            return SpaceConverter.toSpaceLikeSummaryResDTO(space, thumbnail, isLiked);
         });
     }
 

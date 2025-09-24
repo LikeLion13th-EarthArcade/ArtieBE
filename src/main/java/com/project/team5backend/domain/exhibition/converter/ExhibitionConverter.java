@@ -217,6 +217,7 @@ public class ExhibitionConverter {
     public static ExhibitionResDTO.ExhibitionLikeSummaryResDTO toExhibitionLikeSummaryResDTO(Exhibition exhibition, String thumbnail, boolean isLiked) {
         return ExhibitionResDTO.ExhibitionLikeSummaryResDTO.builder()
                 .exhibitionId(exhibition.getId())
+                .opening(exhibition.getStartDate())
                 .title(exhibition.getTitle())
                 .thumbnail(thumbnail)
                 .exhibitionCategory(exhibition.getExhibitionCategory())

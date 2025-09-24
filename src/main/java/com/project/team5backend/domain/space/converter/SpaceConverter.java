@@ -102,6 +102,16 @@ public class SpaceConverter {
                 .build();
     }
 
+    public static SpaceResDTO.SpaceLikeSummaryResDTO toSpaceLikeSummaryResDTO(Space space, String thumbnail, boolean isLiked){
+        return SpaceResDTO.SpaceLikeSummaryResDTO.builder()
+                .spaceId(space.getId())
+                .title(space.getName())
+                .thumbnail(thumbnail)
+                .address(space.getAddress().getRoadAddress() + " " + space.getAddress().getDetail())
+                .isLiked(isLiked)
+                .build();
+    }
+
     private static List<String> extractFacility(Space space) {
         if (space.getSpaceFacilities() == null) {
             return List.of(); // null-safe

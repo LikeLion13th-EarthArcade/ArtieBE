@@ -135,7 +135,7 @@ public class SpaceController {
 
     @Operation(summary = "찜한 공간", description = "내가 찜한 공간의 정보를 보여준다")
     @GetMapping("/interest")
-    public CustomResponse<PageResponse<SpaceResDTO.SpaceDetailResDTO>> getInterestedSpaces(
+    public CustomResponse<PageResponse<SpaceResDTO.SpaceLikeSummaryResDTO>> getInterestedSpaces(
             @AuthenticationPrincipal CurrentUser currentUser,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size

@@ -71,4 +71,13 @@ public class SpaceResDTO {
             String operatingInfo,
             String thumbnail
     ){}
+
+    @Builder
+    public record SpaceLikeSummaryResDTO(
+            Long spaceId,
+            String title,
+            String thumbnail,
+            String address,
+            boolean isLiked
+    ){}
 }
