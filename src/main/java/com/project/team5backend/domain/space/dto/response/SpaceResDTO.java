@@ -1,5 +1,6 @@
 package com.project.team5backend.domain.space.dto.response;
 
+import com.project.team5backend.domain.admin.space.dto.response.AdminSpaceResDTO;
 import com.project.team5backend.domain.space.entity.enums.SpaceMood;
 import com.project.team5backend.domain.space.entity.enums.SpaceSize;
 import com.project.team5backend.global.util.PageResponse;
@@ -71,4 +72,29 @@ public class SpaceResDTO {
             String operatingInfo,
             String thumbnail
     ){}
+
+    @Builder
+    public record MySpaceDetailResDTO(
+            Long spaceId,
+            String name,
+            SpaceVerificationResDTO spaceVerificationResDTO,
+            String address,
+            String operatingInfo,
+            SpaceSize spaceSize,
+            SpaceMood spaceMood,
+            String description,
+            List<String> facilities,
+            String phoneNumber,
+            String email,
+            String websiteUrl,
+            String snsUrl,
+            List<String> imageUrls
+    ){
+        @Builder
+        public record SpaceVerificationResDTO(
+                String bizNumber,
+                String businessLicenseFile,
+                String buildingRegisterFile
+        ){}
+    }
 }
