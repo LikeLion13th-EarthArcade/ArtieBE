@@ -1,6 +1,7 @@
 package com.project.team5backend.domain.review.exhibition.repository;
 
 import com.project.team5backend.domain.review.exhibition.entity.ExhibitionReview;
+import com.project.team5backend.domain.user.entity.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -31,4 +32,13 @@ public interface ExhibitionReviewRepository extends JpaRepository<ExhibitionRevi
         ORDER BY er.createdAt DESC
         """)
     Page<ExhibitionReview> findByExhibitionIdAndIsDeletedFalse(@Param("exhibitionId") Long exhibitionId, Pageable pageable);
+
+    @Query("""
+        select er
+        from ExhibitionReview er
+        join fetch er.user u
+        left join er.exhibitionReviewImages eri
+        where er.isDeleted is false and er.user = :user
+    """)
+    Page<ExhibitionReview> findMyExReviewsByIdAndIsDeletedFalse(@Param("user") User user, Pageable pageable);
 }

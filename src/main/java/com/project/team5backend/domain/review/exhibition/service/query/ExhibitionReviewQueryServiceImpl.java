@@ -7,6 +7,10 @@ import com.project.team5backend.domain.review.exhibition.entity.ExhibitionReview
 import com.project.team5backend.domain.review.exhibition.exception.ExhibitionReviewErrorCode;
 import com.project.team5backend.domain.review.exhibition.exception.ExhibitionReviewException;
 import com.project.team5backend.domain.review.exhibition.repository.ExhibitionReviewRepository;
+import com.project.team5backend.domain.user.entity.User;
+import com.project.team5backend.domain.user.exception.UserErrorCode;
+import com.project.team5backend.domain.user.exception.UserException;
+import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.util.S3UrlResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,6 +31,7 @@ public class ExhibitionReviewQueryServiceImpl implements ExhibitionReviewQuerySe
 
     private final ExhibitionReviewRepository exhibitionReviewRepository;
     private final S3UrlResolver s3UrlResolver;
+    private final UserRepository userRepository;
 
     @Override
     public ExhibitionReviewResDTO.ExReviewDetailResDTO getExhibitionReviewDetail(Long exhibitionReviewId) {
@@ -47,6 +52,22 @@ public class ExhibitionReviewQueryServiceImpl implements ExhibitionReviewQuerySe
         Page<ExhibitionReview> reviewPage = exhibitionReviewRepository.findByExhibitionIdAndIsDeletedFalse(exhibitionId, pageable);
 
         return reviewPage.map(review -> {
+            List<String> imageUrls = review.getExhibitionReviewImages().stream()
+                    .map(ExhibitionReviewImage::getFileKey)
+                    .map(s3UrlResolver::toFileUrl)
+                    .toList();
+            return ExhibitionReviewConverter.toExReviewDetailResDTO(review, imageUrls);
+        });
+    }
+
+    @Override
+    public Page<ExhibitionReviewResDTO.ExReviewDetailResDTO> getMyExhibitionReviews(Long userId, Pageable pageable) {
+        User user = userRepository.findByIdAndIsDeletedFalse(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+
+        Page<ExhibitionReview> ExReviewPage = exhibitionReviewRepository.findMyExReviewsByIdAndIsDeletedFalse(user, pageable);
+
+        return ExReviewPage.map(review -> {
             List<String> imageUrls = review.getExhibitionReviewImages().stream()
                     .map(ExhibitionReviewImage::getFileKey)
                     .map(s3UrlResolver::toFileUrl)
