@@ -65,7 +65,7 @@ biz:
 
 culture:
   portal:
-    service-key: {CULTURE_PORTAL_API_KEY}
+    service-key: ${CULTURE_PORTAL_API_KEY}
 
 logging:
   level:
