@@ -37,10 +37,9 @@ public class ExhibitionReviewController {
     ))
     @PostMapping(
             value = "/{exhibitionId}/reviews",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
     )
-    @Operation(summary = "리뷰 생성", description = "리뷰 생성 API")
+    @Operation(summary = "전시 리뷰 생성", description = "전시 리뷰 생성 API - 이미지 선택 안해도 생성 가능")
     public CustomResponse<ExhibitionReviewResDTO.ExReviewCreateResDTO> createExhibitionReview(
             @AuthenticationPrincipal CurrentUser currentUser,
             @PathVariable Long exhibitionId,
@@ -50,7 +49,7 @@ public class ExhibitionReviewController {
         return CustomResponse.onSuccess(exhibitionReviewCommandService.createExhibitionReview(exhibitionId, currentUser.getId(), request, images));
     }
 
-    @Operation(summary = "리뷰 목록 조회", description = "리뷰 목록 조회 api")
+    @Operation(summary = "전시 리뷰 목록 조회", description = "전시 리뷰 목록 조회 api")
     @GetMapping("{exhibitionId}/reviews")
     public CustomResponse<PageResponse<ExhibitionReviewResDTO.ExReviewDetailResDTO>> getExhibitionReviews(
             @PathVariable Long exhibitionId,
@@ -58,14 +57,14 @@ public class ExhibitionReviewController {
         return CustomResponse.onSuccess(PageResponse.of(exhibitionReviewQueryService.getExhibitionReviews(exhibitionId, page)));
     }
 
-    @Operation(summary = "리뷰 상세 조회", description = "리뷰 상세 조회 api")
+    @Operation(summary = "전시 리뷰 상세 조회", description = "전시 리뷰 상세 조회 api")
     @GetMapping("/reviews/{reviewId}")
     public CustomResponse<ExhibitionReviewResDTO.ExReviewDetailResDTO> getExhibitionReviewDetail(
             @PathVariable("reviewId") Long exhibitionReviewId){
         return CustomResponse.onSuccess(exhibitionReviewQueryService.getExhibitionReviewDetail(exhibitionReviewId));
     }
 
-    @Operation(summary = "리뷰 삭제", description = "리뷰 소프트 삭제")
+    @Operation(summary = "전시 리뷰 삭제", description = "전시 리뷰 소프트 삭제 api")
     @DeleteMapping("/reviews/{reviewId}")
     public CustomResponse<String> deleteExhibitionReview(
             @AuthenticationPrincipal CurrentUser currentUser,
