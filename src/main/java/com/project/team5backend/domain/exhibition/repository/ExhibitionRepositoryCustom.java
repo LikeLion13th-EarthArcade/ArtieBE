@@ -17,4 +17,6 @@ public interface ExhibitionRepositoryCustom {
     List<Exhibition> findUnpopularCandidates(LocalDate today, int limit);
 
     Page<Exhibition> findAdminExhibitionsByStatus(StatusGroup status, Pageable pageable);
+
+    Page<Exhibition> findMyExhibitionsByStatus(Long userId, StatusGroup status, Pageable pageable);
 }

@@ -1,16 +1,18 @@
 package com.project.team5backend.domain.exhibition.dto.response;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionCategory;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionMood;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionType;
+import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.global.util.PageResponse;
+import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Builder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.List;
 
 public class ExhibitionResDTO {
@@ -30,26 +32,6 @@ public class ExhibitionResDTO {
             LocalDate endDate,
             String operatingInfo,
             List<String> imageUrls,
-            String websiteUrl,
-            String address,
-            BigDecimal latitude,
-            BigDecimal longitude,
-            ExhibitionCategory exhibitionCategory,
-            ExhibitionType exhibitionType,
-            ExhibitionMood exhibitionMood,
-            Integer price,
-            List<String> facilities
-    ) {}
-    @Builder
-    public record DetailPendingExhibitionResDTO (
-            Long exhibitionId,
-            String title,
-            String description,
-            LocalDate startDate,
-            LocalDate endDate,
-            LocalTime openTime,
-            LocalTime closeTime,
-            List<String> imageFileKeys,
             String websiteUrl,
             String address,
             BigDecimal latitude,
@@ -140,6 +122,31 @@ public class ExhibitionResDTO {
             double reviewAvg,
             int reviewCount,
             Boolean isLiked
+    ){}
+
+    @Builder
+    public record ExhibitionSummaryResDTO(
+            Long exhibitionId,
+            String title,
+            LocalDateTime createdAt,
+            Status status
+    ) {}
+
+    @Builder
+    public record MyExhibitionDetailResDTO(
+            Long exhibitionId,
+            String title,
+            String description,
+            List<String> imageUrls,
+            @Schema(example = "2025.06.30") @JsonFormat(pattern = "YYYY.MM.DD") LocalDate startDate,
+            @Schema(example = "2025.06.30") @JsonFormat(pattern = "YYYY.MM.DD") LocalDate endDate,
+            String operatingInfo,
+            String detailAddress,
+            String address,
+            ExhibitionCategory exhibitionCategory,
+            ExhibitionType exhibitionType,
+            Integer price,
+            String websiteUrl
     ){}
 
     @Builder
