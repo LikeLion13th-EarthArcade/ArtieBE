@@ -5,6 +5,7 @@ import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionCategory;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionMood;
 import com.project.team5backend.global.entity.enums.Status;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -160,5 +161,7 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
     List<ExhibitionSummaryResDTO> findTop3ByStatus(@Param("status") Status status);
 
     boolean existsByPortalExhibitionId(@Param("portalExhibitionId") Long portalExhibitionId);
+
+    Page<Exhibition> findByIdIn(List<Long> ids, Pageable pageable);
 }
 
