@@ -90,7 +90,7 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
       SELECT e.*,
             ROW_NUMBER() OVER (
              PARTITION BY e.district
-             ORDER BY e.review_count DESC, e.updated_at DESC, e.exhibition_id DESC
+             ORDER BY e.review_count DESC, e.updated_at DESC, e.id DESC
            ) rn
       FROM exhibition e
      WHERE e.is_deleted = false
@@ -100,7 +100,7 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
     )
     SELECT * FROM ranked
     WHERE rn = 1
-    ORDER BY review_count DESC, updated_at DESC, exhibition_id DESC
+    ORDER BY review_count DESC, updated_at DESC, id DESC
     """, nativeQuery = true)
     List<Exhibition> findTopByDistrict(@Param("current") LocalDate current, Pageable pageable, @Param("status") Status status);
 

@@ -16,19 +16,19 @@ public interface ExhibitionReviewRepository extends JpaRepository<ExhibitionRevi
     void softDeleteByExhibitionId(@Param("exhibitionId") Long exhibitionId);
 
     @Query("""
-        select sr from SpaceReview sr
-        join fetch sr.user u
-        left join sr.spaceReviewImages eri
-        where sr.id =:spaceReviewId and sr.isDeleted is false
+        select er from ExhibitionReview er
+        join fetch er.user u
+        left join er.exhibitionReviewImages eri
+        where er.id =:exhibitionReviewId and er.isDeleted is false
     """)
-    Optional<ExhibitionReview> findByIdAndIsDeletedFalse(@Param("spaceReviewId") Long spaceReviewId);
+    Optional<ExhibitionReview> findByIdAndIsDeletedFalse(@Param("exhibitionReviewId") Long exhibitionReviewId);
 
     @Query("""
-        SELECT DISTINCT sr FROM SpaceReview sr
-        JOIN FETCH sr.user u
-        LEFT JOIN sr.spaceReviewImages sri
-        WHERE sr.space.id =:spaceId AND sr.isDeleted = false
-        ORDER BY sr.createdAt DESC
+        SELECT DISTINCT er FROM ExhibitionReview er
+        JOIN FETCH er.user u
+        LEFT JOIN er.exhibitionReviewImages sri
+        WHERE er.exhibition.id =:exhibitionId AND er.isDeleted = false
+        ORDER BY er.createdAt DESC
         """)
     Page<ExhibitionReview> findByExhibitionIdAndIsDeletedFalse(@Param("exhibitionId") Long exhibitionId, Pageable pageable);
 }

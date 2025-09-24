@@ -14,8 +14,7 @@ import lombok.Setter;
 public class ExhibitionEmbedding extends BaseOnlyCreateTimeEntity {
 
     @Id
-    @Column(name = "exhibition_id")
-    private Long exhibitionId;
+    private Long id;
 
     @Lob
     @Column(name = "vector", columnDefinition = "MEDIUMTEXT", nullable = false)

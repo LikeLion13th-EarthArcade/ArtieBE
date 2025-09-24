@@ -22,7 +22,7 @@ public interface ExhibitionInteractLogRepository extends JpaRepository<Exhibitio
         SELECT e.exhibition_category AS keyName,
                CAST(SUM(CASE l.action_type WHEN 'LIKE' THEN 1.6 WHEN 'CLICK' THEN 1.0 ELSE 1.0 END) AS DOUBLE) AS score
         FROM exhibition_interact_log l
-        JOIN exhibition e ON e.exhibition_id = l.exhibition_id
+        JOIN exhibition e ON e.id = l.exhibition_id
         WHERE l.user_id = :userId AND l.created_at >= :since
         GROUP BY e.exhibition_category
         ORDER BY
@@ -37,7 +37,7 @@ public interface ExhibitionInteractLogRepository extends JpaRepository<Exhibitio
         SELECT e.exhibition_mood AS keyName,
                CAST(SUM(CASE l.action_type WHEN 'LIKE' THEN 1.6 WHEN 'CLICK' THEN 1.0 ELSE 1.0 END) AS DOUBLE) AS score
         FROM exhibition_interact_log l
-        JOIN exhibition e ON e.exhibition_id = l.exhibition_id
+        JOIN exhibition e ON e.id = l.exhibition_id
         WHERE l.user_id = :userId AND l.created_at >= :since
         GROUP BY e.exhibition_mood
         ORDER BY

@@ -10,8 +10,8 @@ import lombok.*;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class SpaceFacility {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "space_facility_id")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)

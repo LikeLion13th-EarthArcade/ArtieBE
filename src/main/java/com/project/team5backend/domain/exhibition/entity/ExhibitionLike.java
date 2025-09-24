@@ -12,8 +12,8 @@ import lombok.*;
 @NoArgsConstructor
 public class ExhibitionLike extends BaseOnlyCreateTimeEntity {
 
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "exhibition_liked_id")
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     @ManyToOne(fetch = FetchType.LAZY)
