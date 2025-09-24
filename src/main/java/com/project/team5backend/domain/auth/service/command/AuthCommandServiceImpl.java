@@ -8,8 +8,6 @@ import com.project.team5backend.domain.auth.exception.AuthErrorCode;
 import com.project.team5backend.domain.auth.exception.AuthException;
 import com.project.team5backend.domain.auth.repository.AuthRepository;
 import com.project.team5backend.domain.user.entity.User;
-import com.project.team5backend.domain.user.exception.UserErrorCode;
-import com.project.team5backend.domain.user.exception.UserException;
 import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.mail.MailType;
 import com.project.team5backend.global.mail.service.MailService;

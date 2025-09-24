@@ -11,7 +11,8 @@ import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.stereotype.Component;
 
-import static com.project.team5backend.global.constant.common.CommonConstant.*;
+import static com.project.team5backend.global.constant.common.CommonConstant.ACCESS_COOKIE_NAME;
+import static com.project.team5backend.global.constant.common.CommonConstant.REFRESH_COOKIE_NAME;
 import static com.project.team5backend.global.util.CookieUtils.createJwtCookies;
 import static com.project.team5backend.global.util.CookieUtils.getTokenFromCookies;
 

@@ -1,9 +1,9 @@
 package com.project.team5backend.domain.recommendation.service;
 
 import com.project.team5backend.domain.exhibition.entity.Exhibition;
-import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.domain.exhibition.repository.ExhibitionRepository;
 import com.project.team5backend.domain.recommendation.repository.ExhibitionEmbeddingRepository;
+import com.project.team5backend.global.entity.enums.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;

@@ -4,7 +4,8 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 
-import static com.project.team5backend.global.constant.valid.MessageConstant.*;
+import static com.project.team5backend.global.constant.valid.MessageConstant.BLANK_PHONE_NUMBER;
+import static com.project.team5backend.global.constant.valid.MessageConstant.WRONG_PASSWORD_PATTERN;
 import static com.project.team5backend.global.constant.valid.PatternConstant.PASSWORD_PATTERN;
 
 public class AuthReqDTO {
