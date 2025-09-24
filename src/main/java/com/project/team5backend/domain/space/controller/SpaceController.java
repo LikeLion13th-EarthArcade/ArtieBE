@@ -11,6 +11,7 @@ import com.project.team5backend.global.SwaggerBody;
 import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.global.security.userdetails.CurrentUser;
+import com.project.team5backend.global.util.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -20,6 +21,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -127,5 +130,16 @@ public class SpaceController {
             @PathVariable Long spaceId) {
         spaceCommandService.deleteSpace(spaceId, currentUser.getId());
         return CustomResponse.onSuccess(HttpStatus.NO_CONTENT, "공간이 삭제되었습니다.");
+    }
+
+    @Operation(summary = "찜한 공간", description = "내가 찜한 공간의 정보를 보여준다")
+    @GetMapping("/interest")
+    public CustomResponse<PageResponse<SpaceResDTO.SpaceDetailResDTO>> getInterestedSpaces(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return CustomResponse.onSuccess(PageResponse.of(spaceQueryService.getInterestedSpaces(currentUser.getId(), pageable)));
     }
 }

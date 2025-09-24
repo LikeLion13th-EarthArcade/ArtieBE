@@ -1,5 +1,7 @@
 package com.project.team5backend.domain.space.service.query;
 
+import com.project.team5backend.domain.exhibition.converter.ExhibitionConverter;
+import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.image.repository.SpaceImageRepository;
 import com.project.team5backend.domain.space.converter.SpaceConverter;
 import com.project.team5backend.domain.space.dto.response.SpaceResDTO;
@@ -9,7 +11,12 @@ import com.project.team5backend.domain.space.entity.enums.SpaceSize;
 import com.project.team5backend.domain.space.entity.enums.SpaceType;
 import com.project.team5backend.domain.space.exception.SpaceErrorCode;
 import com.project.team5backend.domain.space.exception.SpaceException;
+import com.project.team5backend.domain.space.repository.SpaceLikeRepository;
 import com.project.team5backend.domain.space.repository.SpaceRepository;
+import com.project.team5backend.domain.user.entity.User;
+import com.project.team5backend.domain.user.exception.UserErrorCode;
+import com.project.team5backend.domain.user.exception.UserException;
+import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.global.util.PageResponse;
@@ -35,6 +42,8 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
     private final SpaceRepository spaceRepository;
     private final SpaceImageRepository spaceImageRepository;
     private final S3UrlResolver s3UrlResolver;
+    private final UserRepository userRepository;
+    private final SpaceLikeRepository spaceLikeRepository;
 
     private static final int PAGE_SIZE = 4;
     private static final double SEOUL_CENTER_LAT = 37.5665;
@@ -71,5 +80,24 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
                 });
 
         return SpaceConverter.toSpaceSearchPageResDTO(PageResponse.of(spaceSearchResDTOPage), SEOUL_CENTER_LAT, SEOUL_CENTER_LNG);
+    }
+
+    @Override
+    public Page<SpaceResDTO.SpaceDetailResDTO> getInterestedSpaces(long userId, Pageable pageable) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+
+        List<Long> interestedSpaceIds = spaceLikeRepository.findSpaceIdsByInterestedUser(user);
+
+        Page<Space> interestedSpaces = spaceRepository.findByIdIn(interestedSpaceIds, pageable);
+
+        return interestedSpaces.map(space -> {
+            List<String> imageUrls = spaceImageRepository.findImageUrlsBySpaceId(space.getId())
+                    .stream()
+                    .map(s3UrlResolver::toFileUrl)
+                    .toList();
+
+            return SpaceConverter.toSpaceDetailResDTO(space, imageUrls);
+        });
     }
 }
