@@ -164,6 +164,34 @@ public class ExhibitionConverter {
                 .build();
     }
 
+    public static ExhibitionResDTO.ExhibitionSummaryResDTO toExhibitionSummaryResDTO(Exhibition exhibition){
+        return ExhibitionResDTO.ExhibitionSummaryResDTO.builder()
+                .exhibitionId(exhibition.getId())
+                .title(exhibition.getTitle())
+                .createdAt(exhibition.getCreatedAt())
+                .status(exhibition.getStatus())
+                .build();
+    }
+
+    public static ExhibitionResDTO.MyExhibitionDetailResDTO toMyExhibitionDetailResDTO(Exhibition exhibition, List<String> imageUrls){
+        return ExhibitionResDTO.MyExhibitionDetailResDTO.builder()
+                .exhibitionId(exhibition.getId())
+                .title(exhibition.getTitle())
+                .imageUrls(imageUrls)
+                .description(exhibition.getDescription())
+                .operatingInfo(exhibition.getOperatingInfo())
+                .startDate(exhibition.getStartDate())
+                .endDate(exhibition.getEndDate())
+                .detailAddress(exhibition.getAddress() != null ? exhibition.getAddress().getDetail() : null)
+                .address(exhibition.getAddress() != null ? exhibition.getAddress().getRoadAddress() : null)
+                .exhibitionCategory(exhibition.getExhibitionCategory())
+                .exhibitionType(exhibition.getExhibitionType())
+                .description(exhibition.getDescription())
+                .price(exhibition.getPrice())
+                .websiteUrl(exhibition.getWebsiteUrl())
+                .build();
+    }
+
     //ai 추천 결과 관련 컨버터
     public static ExhibitionResDTO.ExhibitionCardResDTO toCard(Exhibition e, boolean isLiked, String thumbnail) {
         double avg = BigDecimal.valueOf(e.getRatingAvg())
@@ -195,7 +223,7 @@ public class ExhibitionConverter {
                 .description(null)
                 .startDate(LocalDate.parse(exhibitionCrawlResDto.startDate(), formatter))
                 .endDate(LocalDate.parse(exhibitionCrawlResDto.endDate(), formatter))
-                .operatingInfo(null)
+                .operatingInfo("정보 없음")
                 .price(null)
                 .websiteUrl(null)
                 .status(Status.PENDING)

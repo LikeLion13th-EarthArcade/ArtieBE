@@ -9,7 +9,9 @@ import com.project.team5backend.domain.exhibition.service.query.ExhibitionQueryS
 import com.project.team5backend.global.SwaggerBody;
 import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.global.entity.enums.Sort;
+import com.project.team5backend.global.entity.enums.StatusGroup;
 import com.project.team5backend.global.security.userdetails.CurrentUser;
+import com.project.team5backend.global.util.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -17,6 +19,8 @@ import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -55,7 +59,7 @@ public class ExhibitionController {
                     "exhibitionType (PERSON, GROUP)<br>" +
                     "price -> 무료 0원 입력, 나머지 가격<br>" +
                     "startDate, endDate -> 2025-09-24<br>" +
-                    "operatingStartHour, operatingEndHour -> \"12:34\" (스웨거 기본 형식 무시)<br>")
+                    "operatingStartHour, operatingEndHour -> \"12:34\"<br>")
     public CustomResponse<ExhibitionResDTO.ExhibitionCreateResDTO> createExhibition(
             @AuthenticationPrincipal CurrentUser currentUser,
             @RequestPart("request") @Valid ExhibitionReqDTO.ExhibitionCreateReqDTO request,
@@ -134,6 +138,29 @@ public class ExhibitionController {
         return CustomResponse.onSuccess(exhibitionQueryService.getTodayArtieRecommendations(currentUser.getId()));
     }
 
+    @Operation(summary = "내가 등록한 전시",
+            description = "사용자가 등록한 모든 전시를 검색합니다. <br> " +
+                    "[RequestParam statusGroup] : [ALL], [PENDING], [DONE] 3가지 선택<br><br>" +
+                    "ALL : 모든 상태의 전시 <br><br>" +
+                    "PENDING : 대기중 <br>PENDING(호스트의 확정 대기) <br><br>" +
+                    "DONE : 완료됨 <br>APPROVED(호스트의 전시 승인 확정), REJECTED(호스트의 전시 거절 확정), <br>")
+    @GetMapping("/my")
+    public CustomResponse<PageResponse<ExhibitionResDTO.ExhibitionSummaryResDTO>> getExhibitionList(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @RequestParam(name = "status", required = false, defaultValue = "ALL") StatusGroup status,
+            @RequestParam(name = "page", defaultValue = "0") int page
+    ) {
+        return CustomResponse.onSuccess(PageResponse.of(exhibitionQueryService.getSummaryExhibitionList(currentUser.getId(), status, page)));
+    }
+
+    @Operation(summary = "내 전시 상세 보기", description = "상태에 상관없이 내 전시 상세 보기 가능")
+    @GetMapping("/{exhibitionId}/my")
+    public CustomResponse<ExhibitionResDTO.MyExhibitionDetailResDTO> getDetailExhibition(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @PathVariable Long exhibitionId) {
+        return CustomResponse.onSuccess(exhibitionQueryService.getMyDetailExhibition(currentUser.getId(), exhibitionId));
+    }
+
     @Operation(summary = "전시 삭제", description = "전시가 삭제된 전시로 변경하는 api")
     @DeleteMapping("/{exhibitionId}")
     public CustomResponse<String> deleteExhibition(
@@ -141,5 +168,16 @@ public class ExhibitionController {
             @PathVariable Long exhibitionId){
         exhibitionCommandService.deleteExhibition(exhibitionId, currentUser.getId());
         return CustomResponse.onSuccess("해당 전시가 삭제되었습니다.");
+    }
+
+    @Operation(summary = "찜한 전시", description = "내가 찜한 전시의 정보를 보여준다")
+    @GetMapping("/interest")
+    public CustomResponse<PageResponse<ExhibitionResDTO.ExhibitionDetailResDTO>> getInterestedExhibitions(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return CustomResponse.onSuccess(PageResponse.of(exhibitionQueryService.getInterestedExhibitions(currentUser.getId(), pageable)));
     }
 }

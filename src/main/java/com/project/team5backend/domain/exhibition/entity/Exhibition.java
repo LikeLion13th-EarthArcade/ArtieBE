@@ -62,10 +62,10 @@ public class Exhibition extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private ExhibitionMood exhibitionMood;
 
-    @Column(name = "price", nullable = false)
+    @Column(name = "price")
     private Integer price;
 
-    @Column(name = "website_url", nullable = false)
+    @Column(name = "website_url")
     private String websiteUrl;
 
     @Column(name = "status", nullable = false)

@@ -11,8 +11,13 @@ import com.project.team5backend.domain.exhibition.repository.ExhibitionLikeRepos
 import com.project.team5backend.domain.exhibition.repository.ExhibitionRepository;
 import com.project.team5backend.domain.image.repository.ExhibitionImageRepository;
 import com.project.team5backend.domain.recommendation.service.InteractLogService;
+import com.project.team5backend.domain.user.entity.User;
+import com.project.team5backend.domain.user.exception.UserErrorCode;
+import com.project.team5backend.domain.user.exception.UserException;
+import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.global.entity.enums.Status;
+import com.project.team5backend.global.entity.enums.StatusGroup;
 import com.project.team5backend.global.util.PageResponse;
 import com.project.team5backend.global.util.S3UrlResolver;
 import lombok.RequiredArgsConstructor;
@@ -43,6 +48,7 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
     private final InteractLogService interactLogService;
     private final ExhibitionLikeRepository exhibitionLikeRepository;
     private final S3UrlResolver s3UrlResolver;
+    private final UserRepository userRepository;
 
     @Override
     public ExhibitionResDTO.ExhibitionDetailResDTO findExhibitionDetail(Long exhibitionId) {
@@ -152,7 +158,48 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
                 .toList();
     }
 
+    @Override
+    public Page<ExhibitionResDTO.ExhibitionSummaryResDTO> getSummaryExhibitionList(Long userId, StatusGroup status, int page) {
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt"));
+
+        Page<Exhibition> exhibitionPage = exhibitionRepository.findMyExhibitionsByStatus(userId, status, pageable);
+
+        return exhibitionPage.map(ExhibitionConverter::toExhibitionSummaryResDTO);
+    }
+
+    @Override
+    public ExhibitionResDTO.MyExhibitionDetailResDTO getMyDetailExhibition(Long userId, Long exhibitionId) {
+        Exhibition exhibition = exhibitionRepository.findByIdAndUserIdAndIsDeletedFalse(userId, exhibitionId)
+                .orElseThrow(() -> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
+
+        List<String> imageUrls = exhibitionImageRepository.findImageUrlsByExhibitionId(exhibitionId).stream()
+                .map(s3UrlResolver::toFileUrl)
+                .toList();
+
+        return ExhibitionConverter.toMyExhibitionDetailResDTO(exhibition, imageUrls);
+
+    }
+
     private boolean isExhibitionLiked(Long userId, Long exhibitionId) {
         return exhibitionLikeRepository.existsByUserIdAndExhibitionId(userId, exhibitionId);
+    }
+
+    @Override
+    public Page<ExhibitionResDTO.ExhibitionDetailResDTO> getInterestedExhibitions(Long userId, Pageable pageable) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+
+        List<Long> interestedExhibitionIds = exhibitionLikeRepository.findExhibitionIdsByInterestedUser(user);
+
+        Page<Exhibition> interestedExhibitions = exhibitionRepository.findByIdIn(interestedExhibitionIds, pageable);
+
+        return interestedExhibitions.map(exhibition -> {
+            List<String> imageUrls = exhibitionImageRepository.findImageUrlsByExhibitionId(exhibition.getId())
+                    .stream()
+                    .map(s3UrlResolver::toFileUrl)
+                    .toList();
+
+            return ExhibitionConverter.toExhibitionDetailResDTO(exhibition, imageUrls);
+        });
     }
 }

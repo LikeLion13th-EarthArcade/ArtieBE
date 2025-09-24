@@ -4,6 +4,9 @@ import com.project.team5backend.domain.exhibition.dto.response.ExhibitionResDTO;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionCategory;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionMood;
 import com.project.team5backend.global.entity.enums.Sort;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import com.project.team5backend.global.entity.enums.StatusGroup;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -26,4 +29,13 @@ public interface ExhibitionQueryService {
 
     // artie 픽
     List<ExhibitionResDTO.ArtieRecommendationResDTO> getTodayArtieRecommendations(Long userId);
+
+    //내가 등록한 전시
+    Page<ExhibitionResDTO.ExhibitionSummaryResDTO> getSummaryExhibitionList(Long userId, StatusGroup status, int page);
+
+    //내가 등록한 전시 조회
+    ExhibitionResDTO.MyExhibitionDetailResDTO getMyDetailExhibition(Long userId, Long exhibitionId);
+
+
+    Page<ExhibitionResDTO.ExhibitionDetailResDTO> getInterestedExhibitions(Long userId, Pageable pageable);
 }

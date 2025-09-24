@@ -1,8 +1,12 @@
 package com.project.team5backend.domain.space.repository;
 
 import com.project.team5backend.domain.admin.dashboard.dto.response.SpaceSummaryResDTO;
+import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.space.entity.Space;
+import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.global.entity.enums.Status;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -90,4 +94,8 @@ public interface SpaceRepository extends JpaRepository<Space, Long>,SpaceReposit
     order by s.createdAt desc
     """)
     List<SpaceSummaryResDTO> findTop3ByStatus(@Param("status") Status status);
+
+    Page<Space> findByIdIn(List<Long> ids, Pageable pageable);
+
+    Page<Space> findByUser(User user, Pageable pageable);
 }

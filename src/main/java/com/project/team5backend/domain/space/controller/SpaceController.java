@@ -10,7 +10,9 @@ import com.project.team5backend.domain.space.service.query.SpaceQueryService;
 import com.project.team5backend.global.SwaggerBody;
 import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.global.entity.enums.Sort;
+import com.project.team5backend.global.entity.enums.StatusGroup;
 import com.project.team5backend.global.security.userdetails.CurrentUser;
+import com.project.team5backend.global.util.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.ArraySchema;
@@ -20,6 +22,8 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -52,9 +56,10 @@ public class SpaceController {
             description = "등록시 공간 객체가 심사 대상에 포함됩니다.<br>" +
                     "사업자 인증 api가 선행되어 성공해야함 -> 그렇지 않으면 예외<br>" +
                     "facilities -> [\"WIFI\", \"[RESTROOM]\", \"[STROLLER_RENTAL]\"]<br>" +
-                    "operatingStartHour, operatingEndHour -> \"12:34\" (스웨거 기본 형식 무시)<br>" +
+                    "operatingStartHour, operatingEndHour -> \"12:34\"<br>" +
                     "spaceMood (WHITE_BOX, INDUSTRIAL, VINTAGE_CLASSIC, NATURE_LIGHT, FOCUSED_LIGHTING)<br>" +
-                    "spaceSize (SMALL(~10), MEDIUM_SMALL(~30), MEDIUM(~50), LARGE(50~)<br>")
+                    "spaceSize (SMALL(~10), MEDIUM_SMALL(~30), MEDIUM(~50), LARGE(50~)<br>" +
+                    "spaceType (EXHIBITION(전시), POPUP_STORE(팝업), EXPERIENCE_EXHIBITION(체험 전시)")
     public CustomResponse<SpaceResDTO.SpaceCreateResDTO> createSpace(
             @AuthenticationPrincipal CurrentUser currentUser,
             @RequestPart("request") @Valid SpaceReqDTO.SpaceCreateReqDTO spaceCreateReqDTO,
@@ -126,5 +131,28 @@ public class SpaceController {
             @PathVariable Long spaceId) {
         spaceCommandService.deleteSpace(spaceId, currentUser.getId());
         return CustomResponse.onSuccess(HttpStatus.NO_CONTENT, "공간이 삭제되었습니다.");
+    }
+
+    @Operation(summary = "찜한 공간", description = "내가 찜한 공간의 정보를 보여준다")
+    @GetMapping("/interest")
+    public CustomResponse<PageResponse<SpaceResDTO.SpaceDetailResDTO>> getInterestedSpaces(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size);
+        return CustomResponse.onSuccess(PageResponse.of(spaceQueryService.getInterestedSpaces(currentUser.getId(), pageable)));
+    }
+
+    @Operation(summary = "내가 등록한 공간")
+    @GetMapping("/my")
+    public CustomResponse<PageResponse<SpaceResDTO.SpaceDetailResDTO>> getMySpaces(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @RequestParam(required = false) StatusGroup statusGroup,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, org.springframework.data.domain.Sort.by("createdAt").descending());
+        return CustomResponse.onSuccess(PageResponse.of(spaceQueryService.getMySpace(currentUser.getId(), statusGroup, pageable)));
     }
 }

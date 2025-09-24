@@ -5,6 +5,7 @@ import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionCategory;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionMood;
 import com.project.team5backend.global.entity.enums.Status;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -52,6 +53,13 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
         and e.isDeleted = false
     """)
     Optional<Exhibition> findByIdAndIsDeletedFalse(@Param("exhibitionId") Long exhibitionId);
+
+    @Query("""
+        select e from Exhibition e
+        where e.id = :exhibitionId and e.user.id =:userId
+        and e.isDeleted = false
+    """)
+    Optional<Exhibition> findByIdAndUserIdAndIsDeletedFalse(@Param("userId") Long userId, @Param("exhibitionId") Long exhibitionId);
 
     //삭제되지않았고, 승인되고, 진행중인 전시
     @Query("""
@@ -160,5 +168,7 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
     List<ExhibitionSummaryResDTO> findTop3ByStatus(@Param("status") Status status);
 
     boolean existsByPortalExhibitionId(@Param("portalExhibitionId") Long portalExhibitionId);
+
+    Page<Exhibition> findByIdIn(List<Long> ids, Pageable pageable);
 }
 
