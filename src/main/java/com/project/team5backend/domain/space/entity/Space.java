@@ -1,5 +1,6 @@
 package com.project.team5backend.domain.space.entity;
 
+import com.project.team5backend.domain.facility.entity.SpaceFacility;
 import com.project.team5backend.domain.space.entity.enums.SpaceMood;
 import com.project.team5backend.domain.space.entity.enums.SpaceSize;
 import com.project.team5backend.domain.space.entity.enums.SpaceType;
@@ -7,12 +8,9 @@ import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.global.entity.BaseTimeEntity;
 import com.project.team5backend.global.entity.embedded.Address;
 import com.project.team5backend.global.entity.enums.Status;
-import com.project.team5backend.domain.facility.entity.SpaceFacility;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.math.BigDecimal;
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +22,6 @@ import java.util.List;
 public class Space extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "space_id")
     private Long id;
 
     @Column(name = "name", nullable = false)
@@ -92,6 +89,9 @@ public class Space extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+    @OneToOne(mappedBy = "space", cascade = CascadeType.ALL, orphanRemoval = true)
+    private SpaceVerification spaceVerification;
 
     public void softDelete() {
         this.isDeleted = true;

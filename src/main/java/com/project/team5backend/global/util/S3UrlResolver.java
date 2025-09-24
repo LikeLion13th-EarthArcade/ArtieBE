@@ -15,7 +15,7 @@ public class S3UrlResolver {
         this.baseUrl = String.format("https://%s.s3.%s.amazonaws.com/", bucketName, region);
     }
 
-    public String toImageUrl(String fileKeyOrUrl) {
+    public String toFileUrl(String fileKeyOrUrl) {
         if (fileKeyOrUrl.startsWith("http://") || fileKeyOrUrl.startsWith("https://")) {
             return fileKeyOrUrl;
         }

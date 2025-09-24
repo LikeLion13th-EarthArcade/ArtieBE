@@ -8,6 +8,7 @@ import com.project.team5backend.domain.exhibition.exception.ExhibitionException;
 import com.project.team5backend.domain.exhibition.repository.ExhibitionRepository;
 import com.project.team5backend.domain.image.repository.ExhibitionImageRepository;
 import com.project.team5backend.global.entity.enums.StatusGroup;
+import com.project.team5backend.global.util.S3UrlResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,10 +24,11 @@ import java.util.List;
 public class AdminExhibitionQueryServiceImpl implements AdminExhibitionQueryService {
 
     private final ExhibitionRepository exhibitionRepository;
-    private final ExhibitionImageRepository imageRepository;
+    private final ExhibitionImageRepository exhibitionImageRepository;
+    private final S3UrlResolver s3UrlResolver;
 
     private static final int PAGE_SIZE = 10;
-    private final ExhibitionImageRepository exhibitionImageRepository;
+
 
     @Override
     public Page<AdminExhibitionResDTO.ExhibitionSummaryResDTO> getSummaryExhibitionList(StatusGroup status, int page) {
@@ -42,7 +44,9 @@ public class AdminExhibitionQueryServiceImpl implements AdminExhibitionQueryServ
         Exhibition exhibition = exhibitionRepository.findByIdAndIsDeletedFalse(exhibitionId)
                 .orElseThrow(() -> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
 
-        List<String> imageUrls = exhibitionImageRepository.findImageUrlsByExhibitionId(exhibitionId);
+        List<String> imageUrls = exhibitionImageRepository.findImageUrlsByExhibitionId(exhibitionId).stream()
+                .map(s3UrlResolver::toFileUrl)
+                .toList();
 
         return AdminExhibitionConverter.toExhibitionDetailResDTO(exhibition, imageUrls);
 

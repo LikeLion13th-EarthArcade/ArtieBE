@@ -48,7 +48,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
                 .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
 
         List<String> imageUrls = spaceImageRepository.findImageUrlsBySpaceId(spaceId).stream()
-                .map(s3UrlResolver::toImageUrl)
+                .map(s3UrlResolver::toFileUrl)
                 .toList();
 
         return SpaceConverter.toSpaceDetailResDTO(space, imageUrls);
@@ -66,7 +66,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
                 requestedStartDate, requestedEndDate, district, size, type, mood, facilities, sort, pageable);
         Page<SpaceResDTO.SpaceSearchResDTO> spaceSearchResDTOPage = spacePage
                 .map(space -> {
-                    String thumbnail = s3UrlResolver.toImageUrl(space.getThumbnail());
+                    String thumbnail = s3UrlResolver.toFileUrl(space.getThumbnail());
                     return SpaceConverter.toSpaceSearchResDTO(space, thumbnail);
                 });
 

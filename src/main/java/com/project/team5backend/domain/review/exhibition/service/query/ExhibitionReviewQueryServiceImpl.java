@@ -35,7 +35,7 @@ public class ExhibitionReviewQueryServiceImpl implements ExhibitionReviewQuerySe
 
         List<String> imageUrls = exhibitionReview.getExhibitionReviewImages().stream()
                 .map(ExhibitionReviewImage::getFileKey)
-                .map(s3UrlResolver::toImageUrl)
+                .map(s3UrlResolver::toFileUrl)
                 .toList();
         return ExhibitionReviewConverter.toExReviewDetailResDTO(exhibitionReview, imageUrls);
     }
@@ -49,7 +49,7 @@ public class ExhibitionReviewQueryServiceImpl implements ExhibitionReviewQuerySe
         return reviewPage.map(review -> {
             List<String> imageUrls = review.getExhibitionReviewImages().stream()
                     .map(ExhibitionReviewImage::getFileKey)
-                    .map(s3UrlResolver::toImageUrl)
+                    .map(s3UrlResolver::toFileUrl)
                     .toList();
             return ExhibitionReviewConverter.toExReviewDetailResDTO(review, imageUrls);
         });

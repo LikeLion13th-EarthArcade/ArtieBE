@@ -13,6 +13,10 @@ public class SpaceVerification {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "space_id")
+    private Space space;
+  
     @Column(name = "biz_number", nullable = false)
     private String bizNumber;
 

@@ -28,7 +28,7 @@ public class AdminSpaceResDTO {
     public record SpaceDetailResDTO(
             Long spaceId,
             String name,
-            List<String> imageUrls,
+            SpaceVerificationResDTO spaceVerificationResDTO,
             String address,
             String operatingHours,
             SpaceSize spaceSize,
@@ -38,6 +38,14 @@ public class AdminSpaceResDTO {
             String phoneNumber,
             String email,
             String websiteUrl,
-            String snsUrl
-    ){}
+            String snsUrl,
+            List<String> imageUrls
+    ){
+        @Builder
+        public record SpaceVerificationResDTO(
+                String businessNumber,
+                String businessLicenseFile,
+                String buildingRegisterFile
+        ){}
+    }
 }
