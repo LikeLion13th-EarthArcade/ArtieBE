@@ -195,7 +195,7 @@ public class ExhibitionConverter {
                 .description(null)
                 .startDate(LocalDate.parse(exhibitionCrawlResDto.startDate(), formatter))
                 .endDate(LocalDate.parse(exhibitionCrawlResDto.endDate(), formatter))
-                .operatingInfo(null)
+                .operatingInfo("정보 없음")
                 .price(null)
                 .websiteUrl(null)
                 .status(Status.PENDING)
