@@ -1,5 +1,7 @@
 package com.project.team5backend.domain.exhibition.service.query;
 
+import com.project.team5backend.domain.admin.exhibition.converter.AdminExhibitionConverter;
+import com.project.team5backend.domain.admin.exhibition.dto.response.AdminExhibitionResDTO;
 import com.project.team5backend.domain.exhibition.converter.ExhibitionConverter;
 import com.project.team5backend.domain.exhibition.dto.response.ExhibitionResDTO;
 import com.project.team5backend.domain.exhibition.entity.Exhibition;
@@ -17,6 +19,7 @@ import com.project.team5backend.domain.user.exception.UserException;
 import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.global.entity.enums.Status;
+import com.project.team5backend.global.entity.enums.StatusGroup;
 import com.project.team5backend.global.util.PageResponse;
 import com.project.team5backend.global.util.S3UrlResolver;
 import lombok.RequiredArgsConstructor;
@@ -156,6 +159,28 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
                     return ExhibitionConverter.toArtieRecommendationResDTO(exhibition, liked, thumbnail);
                 })
                 .toList();
+    }
+
+    @Override
+    public Page<ExhibitionResDTO.ExhibitionSummaryResDTO> getSummaryExhibitionList(Long userId, StatusGroup status, int page) {
+        Pageable pageable = PageRequest.of(page, PAGE_SIZE, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt"));
+
+        Page<Exhibition> exhibitionPage = exhibitionRepository.findMyExhibitionsByStatus(userId, status, pageable);
+
+        return exhibitionPage.map(ExhibitionConverter::toExhibitionSummaryResDTO);
+    }
+
+    @Override
+    public ExhibitionResDTO.MyExhibitionDetailResDTO getMyDetailExhibition(Long userId, Long exhibitionId) {
+        Exhibition exhibition = exhibitionRepository.findByIdAndUserIdAndIsDeletedFalse(userId, exhibitionId)
+                .orElseThrow(() -> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
+
+        List<String> imageUrls = exhibitionImageRepository.findImageUrlsByExhibitionId(exhibitionId).stream()
+                .map(s3UrlResolver::toFileUrl)
+                .toList();
+
+        return ExhibitionConverter.toMyExhibitionDetailResDTO(exhibition, imageUrls);
+
     }
 
     private boolean isExhibitionLiked(Long userId, Long exhibitionId) {

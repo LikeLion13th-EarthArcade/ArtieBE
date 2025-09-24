@@ -1,5 +1,6 @@
 package com.project.team5backend.domain.exhibition.converter;
 
+import com.project.team5backend.domain.admin.exhibition.dto.response.AdminExhibitionResDTO;
 import com.project.team5backend.domain.exhibition.dto.request.ExhibitionReqDTO;
 import com.project.team5backend.domain.exhibition.dto.response.ExhibitionResDTO;
 import com.project.team5backend.domain.exhibition.entity.Exhibition;
@@ -161,6 +162,34 @@ public class ExhibitionConverter {
                 .reviewAvg(exhibition.getRatingAvg())
                 .reviewCount(exhibition.getReviewCount())
                 .isLiked(isLiked)
+                .build();
+    }
+
+    public static ExhibitionResDTO.ExhibitionSummaryResDTO toExhibitionSummaryResDTO(Exhibition exhibition){
+        return ExhibitionResDTO.ExhibitionSummaryResDTO.builder()
+                .exhibitionId(exhibition.getId())
+                .title(exhibition.getTitle())
+                .createdAt(exhibition.getCreatedAt())
+                .status(exhibition.getStatus())
+                .build();
+    }
+
+    public static ExhibitionResDTO.MyExhibitionDetailResDTO toMyExhibitionDetailResDTO(Exhibition exhibition, List<String> imageUrls){
+        return ExhibitionResDTO.MyExhibitionDetailResDTO.builder()
+                .exhibitionId(exhibition.getId())
+                .title(exhibition.getTitle())
+                .imageUrls(imageUrls)
+                .description(exhibition.getDescription())
+                .operatingInfo(exhibition.getOperatingInfo())
+                .startDate(exhibition.getStartDate())
+                .endDate(exhibition.getEndDate())
+                .detailAddress(exhibition.getAddress() != null ? exhibition.getAddress().getDetail() : null)
+                .address(exhibition.getAddress() != null ? exhibition.getAddress().getRoadAddress() : null)
+                .exhibitionCategory(exhibition.getExhibitionCategory())
+                .exhibitionType(exhibition.getExhibitionType())
+                .description(exhibition.getDescription())
+                .price(exhibition.getPrice())
+                .websiteUrl(exhibition.getWebsiteUrl())
                 .build();
     }
 

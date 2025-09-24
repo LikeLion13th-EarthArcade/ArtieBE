@@ -73,28 +73,28 @@ public class ExhibitionRepositoryImpl implements ExhibitionRepositoryCustom {
     }
     @Override
     public List<Exhibition> findUnpopularCandidates(LocalDate today, int limit) {
-        QExhibition e = QExhibition.exhibition;
+        QExhibition exhibition = QExhibition.exhibition;
 
         var likes   = com.querydsl.core.types.dsl.Expressions
-                .numberTemplate(Integer.class, "coalesce({0},0)", e.likeCount);
+                .numberTemplate(Integer.class, "coalesce({0},0)", exhibition.likeCount);
         var reviews = com.querydsl.core.types.dsl.Expressions
-                .numberTemplate(Integer.class, "coalesce({0},0)", e.reviewCount);
+                .numberTemplate(Integer.class, "coalesce({0},0)", exhibition.reviewCount);
 
         // 인기 점수: 좋아요 + 2*리뷰수 (원하면 가중치 바꿔도 됨)
         var popularity = likes.add(reviews.multiply(2));
 
         return queryFactory
-                .selectFrom(e)
+                .selectFrom(exhibition)
                 .where(
-                        e.isDeleted.isFalse(),
-                        e.status.eq(Status.APPROVED),
-                        e.startDate.loe(today),
-                        e.endDate.goe(today)
+                        exhibition.isDeleted.isFalse(),
+                        exhibition.status.eq(Status.APPROVED),
+                        exhibition.startDate.loe(today),
+                        exhibition.endDate.goe(today)
                 )
                 .orderBy(
                         popularity.asc(),   // 덜 인기 순
-                        e.createdAt.desc(), // 동률이면 더 최신 우선
-                        e.id.desc()
+                        exhibition.createdAt.desc(), // 동률이면 더 최신 우선
+                        exhibition.id.desc()
                 )
                 .limit(limit)
                 .fetch();
@@ -113,6 +113,30 @@ public class ExhibitionRepositoryImpl implements ExhibitionRepositoryCustom {
         List<Exhibition> content = queryFactory
                 .selectFrom(exhibition)
                 .where(statusCondition(exhibition, status))
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0L);
+    }
+
+    @Override
+    public Page<Exhibition> findMyExhibitionsByStatus(Long userId, StatusGroup status, Pageable pageable){
+        QExhibition exhibition = QExhibition.exhibition;
+
+        Long total = queryFactory
+                .select(exhibition.count())
+                .from(exhibition)
+                .where(
+                        exhibition.user.id.eq(userId),
+                        statusCondition(exhibition, status))
+                .fetchOne();
+
+        List<Exhibition> content = queryFactory
+                .selectFrom(exhibition)
+                .where(
+                        exhibition.user.id.eq(userId),
+                        statusCondition(exhibition, status))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();

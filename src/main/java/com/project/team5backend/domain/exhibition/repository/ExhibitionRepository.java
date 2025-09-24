@@ -54,6 +54,13 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
     """)
     Optional<Exhibition> findByIdAndIsDeletedFalse(@Param("exhibitionId") Long exhibitionId);
 
+    @Query("""
+        select e from Exhibition e
+        where e.id = :exhibitionId and e.user.id =:userId
+        and e.isDeleted = false
+    """)
+    Optional<Exhibition> findByIdAndUserIdAndIsDeletedFalse(@Param("userId") Long userId, @Param("exhibitionId") Long exhibitionId);
+
     //삭제되지않았고, 승인되고, 진행중인 전시
     @Query("""
         select e from Exhibition e
