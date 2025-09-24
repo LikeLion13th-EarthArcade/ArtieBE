@@ -55,7 +55,7 @@ public class SpaceController {
             description = "등록시 공간 객체가 심사 대상에 포함됩니다.<br>" +
                     "사업자 인증 api가 선행되어 성공해야함 -> 그렇지 않으면 예외<br>" +
                     "facilities -> [\"WIFI\", \"[RESTROOM]\", \"[STROLLER_RENTAL]\"]<br>" +
-                    "operatingStartHour, operatingEndHour -> \"12:34\" (스웨거 기본 형식 무시)<br>" +
+                    "operatingStartHour, operatingEndHour -> \"12:34\"<br>" +
                     "spaceMood (WHITE_BOX, INDUSTRIAL, VINTAGE_CLASSIC, NATURE_LIGHT, FOCUSED_LIGHTING)<br>" +
                     "spaceSize (SMALL(~10), MEDIUM_SMALL(~30), MEDIUM(~50), LARGE(50~)<br>" +
                     "spaceType (EXHIBITION(전시), POPUP_STORE(팝업), EXPERIENCE_EXHIBITION(체험 전시)")

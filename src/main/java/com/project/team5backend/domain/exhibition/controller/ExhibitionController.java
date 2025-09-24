@@ -58,7 +58,7 @@ public class ExhibitionController {
                     "exhibitionType (PERSON, GROUP)<br>" +
                     "price -> 무료 0원 입력, 나머지 가격<br>" +
                     "startDate, endDate -> 2025-09-24<br>" +
-                    "operatingStartHour, operatingEndHour -> \"12:34\" (스웨거 기본 형식 무시)<br>")
+                    "operatingStartHour, operatingEndHour -> \"12:34\"<br>")
     public CustomResponse<ExhibitionResDTO.ExhibitionCreateResDTO> createExhibition(
             @AuthenticationPrincipal CurrentUser currentUser,
             @RequestPart("request") @Valid ExhibitionReqDTO.ExhibitionCreateReqDTO request,
