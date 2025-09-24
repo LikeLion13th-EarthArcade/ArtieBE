@@ -51,9 +51,9 @@ public class ReservationController {
             description = "내가 등록한 공간에 대한 예약 목록 조회 <br>" +
                     "[RequestParam statusGroup] : [ALL], [PENDING], [DONE] 3가지 선택<br><br>" +
                     "ALL : 모든 상태의 예약 <br><br>" +
-                    "PENDING : 진행중 <br>PENDING(호스트의 확정 대기), BOOKER_CANCEL_REQUESTED(예약자 취소 요청) <br><br>" +
-                    "DONE : 완료됨 <br>APPROVED(호스트의 예약 확정), CANCELED_BY_BOOKER(예약자 취소 요청 확정), <br>" +
-                    "BOOKER_CANCEL_REJECTED(예약자 취소 요청 거절), CANCELED_BY_HOST(호스트의 예약 거절(예약 확정됐는데, 호스트 책임의 거절))")
+                    "PENDING : 진행중 <br>PENDING(호스트의 승인 대기), BOOKER_CANCEL_REQUESTED(예약자의 취소 요청됨) <br><br>" +
+                    "DONE : 완료됨 <br>APPROVED(호스트의 예약 승인), REJECTED(PENDING 상태에서 호스트의 거절), CANCELED_BY_BOOKER(예약자 취소 요청 승인), <br>" +
+                    "BOOKER_CANCEL_REJECTED(예약자의 취소 요청 거절됨), CANCELED_BY_HOST(호스트의 예약 거절(예약 확정됐는데, 호스트 책임의 거절))")
     @GetMapping("/reservations/host")
     public CustomResponse<PageResponse<ReservationResDTO.ReservationDetailResDTO>> getReservationList(
             @AuthenticationPrincipal CurrentUser currentUser,
@@ -66,12 +66,13 @@ public class ReservationController {
     }
 
     @Operation(summary = "예약 목록 조회 (예약자 전용)",
-            description = "내가 등록한 공간에 대한 예약 목록 조회 <br><br>" +
+            description = "내가 생성한 예약 목록 조회 <br><br>" +
                     "[RequestParam statusGroup] : [ALL], [PENDING], [DONE] 3가지 선택<br><br>" +
                     "ALL : 모든 상태의 예약 <br><br>" +
-                    "PENDING : 진행중 <br>PENDING(호스트의 확정 대기), BOOKER_CANCEL_REQUESTED(예약자 취소 요청) <br><br>" +
-                    "DONE : 완료됨 <br>APPROVED(호스트의 예약 확정), CANCELED_BY_BOOKER(예약자 취소 요청 확정), <br>" +
-                    "BOOKER_CANCEL_REJECTED(예약자 취소 요청 거절), CANCELED_BY_HOST(호스트의 예약 거절(예약 확정됐는데, 호스트 책임의 거절))")
+                    "PENDING : 진행중 <br>PENDING(호스트 승인 대기), BOOKER_CANCEL_REQUESTED(예약자의 취소 요청됨) <br><br>" +
+                    "DONE : 완료됨 <br>APPROVED(호스트 예약 승인), REJECTED(PENDING 상태에서 호스트의 거절), CANCELED_BY_BOOKER(예약자 취소 요청 승인), <br>" +
+                    "BOOKER_CANCEL_REJECTED(예약자 취소 요청 거부), CANCELED_BY_HOST(호스트의 예약 거절(예약 확정됐는데, 호스트 책임의 거절))<br><br>" +
+                    "Reservation Status 참고 : https://www.notion.so/Reservation-2782a6b086de80ca8123d0ea8d57edbb")
     @GetMapping("/reservations/my")
     public CustomResponse<PageResponse<ReservationResDTO.ReservationDetailResDTO>> getMyReservationList(
             @AuthenticationPrincipal CurrentUser currentUser,
@@ -84,8 +85,9 @@ public class ReservationController {
     }
 
     @Operation(summary = "예약자의 요청 수락 (호스트 전용)",
-            description = "PENDING 상태의 예약을 호스트가 수락하여 APPROVED 상태로 전환 <br>" +
-            "또는 BOOKER_CANCEL_REQUESTED 상태를 수락해 예약을 취소해 줌")
+            description = "PENDING(호스트 승인 대기) -> APPROVED(호스트 예약 승인)<br>" +
+            "BOOKER_CANCEL_REQUESTED(예약자 취소 요청됨) -> CANCELED_BY_BOOKER(예약자 취소 요청 승인)<br><br>" +
+                    "Reservation Status 참고 : https://www.notion.so/Reservation-2782a6b086de80ca8123d0ea8d57edbb")
     @PostMapping("/reservations/{reservationId}/host/approval")
     public CustomResponse<ReservationResDTO.ReservationStatusResDTO> approveRequest(
             @AuthenticationPrincipal CurrentUser currentUser,
@@ -94,7 +96,11 @@ public class ReservationController {
         return CustomResponse.onSuccess(reservationCommandService.approveRequest(currentUser.getId(), reservationId));
     }
 
-    @Operation(summary = "예약자의 요청 거절 (호스트 전용)", description = "PENDING 또는 APPROVE 상태의 예약을 취소하거나 BOOKER_CANCEL_REQUESTED를 거절할 수 있다")
+    @Operation(summary = "예약자의 요청 거절 (호스트 전용)",
+            description = "PENDING(호스트 승인 대기) -> REJECTED(승인 거절)<br>" +
+                    "APPROVED(호스트 예약 승인) -> CANCELED_BY_HOST(호스트의 취소)<br>" +
+                    "BOOKER_CANCEL_REQUESTED(예약자 취소 요청됨) -> BOOKER_CANCEL_REJECTED(예약자 취소 요청 거부)<br><br>" +
+                    "Reservation Status 참고 : https://www.notion.so/Reservation-2782a6b086de80ca8123d0ea8d57edbb")
     @PostMapping("/reservations/{reservationId}/host/rejection")
     public CustomResponse<ReservationResDTO.ReservationStatusResDTO> rejectRequest(
             @AuthenticationPrincipal CurrentUser currentUser,
@@ -104,7 +110,10 @@ public class ReservationController {
         return CustomResponse.onSuccess(reservationCommandService.rejectRequest(currentUser.getId(), reservationId, reservationRejectReqDTO));
     }
 
-    @Operation(summary = "예약 취소 요청 (예약자 전용)", description = "PENDING인 경우에는 CANCELED APPROVE인 경우에는 BOOKER_CANCEL_REQUESTED")
+    @Operation(summary = "예약 취소 요청 (예약자 전용)",
+            description = "PENDING(호스트 승인 대기) -> CANCELED(승인 되기 전에 취소함)<br>" +
+                    "APPROVED(호스트 예약 승인) -> BOOKER_CANCEL_REQUESTED(예약자 취소 요청됨)<br><br>" +
+                    "Reservation Status 참고 : https://www.notion.so/Reservation-2782a6b086de80ca8123d0ea8d57edbb")
     @PostMapping("/reservations/{reservationId}/booker/cancel-request")
     public CustomResponse<ReservationResDTO.ReservationStatusResDTO> requestCancellation(
             @AuthenticationPrincipal CurrentUser currentUser,
