@@ -1,13 +1,20 @@
 package com.project.team5backend.domain.review.space.service.query;
 
 
+import com.project.team5backend.domain.image.entity.ExhibitionReviewImage;
 import com.project.team5backend.domain.image.entity.SpaceReviewImage;
+import com.project.team5backend.domain.review.exhibition.converter.ExhibitionReviewConverter;
+import com.project.team5backend.domain.review.exhibition.entity.ExhibitionReview;
 import com.project.team5backend.domain.review.space.converter.SpaceReviewConverter;
 import com.project.team5backend.domain.review.space.dto.response.SpaceReviewResDTO;
 import com.project.team5backend.domain.review.space.entity.SpaceReview;
 import com.project.team5backend.domain.review.space.exception.SpaceReviewErrorCode;
 import com.project.team5backend.domain.review.space.exception.SpaceReviewException;
 import com.project.team5backend.domain.review.space.repository.SpaceReviewRepository;
+import com.project.team5backend.domain.user.entity.User;
+import com.project.team5backend.domain.user.exception.UserErrorCode;
+import com.project.team5backend.domain.user.exception.UserException;
+import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.util.S3UrlResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -25,6 +32,7 @@ import java.util.List;
 public class SpaceReviewQueryServiceImpl implements SpaceReviewQueryService {
     private final SpaceReviewRepository spaceReviewRepository;
     private final S3UrlResolver s3UrlResolver;
+    private final UserRepository userRepository;
 
     @Override
     public SpaceReviewResDTO.SpaceReviewDetailResDTO getSpaceReviewDetail(Long spaceReviewId) {
@@ -48,6 +56,22 @@ public class SpaceReviewQueryServiceImpl implements SpaceReviewQueryService {
                     .map(s3UrlResolver::toFileUrl)
                     .toList();
             return SpaceReviewConverter.toSpaceReviewDetailResDTO(spaceReview, imageUrls);
+        });
+    }
+
+    @Override
+    public Page<SpaceReviewResDTO.SpaceReviewDetailResDTO> getMySpaceReviews(Long userId, Pageable pageable) {
+        User user = userRepository.findByIdAndIsDeletedFalse(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+
+        Page<SpaceReview> spaceReviewPage = spaceReviewRepository.findMySpaceReviewsByIdAndIsDeletedFalse(user, pageable);
+
+        return spaceReviewPage.map(review -> {
+            List<String> imageUrls = review.getSpaceReviewImages().stream()
+                    .map(SpaceReviewImage::getFileKey)
+                    .map(s3UrlResolver::toFileUrl)
+                    .toList();
+            return SpaceReviewConverter.toSpaceReviewDetailResDTO(review, imageUrls);
         });
     }
 }

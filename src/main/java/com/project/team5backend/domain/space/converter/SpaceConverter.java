@@ -1,5 +1,6 @@
 package com.project.team5backend.domain.space.converter;
 
+import com.project.team5backend.domain.admin.space.dto.response.AdminSpaceResDTO;
 import com.project.team5backend.domain.facility.entity.Facility;
 import com.project.team5backend.domain.facility.entity.SpaceFacility;
 import com.project.team5backend.domain.space.dto.request.SpaceReqDTO;
@@ -83,6 +84,30 @@ public class SpaceConverter {
                 .build();
     }
 
+    public static SpaceResDTO.MySpaceDetailResDTO toMySpaceDetailResDTO(Space space,
+                                                                      SpaceVerification spaceVerification,
+                                                                      List<String> imageUrls,
+                                                                      String businessLicenseFile,
+                                                                      String buildingRegisterFile)
+    {
+        return SpaceResDTO.MySpaceDetailResDTO.builder()
+                .spaceId(space.getId())
+                .name(space.getName())
+                .spaceVerificationResDTO(toVerificationResDTO(spaceVerification, businessLicenseFile, buildingRegisterFile))
+                .address(space.getAddress().getRoadAddress())
+                .operatingInfo(space.getOperatingInfo())
+                .spaceSize(space.getSpaceSize())
+                .spaceMood(space.getSpaceMood())
+                .description(space.getDescription())
+                .facilities(extractFacility(space))
+                .phoneNumber(space.getPhoneNumber())
+                .email(space.getEmail())
+                .websiteUrl(space.getWebsiteUrl())
+                .snsUrl(space.getSnsUrl())
+                .imageUrls(imageUrls)
+                .build();
+    }
+
     public static SpaceResDTO.SpaceSearchResDTO toSpaceSearchResDTO(Space space, String thumbnail){
         return SpaceResDTO.SpaceSearchResDTO.builder()
                 .spaceId(space.getId())
@@ -99,6 +124,24 @@ public class SpaceConverter {
         return SpaceResDTO.SpaceSearchPageResDTO.builder()
                 .page(page)
                 .map(new SpaceResDTO.SpaceSearchPageResDTO.MapInfo(lat, lon))
+                .build();
+    }
+
+    private static SpaceResDTO.MySpaceDetailResDTO.SpaceVerificationResDTO toVerificationResDTO(SpaceVerification verification, String businessLicenseFile, String buildingRegisterFile) {
+        return SpaceResDTO.MySpaceDetailResDTO.SpaceVerificationResDTO.builder()
+                .bizNumber(verification.getBizNumber())
+                .businessLicenseFile(businessLicenseFile)
+                .buildingRegisterFile(buildingRegisterFile)
+                .build();
+    }
+
+    public static SpaceResDTO.SpaceLikeSummaryResDTO toSpaceLikeSummaryResDTO(Space space, String thumbnail, boolean isLiked){
+        return SpaceResDTO.SpaceLikeSummaryResDTO.builder()
+                .spaceId(space.getId())
+                .title(space.getName())
+                .thumbnail(thumbnail)
+                .address(space.getAddress().getRoadAddress() + " " + space.getAddress().getDetail())
+                .isLiked(isLiked)
                 .build();
     }
 

@@ -214,6 +214,19 @@ public class ExhibitionConverter {
                 .build();
     }
 
+    public static ExhibitionResDTO.ExhibitionLikeSummaryResDTO toExhibitionLikeSummaryResDTO(Exhibition exhibition, String thumbnail, boolean isLiked, boolean opening) {
+        return ExhibitionResDTO.ExhibitionLikeSummaryResDTO.builder()
+                .exhibitionId(exhibition.getId())
+                .opening(opening)
+                .title(exhibition.getTitle())
+                .thumbnail(thumbnail)
+                .exhibitionCategory(exhibition.getExhibitionCategory())
+                .exhibitionType(exhibition.getExhibitionType())
+                .exhibitionMood(exhibition.getExhibitionMood())
+                .isLiked(isLiked)
+                .build();
+    }
+
     // 크롤링 전용 dto
     public static Exhibition toExhibitionCrawl(ExhibitionResDTO.ExhibitionCrawlResDto exhibitionCrawlResDto, Address address, ExhibitionResDTO.ExhibitionEnumResDTO exhibitionEnumResDTO, User user) {
         DateTimeFormatter formatter = DateTimeFormatter.BASIC_ISO_DATE;

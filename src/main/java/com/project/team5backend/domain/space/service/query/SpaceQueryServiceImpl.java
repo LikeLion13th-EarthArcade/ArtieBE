@@ -4,6 +4,7 @@ import com.project.team5backend.domain.image.repository.SpaceImageRepository;
 import com.project.team5backend.domain.space.converter.SpaceConverter;
 import com.project.team5backend.domain.space.dto.response.SpaceResDTO;
 import com.project.team5backend.domain.space.entity.Space;
+import com.project.team5backend.domain.space.entity.SpaceVerification;
 import com.project.team5backend.domain.space.entity.enums.SpaceMood;
 import com.project.team5backend.domain.space.entity.enums.SpaceSize;
 import com.project.team5backend.domain.space.entity.enums.SpaceType;
@@ -30,6 +31,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Objects;
 
 
 @Service
@@ -82,7 +84,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
     }
 
     @Override
-    public Page<SpaceResDTO.SpaceDetailResDTO> getInterestedSpaces(long userId, Pageable pageable) {
+    public Page<SpaceResDTO.SpaceLikeSummaryResDTO> getInterestedSpaces(long userId, Pageable pageable) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
@@ -91,12 +93,9 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
         Page<Space> interestedSpaces = spaceRepository.findByIdIn(interestedSpaceIds, pageable);
 
         return interestedSpaces.map(space -> {
-            List<String> imageUrls = spaceImageRepository.findImageUrlsBySpaceId(space.getId())
-                    .stream()
-                    .map(s3UrlResolver::toFileUrl)
-                    .toList();
-
-            return SpaceConverter.toSpaceDetailResDTO(space, imageUrls);
+            String thumbnail = s3UrlResolver.toFileUrl(space.getThumbnail());
+            boolean isLiked = interestedSpaceIds.contains(space.getId());
+            return SpaceConverter.toSpaceLikeSummaryResDTO(space, thumbnail, isLiked);
         });
     }
 
@@ -114,5 +113,28 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
 
             return SpaceConverter.toSpaceDetailResDTO(space, imageUrls);
         });
+    }
+
+    @Override
+    public SpaceResDTO.MySpaceDetailResDTO getMySpaceDetail(long userId, long spaceId) {
+        User user = userRepository.findByIdAndIsDeletedFalse(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+
+        Space space = spaceRepository.findByIdAndIsDeletedFalse(spaceId)
+                .orElseThrow(() -> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
+
+        if (!Objects.equals(space.getUser(), user)) {
+            throw new SpaceException(SpaceErrorCode.SPACE_FORBIDDEN);
+        }
+
+        List<String> imageUrls = spaceImageRepository.findImageUrlsBySpaceId(spaceId).stream()
+                .map(s3UrlResolver::toFileUrl)
+                .toList();
+
+        SpaceVerification spaceVerification = space.getSpaceVerification();
+        String businessLicenseFile = s3UrlResolver.toFileUrl(spaceVerification.getBusinessLicenseKey());
+        String buildingRegisterFile = s3UrlResolver.toFileUrl(spaceVerification.getBuildingRegisterKey());
+
+        return SpaceConverter.toMySpaceDetailResDTO(space, spaceVerification, imageUrls, businessLicenseFile, buildingRegisterFile);
     }
 }

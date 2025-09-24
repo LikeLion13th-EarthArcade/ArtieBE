@@ -125,6 +125,18 @@ public class ExhibitionResDTO {
     ){}
 
     @Builder
+    public record ExhibitionLikeSummaryResDTO(
+            Long exhibitionId,
+            Boolean opening,
+            String title,
+            String thumbnail,
+            ExhibitionCategory exhibitionCategory,
+            ExhibitionType exhibitionType,
+            ExhibitionMood exhibitionMood,
+            Boolean isLiked
+    ){}
+
+    @Builder
     public record ExhibitionSummaryResDTO(
             Long exhibitionId,
             String title,

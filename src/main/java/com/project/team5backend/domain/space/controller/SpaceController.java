@@ -135,7 +135,7 @@ public class SpaceController {
 
     @Operation(summary = "찜한 공간", description = "내가 찜한 공간의 정보를 보여준다")
     @GetMapping("/interest")
-    public CustomResponse<PageResponse<SpaceResDTO.SpaceDetailResDTO>> getInterestedSpaces(
+    public CustomResponse<PageResponse<SpaceResDTO.SpaceLikeSummaryResDTO>> getInterestedSpaces(
             @AuthenticationPrincipal CurrentUser currentUser,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
@@ -154,5 +154,14 @@ public class SpaceController {
     ) {
         Pageable pageable = PageRequest.of(page, size, org.springframework.data.domain.Sort.by("createdAt").descending());
         return CustomResponse.onSuccess(PageResponse.of(spaceQueryService.getMySpace(currentUser.getId(), statusGroup, pageable)));
+    }
+
+    @Operation(summary = "내가 등록한 공간 상세 조회")
+    @GetMapping("/my/{spaceId}")
+    public CustomResponse<SpaceResDTO.MySpaceDetailResDTO> getDetailSpace(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @PathVariable Long spaceId
+    ) {
+        return CustomResponse.onSuccess(spaceQueryService.getMySpaceDetail(currentUser.getId(), spaceId));
     }
 }

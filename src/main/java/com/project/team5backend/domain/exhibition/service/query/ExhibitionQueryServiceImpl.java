@@ -185,7 +185,7 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
     }
 
     @Override
-    public Page<ExhibitionResDTO.ExhibitionDetailResDTO> getInterestedExhibitions(Long userId, Pageable pageable) {
+    public Page<ExhibitionResDTO.ExhibitionLikeSummaryResDTO> getInterestedExhibitions(Long userId, Pageable pageable) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
@@ -193,13 +193,18 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
 
         Page<Exhibition> interestedExhibitions = exhibitionRepository.findByIdIn(interestedExhibitionIds, pageable);
 
+        LocalDate today = LocalDate.now();
         return interestedExhibitions.map(exhibition -> {
-            List<String> imageUrls = exhibitionImageRepository.findImageUrlsByExhibitionId(exhibition.getId())
-                    .stream()
-                    .map(s3UrlResolver::toFileUrl)
-                    .toList();
-
-            return ExhibitionConverter.toExhibitionDetailResDTO(exhibition, imageUrls);
+            String thumbnail = s3UrlResolver.toFileUrl(exhibition.getThumbnail());
+            boolean isLiked = interestedExhibitionIds.contains(exhibition.getId());
+            boolean opening = isOpening(exhibition, today);
+            return ExhibitionConverter.toExhibitionLikeSummaryResDTO(exhibition, thumbnail, isLiked, opening);
         });
+    }
+
+    private boolean isOpening(Exhibition exhibition, LocalDate today) {
+        return exhibition.getStartDate() != null && exhibition.getEndDate() != null
+                && !today.isBefore(exhibition.getStartDate())
+                && !today.isAfter(exhibition.getEndDate());
     }
 }
