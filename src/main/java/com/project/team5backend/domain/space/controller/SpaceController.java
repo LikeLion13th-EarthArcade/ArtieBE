@@ -47,7 +47,11 @@ public class SpaceController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    @Operation(summary = "전시 공간 등록", description = "등록시 공간 객체가 심사 대상에 포함됩니다.")
+    @Operation(summary = "전시 공간 등록",
+            description = "등록시 공간 객체가 심사 대상에 포함됩니다.<br>" +
+                    "사업자 인증 api가 선행되어야 함 -> 그렇지 않으면 예외<br>" +
+                    "operatingStartHour, operatingEndHour -> HH:mm 처럼 입력 (스웨거가 보여주는 모습이랑 다름)<br>" +
+                    "Facility -> 리스트 형태로 전달 RESTROOM(화장실), WIFI(와이파이), STROLLER_RENTAL(유모차 대여)")
     public CustomResponse<SpaceResDTO.SpaceCreateResDTO> createSpace(
             @AuthenticationPrincipal CurrentUser currentUser,
             @RequestPart("request") @Valid SpaceReqDTO.SpaceCreateReqDTO spaceCreateReqDTO,
