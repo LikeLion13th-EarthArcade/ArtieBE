@@ -78,4 +78,4 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
-buildDir = "C://intelliJ_builds//ArtieBE//build"
+//buildDir = "C://intelliJ_builds//ArtieBE//build"
