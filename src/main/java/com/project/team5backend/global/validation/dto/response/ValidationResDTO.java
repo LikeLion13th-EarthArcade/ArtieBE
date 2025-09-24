@@ -1,9 +1,6 @@
 package com.project.team5backend.global.validation.dto.response;
 
 import lombok.Builder;
-import org.w3c.dom.CDATASection;
-
-import java.util.List;
 
 public class ValidationResDTO {
 

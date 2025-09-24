@@ -1,6 +1,8 @@
 package com.project.team5backend.domain.review.exhibition.dto.request;
 
-import jakarta.validation.constraints.*;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 
 import static com.project.team5backend.global.constant.valid.MessageConstant.BLANK_REVIEW_RATE;

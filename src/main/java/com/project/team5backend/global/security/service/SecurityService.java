@@ -1,7 +1,5 @@
 package com.project.team5backend.global.security.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.global.apiPayload.exception.CustomException;
 import com.project.team5backend.global.security.exception.SecurityErrorCode;
 import com.project.team5backend.global.security.util.JwtUtil;
@@ -9,7 +7,6 @@ import com.project.team5backend.global.util.RedisUtils;
 import io.jsonwebtoken.ExpiredJwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.Objects;

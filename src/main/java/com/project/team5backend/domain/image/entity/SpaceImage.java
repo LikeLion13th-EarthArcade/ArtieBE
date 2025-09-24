@@ -3,7 +3,10 @@ package com.project.team5backend.domain.image.entity;
 import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.global.entity.BaseCreateDeleteEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 
 
 @Entity

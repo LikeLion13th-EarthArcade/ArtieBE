@@ -2,9 +2,9 @@ package com.project.team5backend.global.repository;
 
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfToken;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 public class CustomCookieCsrfTokenRepository implements CsrfTokenRepository {
 

@@ -1,6 +1,5 @@
 package com.project.team5backend.domain.space.service.query;
 
-import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.domain.image.repository.SpaceImageRepository;
 import com.project.team5backend.domain.space.converter.SpaceConverter;
 import com.project.team5backend.domain.space.dto.response.SpaceResDTO;
@@ -11,6 +10,7 @@ import com.project.team5backend.domain.space.entity.enums.SpaceType;
 import com.project.team5backend.domain.space.exception.SpaceErrorCode;
 import com.project.team5backend.domain.space.exception.SpaceException;
 import com.project.team5backend.domain.space.repository.SpaceRepository;
+import com.project.team5backend.global.entity.enums.Sort;
 import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.global.util.PageResponse;
 import com.project.team5backend.global.util.S3UrlResolver;

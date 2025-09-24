@@ -1,7 +1,6 @@
 package com.project.team5backend.global.validation.controller;
 
 import com.project.team5backend.global.apiPayload.CustomResponse;
-import com.project.team5backend.global.biznumber.dto.response.BizNumberResDTO;
 import com.project.team5backend.global.mail.MailType;
 import com.project.team5backend.global.validation.dto.request.ValidationReqDTO;
 import com.project.team5backend.global.validation.dto.response.ValidationResDTO;
@@ -16,7 +15,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.project.team5backend.global.constant.scope.ScopeConstant.SCOPE_SIGNUP;
-import static com.project.team5backend.global.constant.scope.ScopeConstant.SCOPE_TEMP_PASSWORD;
 
 @RestController
 @RequiredArgsConstructor

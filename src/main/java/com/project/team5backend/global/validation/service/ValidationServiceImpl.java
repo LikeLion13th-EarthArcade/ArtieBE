@@ -1,6 +1,5 @@
 package com.project.team5backend.global.validation.service;
 
-import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.biznumber.client.BizNumberClient;
 import com.project.team5backend.global.biznumber.dto.response.BizNumberResDTO;
@@ -21,7 +20,6 @@ import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static com.project.team5backend.global.constant.redis.RedisConstant.*;

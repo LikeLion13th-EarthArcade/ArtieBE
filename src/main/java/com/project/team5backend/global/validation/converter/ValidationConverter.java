@@ -6,8 +6,6 @@ import com.project.team5backend.global.validation.dto.response.ValidationResDTO;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
-import java.util.List;
-
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ValidationConverter {
 

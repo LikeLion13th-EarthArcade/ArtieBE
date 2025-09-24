@@ -1,8 +1,10 @@
 package com.project.team5backend.domain.recommendation.repository;
 
-import com.project.team5backend.domain.recommendation.entity.ExhibitionInteractLog; // 네가 가진 엔티티 경로 맞추기
 import com.project.team5backend.domain.recommendation.dto.KeyScoreRow;
-import org.springframework.data.jpa.repository.*;
+import com.project.team5backend.domain.recommendation.entity.ExhibitionInteractLog;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.time.LocalDateTime;

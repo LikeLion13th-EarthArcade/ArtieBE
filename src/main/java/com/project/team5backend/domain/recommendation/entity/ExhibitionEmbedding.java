@@ -2,7 +2,10 @@ package com.project.team5backend.domain.recommendation.entity;
 
 import com.project.team5backend.global.entity.BaseOnlyCreateTimeEntity;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Entity
 @Table(name = "exhibition_embedding")

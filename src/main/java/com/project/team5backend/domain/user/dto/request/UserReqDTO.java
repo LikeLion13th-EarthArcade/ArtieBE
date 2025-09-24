@@ -4,7 +4,9 @@ package com.project.team5backend.domain.user.dto.request;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
-import lombok.*;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import static com.project.team5backend.global.constant.valid.MessageConstant.*;
 import static com.project.team5backend.global.constant.valid.PatternConstant.PASSWORD_PATTERN;
