@@ -21,6 +21,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -47,7 +48,11 @@ public class SpaceController {
             consumes = MediaType.MULTIPART_FORM_DATA_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE
     )
-    @Operation(summary = "전시 공간 등록", description = "등록시 공간 객체가 심사 대상에 포함됩니다.")
+    @Operation(summary = "전시 공간 등록",
+            description = "등록시 공간 객체가 심사 대상에 포함됩니다.<br>" +
+                    "사업자 인증 api가 선행되어야 함 -> 그렇지 않으면 예외<br>" +
+                    "operatingStartHour, operatingEndHour -> HH:mm 처럼 입력 (스웨거가 보여주는 모습이랑 다름)<br>" +
+                    "Facility -> 리스트 형태로 전달 RESTROOM(화장실), WIFI(와이파이), STROLLER_RENTAL(유모차 대여)")
     public CustomResponse<SpaceResDTO.SpaceCreateResDTO> createSpace(
             @AuthenticationPrincipal CurrentUser currentUser,
             @RequestPart("request") @Valid SpaceReqDTO.SpaceCreateReqDTO spaceCreateReqDTO,
@@ -55,7 +60,7 @@ public class SpaceController {
             @RequestParam(value = "buildingRegisterFile") MultipartFile buildingRegisterFile,
             @RequestPart(value = "images", required = false) List<MultipartFile> images
     ) {
-        return CustomResponse.onSuccess(spaceCommandService.createSpace(spaceCreateReqDTO, currentUser.getId(), businessLicenseFile, buildingRegisterFile, images));
+        return CustomResponse.onSuccess(HttpStatus.CREATED, spaceCommandService.createSpace(spaceCreateReqDTO, currentUser.getId(), businessLicenseFile, buildingRegisterFile, images));
     }
 
     @PostMapping("/{spaceId}/like")
@@ -67,7 +72,7 @@ public class SpaceController {
         return CustomResponse.onSuccess(spaceCommandService.toggleLike(spaceId, currentUser.getId()));
     }
 
-    @Operation(summary = "전시 공간 상세 조회")
+    @Operation(summary = "전시 공간 상세 조회", description = "공간 id를 이용해 공간의 상세 정보 조회")
     @GetMapping("/{spaceId}")
     public CustomResponse<SpaceResDTO.SpaceDetailResDTO> getSpaceDetail(@PathVariable Long spaceId) {
         return CustomResponse.onSuccess(spaceQueryService.getSpaceDetail(spaceId));
@@ -101,6 +106,6 @@ public class SpaceController {
             @AuthenticationPrincipal CurrentUser currentUser,
             @PathVariable Long spaceId) {
         spaceCommandService.deleteSpace(spaceId, currentUser.getId());
-        return CustomResponse.onSuccess("공간이 삭제되었습니다.");
+        return CustomResponse.onSuccess(HttpStatus.NO_CONTENT, "공간이 삭제되었습니다.");
     }
 }
