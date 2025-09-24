@@ -140,7 +140,7 @@ public class RecommendationService {
 
         var candIds = candidates.stream().map(Exhibition::getId).toList();
         Map<Long, float[]> embMap = embRepo.findByExhibitionIdIn(candIds).stream()
-                .collect(Collectors.toMap(ExhibitionEmbedding::getId, ExhibitionEmbedding::toArray));
+                .collect(Collectors.toMap(ExhibitionEmbedding::getExhibitionId, ExhibitionEmbedding::toArray));
 
         // 리뷰 점수 정규화
         double minR = Double.POSITIVE_INFINITY, maxR = Double.NEGATIVE_INFINITY;
