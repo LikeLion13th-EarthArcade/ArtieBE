@@ -50,7 +50,7 @@ public class UserController {
         return CustomResponse.onSuccess(HttpStatus.CREATED, "회원 가입 완료");
     }
 
-    @Operation(summary = "회원 정보 조회")
+    @Operation(summary = "회원 정보 조회", description = "이름과 이메일")
     @GetMapping("/me")
     public CustomResponse<UserResDTO.UserProfileResDTO> getUserProfile(
             @AuthenticationPrincipal CurrentUser currentUser
