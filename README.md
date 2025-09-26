@@ -1,7 +1,7 @@
 # Team5-BackEnd
 
 ### ⚙️ 기술 스택
-- Java 17
+- Java 17 
 - Spring Boot 3.5.3
 
 ### 📋 Commit Message Convention
