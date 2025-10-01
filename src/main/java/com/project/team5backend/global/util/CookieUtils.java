@@ -44,7 +44,7 @@ public class CookieUtils {
         // -1 세션이 종료하면 쿠키 삭제
         csrfCookie.setMaxAge(CSRF_COOKIE_MAX_AGE);
         // CSRF 설정 -> 배포 중에는 Lax
-        csrfCookie.setAttribute("SameSite", "Lax");
+        csrfCookie.setAttribute("SameSite", "None");
         // 쿠키 추가
         response.addCookie(csrfCookie);
     }
