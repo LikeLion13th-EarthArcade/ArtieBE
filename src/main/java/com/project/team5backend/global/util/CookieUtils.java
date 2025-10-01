@@ -26,7 +26,7 @@ public class CookieUtils {
         // 쿠키 만료 시간 환경변수로 받아옴 (MS -> Sec로 변환 하려고 /1000)
         jwtCookie.setMaxAge((int) (tokenExpMs / 1000));
         // CSRF 설정 -> 개발 중에는 None
-        jwtCookie.setAttribute("SameSite", "Lax");
+        jwtCookie.setAttribute("SameSite", "None");
         // 쿠키 추가
         response.addCookie(jwtCookie);
     }
