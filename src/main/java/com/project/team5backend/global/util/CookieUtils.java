@@ -18,7 +18,7 @@ public class CookieUtils {
         // JS 에서 쿠키 읽기 불가능 XSS 방지
         jwtCookie.setHttpOnly(true);
         // HTTPS 연결에서만 쿠키 전송
-        jwtCookie.setSecure(true);
+        jwtCookie.setSecure(false);
         // '/' 경로 이하 모든 API 요청에 쿠키가 포함되도록
         jwtCookie.setPath("/");
         // 우리 도메인에서만 사용
@@ -36,7 +36,7 @@ public class CookieUtils {
         // csrf 쿠키는 js가 읽어야 헤더에 넣을 수 있음
         csrfCookie.setHttpOnly(false);
         // HTTPS 연결에서만 쿠키 전송
-        csrfCookie.setSecure(true);
+        csrfCookie.setSecure(false);
         // '/' 경로 이하 모든 API 요청에 쿠키가 포함되도록
         csrfCookie.setPath("/");
         // 우리 도메인에서만 사용
