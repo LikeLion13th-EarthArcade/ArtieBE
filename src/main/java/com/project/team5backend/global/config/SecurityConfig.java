@@ -10,6 +10,7 @@ import com.project.team5backend.global.security.repository.CustomCookieCsrfToken
 import com.project.team5backend.global.security.util.JwtUtil;
 import com.project.team5backend.global.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -24,6 +25,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.web.cors.CorsConfigurationSource;
 
 @Configuration // 빈 등록
 @EnableWebSecurity // 필터 체인 관리 시작 어노테이션
@@ -39,6 +41,7 @@ public class SecurityConfig {
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final CustomCookieCsrfTokenRepository customCookieCsrfTokenRepository;
+    private final @Qualifier("customCorsConfigurationSource") CorsConfigurationSource corsConfigurationSource;
 
 
     //인증이 필요하지 않은 url
@@ -63,7 +66,7 @@ public class SecurityConfig {
 
         http
                 // CORS CONFIG
-                .cors(cors -> cors.configurationSource(CorsConfig.apiConfigurationSource()))
+                .cors(cors -> cors.configurationSource(corsConfigurationSource))
 
                 // 요쳥별 접근 권한 설정
                 .authorizeHttpRequests(request -> request
