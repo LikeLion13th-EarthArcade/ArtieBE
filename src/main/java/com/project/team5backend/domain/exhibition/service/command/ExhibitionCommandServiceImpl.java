@@ -15,8 +15,6 @@ import com.project.team5backend.domain.facility.entity.Facility;
 import com.project.team5backend.domain.facility.repository.FacilityRepository;
 import com.project.team5backend.domain.image.converter.ImageConverter;
 import com.project.team5backend.domain.image.entity.ExhibitionImage;
-import com.project.team5backend.domain.image.exception.ImageErrorCode;
-import com.project.team5backend.domain.image.exception.ImageException;
 import com.project.team5backend.domain.image.repository.ExhibitionImageRepository;
 import com.project.team5backend.domain.image.service.command.ImageCommandService;
 import com.project.team5backend.domain.image.validator.ExhibitionImageValidator;
