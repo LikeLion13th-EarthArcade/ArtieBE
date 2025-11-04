@@ -54,14 +54,10 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
     public ExhibitionResDTO.ExhibitionDetailResDTO findExhibitionDetail(Long userId, Long exhibitionId) {
         Exhibition exhibition = exhibitionRepository.findByIdAndIsDeletedFalseAndStatusApprovedWithUserAndExhibitionFacilities(exhibitionId, Status.APPROVED)
                 .orElseThrow(() -> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
-
         // ai 분석을 위한 로그 생성
         interactLogService.logClick(userId, exhibitionId);
         // 전시 이미지들의 fileKey만 조회
-        List<String> imageUrls = exhibitionImageRepository.findImageUrlsByExhibitionId(exhibitionId).stream()
-                .map(fileUrlResolverPort::toFileUrl)
-                .toList();
-
+        List<String> imageUrls = getFileKeys(exhibitionId);
         return ExhibitionConverter.toExhibitionDetailResDTO(exhibition, imageUrls);
     }
 
@@ -111,9 +107,7 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
             throw new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND);
         }
         Exhibition upcomingEx = exhibitions.get(0);
-        List<String> imageUrls = exhibitionImageRepository.findImageUrlsByExhibitionId(upcomingEx.getId()).stream()
-                .map(fileUrlResolverPort::toFileUrl)
-                .toList();
+        List<String> imageUrls = getFileKeys(upcomingEx.getId());
         return ExhibitionConverter.toUpcomingPopularExhibitionResDTO(upcomingEx.getId(), upcomingEx.getTitle(), imageUrls);
     }
 
@@ -172,12 +166,8 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
         Exhibition exhibition = exhibitionRepository.findByIdAndUserIdAndIsDeletedFalse(userId, exhibitionId)
                 .orElseThrow(() -> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
 
-        List<String> imageUrls = exhibitionImageRepository.findImageUrlsByExhibitionId(exhibitionId).stream()
-                .map(fileUrlResolverPort::toFileUrl)
-                .toList();
-
+        List<String> imageUrls = getFileKeys(exhibitionId);
         return ExhibitionConverter.toMyExhibitionDetailResDTO(exhibition, imageUrls);
-
     }
 
     private boolean isExhibitionLiked(Long userId, Long exhibitionId) {
@@ -206,5 +196,11 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
         return exhibition.getStartDate() != null && exhibition.getEndDate() != null
                 && !today.isBefore(exhibition.getStartDate())
                 && !today.isAfter(exhibition.getEndDate());
+    }
+
+    private List<String> getFileKeys(Long exhibitionId){
+        return exhibitionImageRepository.findImageUrlsByExhibitionId(exhibitionId).stream()
+                .map(fileUrlResolverPort::toFileUrl)
+                .toList();
     }
 }
