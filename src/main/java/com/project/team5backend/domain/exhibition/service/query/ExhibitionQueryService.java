@@ -3,10 +3,10 @@ package com.project.team5backend.domain.exhibition.service.query;
 import com.project.team5backend.domain.exhibition.dto.response.ExhibitionResDTO;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionCategory;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionMood;
-import com.project.team5backend.global.entity.enums.Sort;
+import com.project.team5backend.domain.common.enums.Sort;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import com.project.team5backend.global.entity.enums.StatusGroup;
+import com.project.team5backend.domain.common.enums.StatusGroup;
 
 import java.time.LocalDate;
 import java.util.List;

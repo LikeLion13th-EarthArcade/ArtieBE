@@ -4,7 +4,7 @@ import com.project.team5backend.domain.admin.dashboard.dto.response.ExhibitionSu
 import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionCategory;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionMood;
-import com.project.team5backend.global.entity.enums.Status;
+import com.project.team5backend.domain.common.enums.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;

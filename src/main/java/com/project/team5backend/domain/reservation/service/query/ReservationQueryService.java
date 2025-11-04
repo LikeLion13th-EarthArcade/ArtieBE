@@ -1,7 +1,7 @@
 package com.project.team5backend.domain.reservation.service.query;
 
 import com.project.team5backend.domain.reservation.dto.response.ReservationResDTO;
-import com.project.team5backend.global.entity.enums.StatusGroup;
+import com.project.team5backend.domain.common.enums.StatusGroup;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

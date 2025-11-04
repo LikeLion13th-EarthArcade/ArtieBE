@@ -12,7 +12,7 @@ import com.project.team5backend.domain.recommendation.dto.response.RecommendResD
 import com.project.team5backend.domain.recommendation.entity.ExhibitionEmbedding;
 import com.project.team5backend.domain.recommendation.repository.ExhibitionEmbeddingRepository;
 import com.project.team5backend.domain.recommendation.repository.ExhibitionInteractLogRepository;
-import com.project.team5backend.global.entity.enums.Status;
+import com.project.team5backend.domain.common.enums.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;

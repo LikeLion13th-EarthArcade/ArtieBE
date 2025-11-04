@@ -5,7 +5,7 @@ import com.project.team5backend.domain.reservation.dto.response.ReservationResDT
 import com.project.team5backend.domain.reservation.entity.Reservation;
 import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.user.entity.User;
-import com.project.team5backend.global.entity.enums.Status;
+import com.project.team5backend.domain.common.enums.Status;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

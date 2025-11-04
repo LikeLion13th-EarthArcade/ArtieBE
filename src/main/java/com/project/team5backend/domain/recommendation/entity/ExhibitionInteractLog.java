@@ -1,7 +1,7 @@
 package com.project.team5backend.domain.recommendation.entity;
 
 import com.project.team5backend.domain.recommendation.model.ActionType;
-import com.project.team5backend.global.entity.BaseOnlyCreateTimeEntity;
+import com.project.team5backend.domain.common.BaseOnlyCreateTimeEntity;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

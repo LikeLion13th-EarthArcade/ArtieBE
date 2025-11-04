@@ -1,4 +1,4 @@
-package com.project.team5backend.global.entity;
+package com.project.team5backend.domain.common;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.EntityListeners;
@@ -12,8 +12,16 @@ import java.time.LocalDateTime;
 @MappedSuperclass
 @Getter
 @EntityListeners(AuditingEntityListener.class)
-public class BaseOnlyCreateTimeEntity {
+public abstract class BaseCreateDeleteEntity {
+
     @CreatedDate
-    @Column(name = "created_at")
+    @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
+
+    @Column(name = "deleted_at")
+    private LocalDateTime deletedAt;
+
+    public void markDeleted() {
+        this.deletedAt = LocalDateTime.now();
+    }
 }

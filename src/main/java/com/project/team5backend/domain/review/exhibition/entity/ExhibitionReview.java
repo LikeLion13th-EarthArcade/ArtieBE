@@ -3,7 +3,7 @@ package com.project.team5backend.domain.review.exhibition.entity;
 import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.image.entity.ExhibitionReviewImage;
 import com.project.team5backend.domain.user.entity.User;
-import com.project.team5backend.global.entity.BaseTimeEntity;
+import com.project.team5backend.domain.common.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.BatchSize;

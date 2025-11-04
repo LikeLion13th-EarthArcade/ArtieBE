@@ -2,7 +2,7 @@ package com.project.team5backend.domain.admin.space.dto.response;
 
 import com.project.team5backend.domain.space.entity.enums.SpaceMood;
 import com.project.team5backend.domain.space.entity.enums.SpaceSize;
-import com.project.team5backend.global.entity.enums.Status;
+import com.project.team5backend.domain.common.enums.Status;
 import lombok.Builder;
 
 import java.time.LocalDateTime;
