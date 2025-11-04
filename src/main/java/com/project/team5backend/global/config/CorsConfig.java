@@ -8,8 +8,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import java.util.ArrayList;
-import java.util.Collections;
+import java.util.List;
 
 @Configuration
 public class CorsConfig implements WebMvcConfigurer {
@@ -19,29 +18,31 @@ public class CorsConfig implements WebMvcConfigurer {
     public CorsConfigurationSource apiConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
 
-        // 허용할 Origin List
-        ArrayList<String> allowedOrigins = new ArrayList<>();
-        allowedOrigins.add("http://localhost:8080");
-        allowedOrigins.add("http://localhost:5173");
-        allowedOrigins.add("http://localhost:5174");
-        allowedOrigins.add("https://artie-blond.vercel.app");
-        allowedOrigins.add("https://artiee.store");
-        allowedOrigins.add("https://api.artiee.store");
-
-        configuration.setAllowedOriginPatterns(allowedOrigins);
-
-        // 허용할 HTTP METHOD
-        ArrayList<String> allowedHttpMethods = new ArrayList<>();
-        allowedHttpMethods.add("OPTIONS");
-        allowedHttpMethods.add("GET");
-        allowedHttpMethods.add("POST");
-        allowedHttpMethods.add("PATCH");
-        allowedHttpMethods.add("DELETE");
-
-        configuration.setAllowedMethods(allowedHttpMethods);
-
-        configuration.setAllowedHeaders(Collections.singletonList("*"));
+        // 허용할 Origin
+        configuration.setAllowedOrigins(List.of(
+                "https://artiee.store",
+                "https://api.artiee.store",
+                "https://artie-blond.vercel.app",
+                "http://localhost:5173",
+                "http://localhost:5174",
+                "http://localhost:8080"
+        ));
         configuration.setAllowCredentials(true);
+
+        // 허용할 HTTP 메서드
+        configuration.setAllowedMethods(List.of("OPTIONS", "GET", "POST", "PATCH", "DELETE"));
+
+        // 허용할 헤더
+        configuration.setAllowedHeaders(List.of("*"));
+
+        // 자격 증명(쿠키) 허용
+        configuration.setAllowCredentials(true);
+
+        // 프론트가 읽을 수 있는 헤더
+        configuration.setExposedHeaders(List.of(
+                "X-XSRF-TOKEN"      // CSRF 토큰
+        ));
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
 
