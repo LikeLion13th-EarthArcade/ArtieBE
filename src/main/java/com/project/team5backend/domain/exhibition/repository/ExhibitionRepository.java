@@ -28,12 +28,13 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
 
     @Query("""
         select e from Exhibition e
-        join fetch e.user
+        join e.user u
         where e.id = :exhibitionId
         and e.isDeleted = false
-        and e.status =:status
+        and u.id = :userId
+        and e.status = :status
     """)
-    Optional<Exhibition> findByIdAndIsDeletedFalseAndStatusApprovedWithUser(@Param("exhibitionId") Long exhibitionId, @Param("status") Status status);
+    Optional<Exhibition> findByIdAndIsDeletedFalseAndStatusApprovedWithUser(@Param("exhibitionId") Long exhibitionId, @Param("userId") Long userId, @Param("status") Status status);
 
     @Query("""
         select distinct e
