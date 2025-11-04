@@ -58,7 +58,8 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
         interactLogService.logClick(userId, exhibitionId);
         // 전시 이미지들의 fileKey만 조회
         List<String> imageUrls = getFileKeys(exhibitionId);
-        return ExhibitionConverter.toExhibitionDetailResDTO(exhibition, imageUrls);
+        boolean liked = exhibitionLikeRepository.existsByUserIdAndExhibitionId(userId, exhibitionId);
+        return ExhibitionConverter.toExhibitionDetailResDTO(exhibition, imageUrls, liked);
     }
 
     @Override

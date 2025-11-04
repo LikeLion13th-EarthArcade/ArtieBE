@@ -62,7 +62,7 @@ public class ExhibitionConverter {
                 .build();
     }
 
-    public static ExhibitionResDTO.ExhibitionDetailResDTO toExhibitionDetailResDTO(Exhibition exhibition, List<String> imageUrls) {
+    public static ExhibitionResDTO.ExhibitionDetailResDTO toExhibitionDetailResDTO(Exhibition exhibition, List<String> imageUrls, boolean liked) {
         return ExhibitionResDTO.ExhibitionDetailResDTO.builder()
                 .exhibitionId(exhibition.getId())
                 .title(exhibition.getTitle())
@@ -80,6 +80,7 @@ public class ExhibitionConverter {
                 .exhibitionMood(exhibition.getExhibitionMood())
                 .price(exhibition.getPrice())
                 .facilities(extractFacility(exhibition))
+                .liked(liked)
                 .build();
     }
 

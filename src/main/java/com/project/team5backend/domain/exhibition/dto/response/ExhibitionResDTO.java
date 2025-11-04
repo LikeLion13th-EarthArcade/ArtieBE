@@ -40,7 +40,8 @@ public class ExhibitionResDTO {
             ExhibitionType exhibitionType,
             ExhibitionMood exhibitionMood,
             Integer price,
-            List<String> facilities
+            List<String> facilities,
+            boolean liked
     ) {}
 
     @Builder
