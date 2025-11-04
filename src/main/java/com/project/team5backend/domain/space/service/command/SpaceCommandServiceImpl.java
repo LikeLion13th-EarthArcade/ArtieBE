@@ -1,5 +1,6 @@
 package com.project.team5backend.domain.space.service.command;
 
+import com.project.team5backend.domain.common.storage.FileStoragePort;
 import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
 import com.project.team5backend.domain.facility.entity.Facility;
 import com.project.team5backend.domain.facility.entity.SpaceFacility;
@@ -33,7 +34,6 @@ import com.project.team5backend.global.address.dto.response.AddressResDTO;
 import com.project.team5backend.global.address.service.AddressService;
 import com.project.team5backend.domain.common.embedded.Address;
 import com.project.team5backend.domain.common.enums.Status;
-import com.project.team5backend.global.infra.s3.S3FileStorageAdapter;
 import com.project.team5backend.global.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -63,7 +63,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
     private final FacilityRepository facilityRepository;
     private final InteractLogService interactLogService;
     private final AddressService addressService;
-    private final S3FileStorageAdapter s3FileStorageAdapter;
+    private final FileStoragePort fileStoragePort;
     private final ImageCommandService imageCommandService;
     private final FileUrlResolverPort fileUrlResolverPort;
     private final RedisUtils<String> redisUtils;
@@ -89,11 +89,11 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
         AddressResDTO.AddressCreateResDTO addressResDTO = addressService.resolve(spaceCreateReqDTO.address());
         Address address = AddressConverter.toAddress(addressResDTO);
 
-        String businessLicenseFileUrl = s3FileStorageAdapter.upload(businessLicenseFile,"businessLicenseFile");
-        String buildingRegisterFileUrl = s3FileStorageAdapter.upload(buildingRegisterFile,"buildingRegister");
+        String businessLicenseFileUrl = fileStoragePort.upload(businessLicenseFile,"businessLicenseFile");
+        String buildingRegisterFileUrl = fileStoragePort.upload(buildingRegisterFile,"buildingRegister");
 
         List<String> imageUrls = images.stream()
-                .map(file -> s3FileStorageAdapter.upload(file, "spaces"))
+                .map(file -> fileStoragePort.upload(file, "spaces"))
                 .toList();
 
         String thumbnail = fileUrlResolverPort.toFileKey(imageUrls.get(0));

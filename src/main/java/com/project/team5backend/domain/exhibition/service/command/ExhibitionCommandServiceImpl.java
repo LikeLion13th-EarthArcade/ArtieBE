@@ -1,5 +1,6 @@
 package com.project.team5backend.domain.exhibition.service.command;
 
+import com.project.team5backend.domain.common.storage.FileStoragePort;
 import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
 import com.project.team5backend.domain.exhibition.converter.ExhibitionConverter;
 import com.project.team5backend.domain.exhibition.converter.ExhibitionLikeConverter;
@@ -31,7 +32,6 @@ import com.project.team5backend.global.address.dto.response.AddressResDTO;
 import com.project.team5backend.global.address.service.AddressService;
 import com.project.team5backend.domain.common.embedded.Address;
 import com.project.team5backend.domain.common.enums.Status;
-import com.project.team5backend.global.infra.s3.S3FileStorageAdapter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -55,7 +55,7 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
     private final ImageCommandService imageCommandService;
     private final AddressService addressService;
     private final InteractLogService interactLogService;
-    private final S3FileStorageAdapter s3FileStorageAdapter;
+    private final FileStoragePort fileStoragePort;
     private final FileUrlResolverPort fileUrlResolverPort;
 
     @Override
@@ -69,7 +69,7 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
         Address address = AddressConverter.toAddress(addressResDTO);
 
         List<String> imageUrls = images.stream()
-                .map(file -> s3FileStorageAdapter.upload(file, "exhibitions"))
+                .map(file -> fileStoragePort.upload(file, "exhibitions"))
                 .toList();
 
         String thumbnail = fileUrlResolverPort.toFileKey(imageUrls.get(0));

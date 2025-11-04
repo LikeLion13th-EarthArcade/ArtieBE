@@ -1,5 +1,6 @@
 package com.project.team5backend.domain.review.exhibition.service.command;
 
+import com.project.team5backend.domain.common.storage.FileStoragePort;
 import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.exhibition.exception.ExhibitionErrorCode;
 import com.project.team5backend.domain.exhibition.exception.ExhibitionException;
@@ -22,7 +23,6 @@ import com.project.team5backend.domain.user.exception.UserErrorCode;
 import com.project.team5backend.domain.user.exception.UserException;
 import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.domain.common.enums.Status;
-import com.project.team5backend.global.infra.s3.S3FileStorageAdapter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -44,7 +44,7 @@ public class ExhibitionReviewCommandServiceImpl implements ExhibitionReviewComma
     private final ExhibitionReviewRepository exhibitionReviewRepository;
     private final ExhibitionReviewImageRepository exhibitionReviewImageRepository;
     private final ImageCommandService imageCommandService;
-    private final S3FileStorageAdapter s3FileStorageAdapter;
+    private final FileStoragePort fileStoragePort;
     @Override
     public ExhibitionReviewResDTO.ExReviewCreateResDTO createExhibitionReview(Long exhibitionId, Long userId, ExhibitionReviewReqDTO.createExReviewReqDTO createExhibitionReviewReqDTO, List<MultipartFile> images) {
         Exhibition exhibition = exhibitionRepository.findByIdAndIsDeletedFalseAndStatusApproveAndOpening(exhibitionId, LocalDate.now(), Status.APPROVED)
@@ -81,7 +81,7 @@ public class ExhibitionReviewCommandServiceImpl implements ExhibitionReviewComma
                 .orElseGet(List::of)
                 .stream()
                 .map(file -> {
-                    String url = s3FileStorageAdapter.upload(file, "exhibitionReviews");
+                    String url = fileStoragePort.upload(file, "exhibitionReviews");
                     return ImageConverter.toExhibitionReviewImage(exhibitionReview, url);
                 })
                 .toList();
