@@ -3,7 +3,7 @@ package com.project.team5backend.domain.admin.reservation.controller;
 import com.project.team5backend.domain.admin.reservation.service.query.AdminReservationQueryService;
 import com.project.team5backend.domain.reservation.dto.response.ReservationResDTO;
 import com.project.team5backend.global.apiPayload.CustomResponse;
-import com.project.team5backend.global.entity.enums.StatusGroup;
+import com.project.team5backend.domain.common.enums.StatusGroup;
 import com.project.team5backend.global.util.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

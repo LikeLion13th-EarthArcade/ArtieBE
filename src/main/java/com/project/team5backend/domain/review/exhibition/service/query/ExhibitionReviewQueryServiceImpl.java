@@ -1,5 +1,6 @@
 package com.project.team5backend.domain.review.exhibition.service.query;
 
+import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
 import com.project.team5backend.domain.image.entity.ExhibitionReviewImage;
 import com.project.team5backend.domain.review.exhibition.converter.ExhibitionReviewConverter;
 import com.project.team5backend.domain.review.exhibition.dto.response.ExhibitionReviewResDTO;
@@ -11,7 +12,6 @@ import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.user.exception.UserErrorCode;
 import com.project.team5backend.domain.user.exception.UserException;
 import com.project.team5backend.domain.user.repository.UserRepository;
-import com.project.team5backend.global.util.S3UrlResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -30,7 +30,7 @@ import java.util.List;
 public class ExhibitionReviewQueryServiceImpl implements ExhibitionReviewQueryService {
 
     private final ExhibitionReviewRepository exhibitionReviewRepository;
-    private final S3UrlResolver s3UrlResolver;
+    private final FileUrlResolverPort fileUrlResolverPort;
     private final UserRepository userRepository;
 
     @Override
@@ -40,7 +40,7 @@ public class ExhibitionReviewQueryServiceImpl implements ExhibitionReviewQuerySe
 
         List<String> imageUrls = exhibitionReview.getExhibitionReviewImages().stream()
                 .map(ExhibitionReviewImage::getFileKey)
-                .map(s3UrlResolver::toFileUrl)
+                .map(fileUrlResolverPort::toFileUrl)
                 .toList();
         return ExhibitionReviewConverter.toExReviewDetailResDTO(exhibitionReview, imageUrls);
     }
@@ -54,7 +54,7 @@ public class ExhibitionReviewQueryServiceImpl implements ExhibitionReviewQuerySe
         return reviewPage.map(review -> {
             List<String> imageUrls = review.getExhibitionReviewImages().stream()
                     .map(ExhibitionReviewImage::getFileKey)
-                    .map(s3UrlResolver::toFileUrl)
+                    .map(fileUrlResolverPort::toFileUrl)
                     .toList();
             return ExhibitionReviewConverter.toExReviewDetailResDTO(review, imageUrls);
         });
@@ -70,7 +70,7 @@ public class ExhibitionReviewQueryServiceImpl implements ExhibitionReviewQuerySe
         return ExReviewPage.map(review -> {
             List<String> imageUrls = review.getExhibitionReviewImages().stream()
                     .map(ExhibitionReviewImage::getFileKey)
-                    .map(s3UrlResolver::toFileUrl)
+                    .map(fileUrlResolverPort::toFileUrl)
                     .toList();
             return ExhibitionReviewConverter.toExReviewDetailResDTO(review, imageUrls);
         });

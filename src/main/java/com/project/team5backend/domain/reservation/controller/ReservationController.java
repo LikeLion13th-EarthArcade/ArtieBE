@@ -5,7 +5,7 @@ import com.project.team5backend.domain.reservation.dto.response.ReservationResDT
 import com.project.team5backend.domain.reservation.service.command.ReservationCommandService;
 import com.project.team5backend.domain.reservation.service.query.ReservationQueryService;
 import com.project.team5backend.global.apiPayload.CustomResponse;
-import com.project.team5backend.global.entity.enums.StatusGroup;
+import com.project.team5backend.domain.common.enums.StatusGroup;
 import com.project.team5backend.global.security.userdetails.CurrentUser;
 import com.project.team5backend.global.util.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;

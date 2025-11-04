@@ -4,7 +4,7 @@ import com.project.team5backend.domain.admin.exhibition.dto.response.AdminExhibi
 import com.project.team5backend.domain.admin.exhibition.service.command.AdminExhibitionCommandService;
 import com.project.team5backend.domain.admin.exhibition.service.query.AdminExhibitionQueryService;
 import com.project.team5backend.global.apiPayload.CustomResponse;
-import com.project.team5backend.global.entity.enums.StatusGroup;
+import com.project.team5backend.domain.common.enums.StatusGroup;
 import com.project.team5backend.global.util.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

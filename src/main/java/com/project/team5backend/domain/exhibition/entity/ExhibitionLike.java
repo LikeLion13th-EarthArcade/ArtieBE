@@ -1,7 +1,7 @@
 package com.project.team5backend.domain.exhibition.entity;
 
 import com.project.team5backend.domain.user.entity.User;
-import com.project.team5backend.global.entity.BaseOnlyCreateTimeEntity;
+import com.project.team5backend.domain.common.BaseOnlyCreateTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
 

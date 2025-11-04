@@ -1,5 +1,6 @@
 package com.project.team5backend.domain.review.space.service.command;
 
+import com.project.team5backend.domain.common.storage.FileStoragePort;
 import com.project.team5backend.domain.image.converter.ImageConverter;
 import com.project.team5backend.domain.image.entity.SpaceReviewImage;
 import com.project.team5backend.domain.image.exception.ImageErrorCode;
@@ -21,8 +22,7 @@ import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.user.exception.UserErrorCode;
 import com.project.team5backend.domain.user.exception.UserException;
 import com.project.team5backend.domain.user.repository.UserRepository;
-import com.project.team5backend.global.entity.enums.Status;
-import com.project.team5backend.global.infra.s3.S3FileStorageAdapter;
+import com.project.team5backend.domain.common.enums.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -39,7 +39,7 @@ public class SpaceReviewCommandServiceImpl implements SpaceReviewCommandService 
     private final SpaceReviewRepository spaceReviewRepository;
     private final SpaceRepository spaceRepository;
     private final UserRepository userRepository;;
-    private final S3FileStorageAdapter s3FileStorageAdapter;
+    private final FileStoragePort fileStoragePort;
     private final SpaceReviewImageRepository spaceReviewImageRepository;
     private final ImageCommandService imageCommandService;
 
@@ -78,7 +78,7 @@ public class SpaceReviewCommandServiceImpl implements SpaceReviewCommandService 
                 .orElseGet(List::of)
                 .stream()
                 .map(file -> {
-                    String url = s3FileStorageAdapter.upload(file, "spaceReviews");
+                    String url = fileStoragePort.upload(file, "spaceReviews");
                     return ImageConverter.toSpaceReviewImage(spaceReview, url);
                 })
                 .toList();

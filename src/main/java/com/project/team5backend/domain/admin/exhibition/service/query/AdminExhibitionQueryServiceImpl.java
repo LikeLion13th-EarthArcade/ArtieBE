@@ -2,13 +2,13 @@ package com.project.team5backend.domain.admin.exhibition.service.query;
 
 import com.project.team5backend.domain.admin.exhibition.converter.AdminExhibitionConverter;
 import com.project.team5backend.domain.admin.exhibition.dto.response.AdminExhibitionResDTO;
+import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
 import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.exhibition.exception.ExhibitionErrorCode;
 import com.project.team5backend.domain.exhibition.exception.ExhibitionException;
 import com.project.team5backend.domain.exhibition.repository.ExhibitionRepository;
 import com.project.team5backend.domain.image.repository.ExhibitionImageRepository;
-import com.project.team5backend.global.entity.enums.StatusGroup;
-import com.project.team5backend.global.util.S3UrlResolver;
+import com.project.team5backend.domain.common.enums.StatusGroup;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -25,7 +25,7 @@ public class AdminExhibitionQueryServiceImpl implements AdminExhibitionQueryServ
 
     private final ExhibitionRepository exhibitionRepository;
     private final ExhibitionImageRepository exhibitionImageRepository;
-    private final S3UrlResolver s3UrlResolver;
+    private final FileUrlResolverPort fileUrlResolverPort;
 
     private static final int PAGE_SIZE = 10;
 
@@ -45,7 +45,7 @@ public class AdminExhibitionQueryServiceImpl implements AdminExhibitionQueryServ
                 .orElseThrow(() -> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
 
         List<String> imageUrls = exhibitionImageRepository.findImageUrlsByExhibitionId(exhibitionId).stream()
-                .map(s3UrlResolver::toFileUrl)
+                .map(fileUrlResolverPort::toFileUrl)
                 .toList();
 
         return AdminExhibitionConverter.toExhibitionDetailResDTO(exhibition, imageUrls);

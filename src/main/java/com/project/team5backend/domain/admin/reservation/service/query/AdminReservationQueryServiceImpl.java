@@ -4,7 +4,7 @@ import com.project.team5backend.domain.reservation.converter.ReservationConverte
 import com.project.team5backend.domain.reservation.dto.response.ReservationResDTO;
 import com.project.team5backend.domain.reservation.entity.Reservation;
 import com.project.team5backend.domain.reservation.repository.CustomReservationRepository;
-import com.project.team5backend.global.entity.enums.StatusGroup;
+import com.project.team5backend.domain.common.enums.StatusGroup;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

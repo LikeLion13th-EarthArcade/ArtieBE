@@ -5,9 +5,9 @@ import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionMood;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionType;
 import com.project.team5backend.domain.facility.entity.ExhibitionFacility;
 import com.project.team5backend.domain.user.entity.User;
-import com.project.team5backend.global.entity.BaseTimeEntity;
-import com.project.team5backend.global.entity.embedded.Address;
-import com.project.team5backend.global.entity.enums.Status;
+import com.project.team5backend.domain.common.BaseTimeEntity;
+import com.project.team5backend.domain.common.embedded.Address;
+import com.project.team5backend.domain.common.enums.Status;
 import jakarta.persistence.*;
 import lombok.*;
 

@@ -1,5 +1,6 @@
 package com.project.team5backend.domain.space.service.query;
 
+import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
 import com.project.team5backend.domain.image.repository.SpaceImageRepository;
 import com.project.team5backend.domain.space.converter.SpaceConverter;
 import com.project.team5backend.domain.space.dto.response.SpaceResDTO;
@@ -16,11 +17,10 @@ import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.user.exception.UserErrorCode;
 import com.project.team5backend.domain.user.exception.UserException;
 import com.project.team5backend.domain.user.repository.UserRepository;
-import com.project.team5backend.global.entity.enums.Sort;
-import com.project.team5backend.global.entity.enums.Status;
-import com.project.team5backend.global.entity.enums.StatusGroup;
+import com.project.team5backend.domain.common.enums.Sort;
+import com.project.team5backend.domain.common.enums.Status;
+import com.project.team5backend.domain.common.enums.StatusGroup;
 import com.project.team5backend.global.util.PageResponse;
-import com.project.team5backend.global.util.S3UrlResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -42,7 +42,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
 
     private final SpaceRepository spaceRepository;
     private final SpaceImageRepository spaceImageRepository;
-    private final S3UrlResolver s3UrlResolver;
+    private final FileUrlResolverPort fileUrlResolverPort;
     private final UserRepository userRepository;
     private final SpaceLikeRepository spaceLikeRepository;
 
@@ -58,7 +58,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
                 .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
 
         List<String> imageUrls = spaceImageRepository.findImageUrlsBySpaceId(spaceId).stream()
-                .map(s3UrlResolver::toFileUrl)
+                .map(fileUrlResolverPort::toFileUrl)
                 .toList();
 
         return SpaceConverter.toSpaceDetailResDTO(space, imageUrls);
@@ -76,7 +76,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
                 requestedStartDate, requestedEndDate, district, size, type, mood, facilities, sort, pageable);
         Page<SpaceResDTO.SpaceSearchResDTO> spaceSearchResDTOPage = spacePage
                 .map(space -> {
-                    String thumbnail = s3UrlResolver.toFileUrl(space.getThumbnail());
+                    String thumbnail = fileUrlResolverPort.toFileUrl(space.getThumbnail());
                     return SpaceConverter.toSpaceSearchResDTO(space, thumbnail);
                 });
 
@@ -93,7 +93,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
         Page<Space> interestedSpaces = spaceRepository.findByIdIn(interestedSpaceIds, pageable);
 
         return interestedSpaces.map(space -> {
-            String thumbnail = s3UrlResolver.toFileUrl(space.getThumbnail());
+            String thumbnail = fileUrlResolverPort.toFileUrl(space.getThumbnail());
             boolean isLiked = interestedSpaceIds.contains(space.getId());
             return SpaceConverter.toSpaceLikeSummaryResDTO(space, thumbnail, isLiked);
         });
@@ -108,7 +108,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
         return spacePage.map(space -> {
             List<String> imageUrls = spaceImageRepository.findImageUrlsBySpaceId(space.getId())
                     .stream()
-                    .map(s3UrlResolver::toFileUrl)
+                    .map(fileUrlResolverPort::toFileUrl)
                     .toList();
 
             return SpaceConverter.toSpaceDetailResDTO(space, imageUrls);
@@ -128,12 +128,12 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
         }
 
         List<String> imageUrls = spaceImageRepository.findImageUrlsBySpaceId(spaceId).stream()
-                .map(s3UrlResolver::toFileUrl)
+                .map(fileUrlResolverPort::toFileUrl)
                 .toList();
 
         SpaceVerification spaceVerification = space.getSpaceVerification();
-        String businessLicenseFile = s3UrlResolver.toFileUrl(spaceVerification.getBusinessLicenseKey());
-        String buildingRegisterFile = s3UrlResolver.toFileUrl(spaceVerification.getBuildingRegisterKey());
+        String businessLicenseFile = fileUrlResolverPort.toFileUrl(spaceVerification.getBusinessLicenseKey());
+        String buildingRegisterFile = fileUrlResolverPort.toFileUrl(spaceVerification.getBuildingRegisterKey());
 
         return SpaceConverter.toMySpaceDetailResDTO(space, spaceVerification, imageUrls, businessLicenseFile, buildingRegisterFile);
     }

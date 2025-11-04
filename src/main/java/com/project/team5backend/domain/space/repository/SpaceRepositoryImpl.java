@@ -3,16 +3,15 @@ package com.project.team5backend.domain.space.repository;
 import com.project.team5backend.domain.facility.entity.QFacility;
 import com.project.team5backend.domain.facility.entity.QSpaceFacility;
 import com.project.team5backend.domain.reservation.entity.QReservation;
-import com.project.team5backend.domain.reservation.entity.Reservation;
 import com.project.team5backend.domain.space.entity.QSpace;
 import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.space.entity.enums.SpaceMood;
 import com.project.team5backend.domain.space.entity.enums.SpaceSize;
 import com.project.team5backend.domain.space.entity.enums.SpaceType;
 import com.project.team5backend.domain.user.entity.User;
-import com.project.team5backend.global.entity.enums.Sort;
-import com.project.team5backend.global.entity.enums.Status;
-import com.project.team5backend.global.entity.enums.StatusGroup;
+import com.project.team5backend.domain.common.enums.Sort;
+import com.project.team5backend.domain.common.enums.Status;
+import com.project.team5backend.domain.common.enums.StatusGroup;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
@@ -28,7 +27,6 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
-import static com.project.team5backend.domain.reservation.entity.QReservation.reservation;
 import static com.project.team5backend.domain.space.entity.QSpace.space;
 
 @Repository
