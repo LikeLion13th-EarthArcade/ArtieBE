@@ -1,5 +1,6 @@
 package com.project.team5backend.domain.space.service.command;
 
+import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
 import com.project.team5backend.domain.facility.entity.Facility;
 import com.project.team5backend.domain.facility.entity.SpaceFacility;
 import com.project.team5backend.domain.facility.repository.FacilityRepository;
@@ -34,7 +35,6 @@ import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.global.infra.s3.S3FileStorageAdapter;
 import com.project.team5backend.global.util.ImageUtils;
 import com.project.team5backend.global.util.RedisUtils;
-import com.project.team5backend.global.util.S3UrlResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -65,7 +65,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
     private final AddressService addressService;
     private final S3FileStorageAdapter s3FileStorageAdapter;
     private final ImageCommandService imageCommandService;
-    private final S3UrlResolver s3UrlResolver;
+    private final FileUrlResolverPort fileUrlResolverPort;
     private final RedisUtils<String> redisUtils;
 
     @Override
@@ -96,7 +96,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
                 .map(file -> s3FileStorageAdapter.upload(file, "spaces"))
                 .toList();
 
-        String thumbnail = s3UrlResolver.toFileKey(imageUrls.get(0));
+        String thumbnail = fileUrlResolverPort.toFileKey(imageUrls.get(0));
         Space space = SpaceConverter.toSpace(spaceCreateReqDTO, user, thumbnail, address);
 
         SpaceVerification spaceVerification = SpaceConverter.toSpaceVerification(space, spaceCreateReqDTO.bizNumber(), businessLicenseFileUrl, buildingRegisterFileUrl);

@@ -1,5 +1,6 @@
 package com.project.team5backend.domain.exhibition.service.command;
 
+import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
 import com.project.team5backend.domain.exhibition.converter.ExhibitionConverter;
 import com.project.team5backend.domain.exhibition.converter.ExhibitionLikeConverter;
 import com.project.team5backend.domain.exhibition.dto.request.ExhibitionReqDTO;
@@ -31,7 +32,6 @@ import com.project.team5backend.global.entity.embedded.Address;
 import com.project.team5backend.global.entity.enums.Status;
 import com.project.team5backend.global.infra.s3.S3FileStorageAdapter;
 import com.project.team5backend.global.util.ImageUtils;
-import com.project.team5backend.global.util.S3UrlResolver;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -56,7 +56,7 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
     private final AddressService addressService;
     private final InteractLogService interactLogService;
     private final S3FileStorageAdapter s3FileStorageAdapter;
-    private final S3UrlResolver s3UrlResolver;
+    private final FileUrlResolverPort fileUrlResolverPort;
 
     @Override
     public ExhibitionResDTO.ExhibitionCreateResDTO createExhibition(ExhibitionReqDTO.ExhibitionCreateReqDTO exhibitionCreateReqDTO, Long userId, List<MultipartFile> images) {
@@ -72,7 +72,7 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
                 .map(file -> s3FileStorageAdapter.upload(file, "exhibitions"))
                 .toList();
 
-        String thumbnail = s3UrlResolver.toFileKey(imageUrls.get(0));
+        String thumbnail = fileUrlResolverPort.toFileKey(imageUrls.get(0));
         Exhibition exhibition = ExhibitionConverter.toExhibition(exhibitionCreateReqDTO, user, thumbnail, address);
         exhibitionRepository.save(exhibition);
 

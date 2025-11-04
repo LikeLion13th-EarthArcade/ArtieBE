@@ -79,8 +79,11 @@ public class ExhibitionController {
 
     @GetMapping("/{exhibitionId}")
     @Operation(summary = "전시 상세 보기", description = "전시 상세 보기 api")
-    public CustomResponse<ExhibitionResDTO.ExhibitionDetailResDTO> getExhibitionDetail(@PathVariable Long exhibitionId) {
-        return CustomResponse.onSuccess(exhibitionQueryService.findExhibitionDetail(exhibitionId));
+    public CustomResponse<ExhibitionResDTO.ExhibitionDetailResDTO> getExhibitionDetail(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @PathVariable Long exhibitionId
+    ) {
+        return CustomResponse.onSuccess(exhibitionQueryService.findExhibitionDetail(currentUser.getId(), exhibitionId));
     }
 
     @Operation(summary = "전시 검색",
