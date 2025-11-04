@@ -10,6 +10,7 @@ import com.project.team5backend.domain.image.exception.ImageErrorCode;
 import com.project.team5backend.domain.image.exception.ImageException;
 import com.project.team5backend.domain.image.repository.SpaceImageRepository;
 import com.project.team5backend.domain.image.service.command.ImageCommandService;
+import com.project.team5backend.domain.image.validator.ExhibitionImageValidator;
 import com.project.team5backend.domain.recommendation.service.InteractLogService;
 import com.project.team5backend.domain.review.space.repository.SpaceReviewRepository;
 import com.project.team5backend.domain.space.converter.SpaceConverter;
@@ -33,7 +34,6 @@ import com.project.team5backend.global.address.service.AddressService;
 import com.project.team5backend.domain.common.embedded.Address;
 import com.project.team5backend.domain.common.enums.Status;
 import com.project.team5backend.global.infra.s3.S3FileStorageAdapter;
-import com.project.team5backend.global.util.ImageUtils;
 import com.project.team5backend.global.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -81,7 +81,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
             throw new SpaceException(SpaceErrorCode.BIZ_NUMBER_VALIDATION_DOES_NOT_EXIST);
         }
 
-        ImageUtils.validateImages(images); // 이미지 검증 (개수, null 여부)
+        ExhibitionImageValidator.validateImages(images); // 이미지 검증 (개수, null 여부)
 
         User user = userRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
