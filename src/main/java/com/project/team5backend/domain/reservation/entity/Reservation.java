@@ -3,8 +3,8 @@ package com.project.team5backend.domain.reservation.entity;
 
 import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.user.entity.User;
-import com.project.team5backend.global.entity.BaseTimeEntity;
-import com.project.team5backend.global.entity.enums.Status;
+import com.project.team5backend.domain.common.BaseTimeEntity;
+import com.project.team5backend.domain.common.enums.Status;
 import jakarta.persistence.*;
 import lombok.*;
 

@@ -1,11 +1,14 @@
 package com.project.team5backend.domain.recommendation.service;
 
+import com.project.team5backend.domain.recommendation.converter.RecommendationConverter;
 import com.project.team5backend.domain.recommendation.entity.ExhibitionInteractLog;
 import com.project.team5backend.domain.recommendation.model.ActionType;
 import com.project.team5backend.domain.recommendation.repository.ExhibitionInteractLogRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
 
 @Service
 @RequiredArgsConstructor
@@ -16,26 +19,17 @@ public class InteractLogService {
     private static final java.time.Duration DEDUP = java.time.Duration.ofMinutes(5);
 
     public void logClick(Long userId, Long exhibitionId) {
-        var since = java.time.LocalDateTime.now().minus(DEDUP);
-        boolean recent = logRepo.countRecent(userId, exhibitionId, "CLICK", since) > 0;
-        if (!recent) {
-            logRepo.save(ExhibitionInteractLog.builder()
-                    .userId(userId)
-                    .exhibitionId(exhibitionId)
-                    .actionType(ActionType.CLICK) // enum
-                    .build());
-        }
+        logAction(userId, exhibitionId, ActionType.CLICK);
     }
 
     public void logLike(Long userId, Long exhibitionId) {
-        var since = java.time.LocalDateTime.now().minus(DEDUP);
-        boolean recent = logRepo.countRecent(userId, exhibitionId, "LIKE", since) > 0;
-        if (!recent) {
-            logRepo.save(ExhibitionInteractLog.builder()
-                    .userId(userId)
-                    .exhibitionId(exhibitionId)
-                    .actionType(ActionType.LIKE)
-                    .build());
+        logAction(userId, exhibitionId, ActionType.LIKE);
+    }
+
+    private void logAction(Long userId, Long exhibitionId, ActionType actionType) {
+        LocalDateTime since = java.time.LocalDateTime.now().minus(DEDUP);
+        if (logRepo.countRecent(userId, exhibitionId, "ACTION", since) == 0) {
+            logRepo.save(RecommendationConverter.toExhibitionInteractLog(userId, exhibitionId, actionType));
         }
     }
 }

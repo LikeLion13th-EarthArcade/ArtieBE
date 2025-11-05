@@ -1,4 +1,4 @@
-package com.project.team5backend.global.entity.enums;
+package com.project.team5backend.domain.common.enums;
 
 public enum Status {
     PENDING,    // 입금 완료된 상태, 호스트 검색가능      & 전시/공간 심사중

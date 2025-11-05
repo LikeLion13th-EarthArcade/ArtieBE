@@ -2,7 +2,7 @@ package com.project.team5backend.domain.reservation.repository;
 
 import com.project.team5backend.domain.reservation.entity.Reservation;
 import com.project.team5backend.domain.user.entity.User;
-import com.project.team5backend.global.entity.enums.StatusGroup;
+import com.project.team5backend.domain.common.enums.StatusGroup;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 

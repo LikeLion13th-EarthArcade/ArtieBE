@@ -4,7 +4,7 @@ import com.project.team5backend.domain.admin.space.dto.response.AdminSpaceResDTO
 import com.project.team5backend.domain.admin.space.service.command.AdminSpaceCommandService;
 import com.project.team5backend.domain.admin.space.service.query.AdminSpaceQueryService;
 import com.project.team5backend.global.apiPayload.CustomResponse;
-import com.project.team5backend.global.entity.enums.StatusGroup;
+import com.project.team5backend.domain.common.enums.StatusGroup;
 import com.project.team5backend.global.util.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;

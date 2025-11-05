@@ -12,7 +12,7 @@ import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.user.exception.UserErrorCode;
 import com.project.team5backend.domain.user.exception.UserException;
 import com.project.team5backend.domain.user.repository.UserRepository;
-import com.project.team5backend.global.entity.enums.StatusGroup;
+import com.project.team5backend.domain.common.enums.StatusGroup;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

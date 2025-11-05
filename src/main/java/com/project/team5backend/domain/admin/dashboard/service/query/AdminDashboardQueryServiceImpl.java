@@ -6,7 +6,7 @@ import com.project.team5backend.domain.admin.dashboard.dto.response.ExhibitionSu
 import com.project.team5backend.domain.admin.dashboard.dto.response.SpaceSummaryResDTO;
 import com.project.team5backend.domain.exhibition.repository.ExhibitionRepository;
 import com.project.team5backend.domain.space.repository.SpaceRepository;
-import com.project.team5backend.global.entity.enums.Status;
+import com.project.team5backend.domain.common.enums.Status;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

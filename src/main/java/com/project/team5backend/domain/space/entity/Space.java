@@ -5,9 +5,9 @@ import com.project.team5backend.domain.space.entity.enums.SpaceMood;
 import com.project.team5backend.domain.space.entity.enums.SpaceSize;
 import com.project.team5backend.domain.space.entity.enums.SpaceType;
 import com.project.team5backend.domain.user.entity.User;
-import com.project.team5backend.global.entity.BaseTimeEntity;
-import com.project.team5backend.global.entity.embedded.Address;
-import com.project.team5backend.global.entity.enums.Status;
+import com.project.team5backend.domain.common.BaseTimeEntity;
+import com.project.team5backend.domain.common.embedded.Address;
+import com.project.team5backend.domain.common.enums.Status;
 import jakarta.persistence.*;
 import lombok.*;
 

@@ -51,6 +51,16 @@ public class SecurityController {
     public CustomResponse<String> csrf(
             HttpServletRequest request
     ) {
+        String origin = request.getHeader("Origin");
+        String referer = request.getHeader("Referer");
+        String host = request.getHeader("Host");
+        String remoteAddr = request.getRemoteAddr();
+
+        log.info("[CSRF] 요청 도메인 Origin   : {}", origin);
+        log.info("[CSRF] 요청 Referer (페이지): {}", referer);
+        log.info("[CSRF] 요청 Host (서버)     : {}", host);
+        log.info("[CSRF] 요청 Client IP       : {}", remoteAddr);
+
         // lazy 토큰을 실제로 생성해서 쿠키에 담기도록 트리거
         CsrfToken token = (CsrfToken) request.getAttribute(CsrfToken.class.getName());
         if (token != null) {

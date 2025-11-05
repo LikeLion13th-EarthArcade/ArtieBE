@@ -1,4 +1,4 @@
-package com.project.team5backend.global.entity.enums;
+package com.project.team5backend.domain.common.enums;
 
 public enum StatusGroup {
     ALL,

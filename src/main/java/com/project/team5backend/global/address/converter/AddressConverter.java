@@ -1,7 +1,7 @@
 package com.project.team5backend.global.address.converter;
 
 import com.project.team5backend.global.address.dto.response.AddressResDTO;
-import com.project.team5backend.global.entity.embedded.Address;
+import com.project.team5backend.domain.common.embedded.Address;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 

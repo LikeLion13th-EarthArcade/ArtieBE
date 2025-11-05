@@ -4,7 +4,7 @@ import com.project.team5backend.domain.admin.dashboard.dto.response.ExhibitionSu
 import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionCategory;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionMood;
-import com.project.team5backend.global.entity.enums.Status;
+import com.project.team5backend.domain.common.enums.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -28,12 +28,13 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
 
     @Query("""
         select e from Exhibition e
-        join fetch e.user
+        join e.user u
         where e.id = :exhibitionId
         and e.isDeleted = false
-        and e.status =:status
+        and u.id = :userId
+        and e.status = :status
     """)
-    Optional<Exhibition> findByIdAndIsDeletedFalseAndStatusApprovedWithUser(@Param("exhibitionId") Long exhibitionId, @Param("status") Status status);
+    Optional<Exhibition> findByIdAndIsDeletedFalseAndStatusApprovedWithUser(@Param("exhibitionId") Long exhibitionId, @Param("userId") Long userId, @Param("status") Status status);
 
     @Query("""
         select distinct e

@@ -1,6 +1,6 @@
 package com.project.team5backend.domain.reservation.dto.response;
 
-import com.project.team5backend.global.entity.enums.Status;
+import com.project.team5backend.domain.common.enums.Status;
 import lombok.Builder;
 
 import java.time.LocalDate;

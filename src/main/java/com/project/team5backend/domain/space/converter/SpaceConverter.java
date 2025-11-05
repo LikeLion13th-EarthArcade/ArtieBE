@@ -1,6 +1,5 @@
 package com.project.team5backend.domain.space.converter;
 
-import com.project.team5backend.domain.admin.space.dto.response.AdminSpaceResDTO;
 import com.project.team5backend.domain.facility.entity.Facility;
 import com.project.team5backend.domain.facility.entity.SpaceFacility;
 import com.project.team5backend.domain.space.dto.request.SpaceReqDTO;
@@ -8,8 +7,8 @@ import com.project.team5backend.domain.space.dto.response.SpaceResDTO;
 import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.space.entity.SpaceVerification;
 import com.project.team5backend.domain.user.entity.User;
-import com.project.team5backend.global.entity.embedded.Address;
-import com.project.team5backend.global.entity.enums.Status;
+import com.project.team5backend.domain.common.embedded.Address;
+import com.project.team5backend.domain.common.enums.Status;
 import com.project.team5backend.global.util.PageResponse;
 
 import java.util.List;

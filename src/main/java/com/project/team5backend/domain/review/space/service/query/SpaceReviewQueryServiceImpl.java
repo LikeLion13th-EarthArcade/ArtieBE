@@ -1,10 +1,8 @@
 package com.project.team5backend.domain.review.space.service.query;
 
 
-import com.project.team5backend.domain.image.entity.ExhibitionReviewImage;
+import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
 import com.project.team5backend.domain.image.entity.SpaceReviewImage;
-import com.project.team5backend.domain.review.exhibition.converter.ExhibitionReviewConverter;
-import com.project.team5backend.domain.review.exhibition.entity.ExhibitionReview;
 import com.project.team5backend.domain.review.space.converter.SpaceReviewConverter;
 import com.project.team5backend.domain.review.space.dto.response.SpaceReviewResDTO;
 import com.project.team5backend.domain.review.space.entity.SpaceReview;
@@ -15,7 +13,6 @@ import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.user.exception.UserErrorCode;
 import com.project.team5backend.domain.user.exception.UserException;
 import com.project.team5backend.domain.user.repository.UserRepository;
-import com.project.team5backend.global.util.S3UrlResolver;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,7 +28,7 @@ import java.util.List;
 @Transactional
 public class SpaceReviewQueryServiceImpl implements SpaceReviewQueryService {
     private final SpaceReviewRepository spaceReviewRepository;
-    private final S3UrlResolver s3UrlResolver;
+    private final FileUrlResolverPort fileUrlResolverPort;
     private final UserRepository userRepository;
 
     @Override
@@ -41,7 +38,7 @@ public class SpaceReviewQueryServiceImpl implements SpaceReviewQueryService {
 
         List<String> imageUrls = spaceReview.getSpaceReviewImages().stream()
                 .map(SpaceReviewImage::getFileKey)
-                .map(s3UrlResolver::toFileUrl)
+                .map(fileUrlResolverPort::toFileUrl)
                 .toList();
         return SpaceReviewConverter.toSpaceReviewDetailResDTO(spaceReview, imageUrls);
     }
@@ -53,7 +50,7 @@ public class SpaceReviewQueryServiceImpl implements SpaceReviewQueryService {
         return spaceReviewPage.map(spaceReview -> {
             List<String> imageUrls = spaceReview.getSpaceReviewImages().stream()
                     .map(SpaceReviewImage::getFileKey)
-                    .map(s3UrlResolver::toFileUrl)
+                    .map(fileUrlResolverPort::toFileUrl)
                     .toList();
             return SpaceReviewConverter.toSpaceReviewDetailResDTO(spaceReview, imageUrls);
         });
@@ -69,7 +66,7 @@ public class SpaceReviewQueryServiceImpl implements SpaceReviewQueryService {
         return spaceReviewPage.map(review -> {
             List<String> imageUrls = review.getSpaceReviewImages().stream()
                     .map(SpaceReviewImage::getFileKey)
-                    .map(s3UrlResolver::toFileUrl)
+                    .map(fileUrlResolverPort::toFileUrl)
                     .toList();
             return SpaceReviewConverter.toSpaceReviewDetailResDTO(review, imageUrls);
         });

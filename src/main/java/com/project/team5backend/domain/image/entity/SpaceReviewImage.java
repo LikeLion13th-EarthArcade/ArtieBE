@@ -1,7 +1,7 @@
 package com.project.team5backend.domain.image.entity;
 
 import com.project.team5backend.domain.review.space.entity.SpaceReview;
-import com.project.team5backend.global.entity.BaseCreateDeleteEntity;
+import com.project.team5backend.domain.common.BaseCreateDeleteEntity;
 import jakarta.persistence.*;
 import lombok.*;
 
