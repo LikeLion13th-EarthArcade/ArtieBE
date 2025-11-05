@@ -28,8 +28,7 @@ public class ExhibitionRepositoryImpl implements ExhibitionRepositoryCustom {
 
     @Override
     public Page<Exhibition> findExhibitionsWithFilters(
-            ExhibitionCategory exhibitionCategory, String district, ExhibitionMood exhibitionMood, LocalDate localDate,
-            Sort sort, Pageable pageable) {
+            ExhibitionCategory exhibitionCategory, String district, ExhibitionMood exhibitionMood, LocalDate localDate, Sort sort, Pageable pageable) {
 
         QExhibition exhibition = QExhibition.exhibition;
 
@@ -47,11 +46,7 @@ public class ExhibitionRepositoryImpl implements ExhibitionRepositoryCustom {
                 .fetchOne();
 
         // 정렬, 디폴트 최신순
-        OrderSpecifier<?> order = switch (sort == null ? Sort.POPULAR : sort) {
-            case OLD     -> exhibition.createdAt.asc();
-            case POPULAR -> exhibition.reviewCount.desc().nullsLast();
-            case NEW     -> exhibition.createdAt.desc();
-        };
+        OrderSpecifier<?> order = getOrder(sort, exhibition);
 
         // 페이징된 결과 조회
         List<Exhibition> content = queryFactory
@@ -71,6 +66,7 @@ public class ExhibitionRepositoryImpl implements ExhibitionRepositoryCustom {
 
         return new PageImpl<>(content, pageable, total != null ? total : 0L);
     }
+
     @Override
     public List<Exhibition> findUnpopularCandidates(LocalDate today, int limit) {
         QExhibition exhibition = QExhibition.exhibition;
@@ -121,7 +117,7 @@ public class ExhibitionRepositoryImpl implements ExhibitionRepositoryCustom {
     }
 
     @Override
-    public Page<Exhibition> findMyExhibitionsByStatus(Long userId, StatusGroup status, Pageable pageable){
+    public Page<Exhibition> findMyExhibitionsByStatus(Long userId, StatusGroup status, Sort sort, Pageable pageable){
         QExhibition exhibition = QExhibition.exhibition;
 
         Long total = queryFactory
@@ -132,11 +128,15 @@ public class ExhibitionRepositoryImpl implements ExhibitionRepositoryCustom {
                         statusCondition(exhibition, status))
                 .fetchOne();
 
+        // 정렬, 디폴트 최신순
+        OrderSpecifier<?> order = getOrder(sort, exhibition);
+
         List<Exhibition> content = queryFactory
                 .selectFrom(exhibition)
                 .where(
                         exhibition.user.id.eq(userId),
                         statusCondition(exhibition, status))
+                .orderBy(order, exhibition.id.desc()) // 최신순 정렬
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
@@ -178,4 +178,13 @@ public class ExhibitionRepositoryImpl implements ExhibitionRepositoryCustom {
             case DONE -> exhibition.status.in(Status.APPROVED, Status.REJECTED).and(exhibition.createdAt.goe(sevenDaysAgo));
         };
     }
+
+    private static OrderSpecifier<?> getOrder(Sort sort, QExhibition exhibition) {
+        return switch (sort == null ? Sort.POPULAR : sort) {
+            case OLD -> exhibition.createdAt.asc();
+            case POPULAR -> exhibition.reviewCount.desc().nullsLast();
+            case NEW -> exhibition.createdAt.desc();
+        };
+    }
+
 }

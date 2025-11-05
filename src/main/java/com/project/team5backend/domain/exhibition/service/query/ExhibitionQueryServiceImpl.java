@@ -39,7 +39,6 @@ import java.util.Random;
 @Transactional
 public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
 
-    private static final int PAGE_SIZE = 4;
     private static final double SEOUL_CITY_HALL_LAT = 37.5665;
     private static final double SEOUL_CITY_HALL_LNG = 126.9780;
 
@@ -52,29 +51,20 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
 
     @Override
     public ExhibitionResDTO.ExhibitionDetailResDTO findExhibitionDetail(Long userId, Long exhibitionId) {
-        Exhibition exhibition = exhibitionRepository.findByIdAndIsDeletedFalseAndStatusApprovedWithUserAndExhibitionFacilities(exhibitionId, Status.APPROVED)
-                .orElseThrow(() -> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
-        // ai 분석을 위한 로그 생성
-        interactLogService.logClick(userId, exhibitionId);
-        // 전시 이미지들의 fileKey만 조회
-        List<String> imageUrls = getFileKeys(exhibitionId);
+        Exhibition exhibition = getApprovedExhibitionWithDetails(exhibitionId);
+
+        interactLogService.logClick(userId, exhibitionId); // ai 분석을 위한 로그 생성
+        List<String> imageUrls = getFileKeys(exhibitionId); // 전시 이미지들의 fileKey만 조회
         boolean liked = exhibitionLikeRepository.existsByUserIdAndExhibitionId(userId, exhibitionId);
         return ExhibitionConverter.toExhibitionDetailResDTO(exhibition, imageUrls, liked);
     }
 
     @Override
     public ExhibitionResDTO.ExhibitionSearchPageResDTO searchExhibitions(
-            ExhibitionCategory exhibitionCategory, String district, ExhibitionMood exhibitionMood, LocalDate localDate, Sort sort, int page) {
+            ExhibitionCategory exhibitionCategory, String district, ExhibitionMood exhibitionMood, LocalDate localDate, Sort sort, Pageable pageable) {
 
-        Pageable pageable = PageRequest.of(page, PAGE_SIZE, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt"));
-        // 동적 쿼리로 전시 검색
-        Page<Exhibition> exhibitionPage = exhibitionRepository.findExhibitionsWithFilters(
-                exhibitionCategory, district, exhibitionMood, localDate, sort, pageable);
-        Page<ExhibitionResDTO.ExhibitionSearchResDTO> exhibitionSearchResDTOPage = exhibitionPage
-                .map(exhibition -> {
-                    String thumbnail = fileUrlResolverPort.toFileUrl(exhibition.getThumbnail());
-                    return ExhibitionConverter.toExhibitionSearchResDTO(exhibition, thumbnail);
-                });
+        Page<Exhibition> exhibitionPage = exhibitionRepository.findExhibitionsWithFilters(exhibitionCategory, district, exhibitionMood, localDate, sort, pageable);
+        Page<ExhibitionResDTO.ExhibitionSearchResDTO> exhibitionSearchResDTOPage = getExhibitionSearchResDTOPage(exhibitionPage);
 
         return ExhibitionConverter.toExhibitionSearchPageResDTO(PageResponse.of(exhibitionSearchResDTOPage), SEOUL_CITY_HALL_LAT, SEOUL_CITY_HALL_LNG);
     }
@@ -89,12 +79,7 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
             throw new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND);
         }
         return exhibitions.stream()
-                .map(exhibition ->
-                {
-                    String thumbnail = fileUrlResolverPort.toFileUrl(exhibition.getThumbnail());
-                    boolean liked = isExhibitionLiked(userId, exhibition.getId());
-                    return ExhibitionConverter.toExhibitionHotNowResDTO(exhibition, liked, thumbnail);
-                })
+                .map(exhibition -> getExhibitionHotNowResDTO(userId, exhibition))
                 .toList();
     }
 
@@ -127,10 +112,7 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
         }
         return ExhibitionConverter.toRegionalPopularExhibitionListResDTO(
                 exhibitions.stream()
-                        .map(exhibition -> {
-                            String thumbnail = fileUrlResolverPort.toFileUrl(exhibition.getThumbnail());
-                            return ExhibitionConverter.toRegionalPopularExhibitionResDTO(exhibition, thumbnail);
-                        })
+                        .map(this::getRegionalPopularExhibitionResDTO)
                         .toList()
         );
     }
@@ -144,53 +126,43 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
 
         return candidates.stream()
                 .limit(4)
-                .map(exhibition ->
-                {
-                    String thumbnail = fileUrlResolverPort.toFileUrl(exhibition.getThumbnail());
-                    boolean liked = isExhibitionLiked(userId, exhibition.getId());
-                    return ExhibitionConverter.toArtieRecommendationResDTO(exhibition, liked, thumbnail);
-                })
+                .map(exhibition -> getArtieRecommendationResDTO(userId, exhibition))
                 .toList();
     }
 
     @Override
-    public Page<ExhibitionResDTO.ExhibitionSummaryResDTO> getSummaryExhibitionList(Long userId, StatusGroup status, int page) {
-        Pageable pageable = PageRequest.of(page, PAGE_SIZE, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt"));
-
-        Page<Exhibition> exhibitionPage = exhibitionRepository.findMyExhibitionsByStatus(userId, status, pageable);
-
+    public Page<ExhibitionResDTO.ExhibitionSummaryResDTO> getSummaryExhibitionList(Long userId, StatusGroup status, Sort sort, Pageable pageable) {
+        Page<Exhibition> exhibitionPage = exhibitionRepository.findMyExhibitionsByStatus(userId, status, sort, pageable);
         return exhibitionPage.map(ExhibitionConverter::toExhibitionSummaryResDTO);
     }
 
     @Override
     public ExhibitionResDTO.MyExhibitionDetailResDTO getMyDetailExhibition(Long userId, Long exhibitionId) {
-        Exhibition exhibition = exhibitionRepository.findByIdAndUserIdAndIsDeletedFalse(userId, exhibitionId)
-                .orElseThrow(() -> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
-
+        Exhibition exhibition = getOwnedActiveExhibition(userId, exhibitionId);
         List<String> imageUrls = getFileKeys(exhibitionId);
         return ExhibitionConverter.toMyExhibitionDetailResDTO(exhibition, imageUrls);
     }
 
-    private boolean isExhibitionLiked(Long userId, Long exhibitionId) {
-        return exhibitionLikeRepository.existsByUserIdAndExhibitionId(userId, exhibitionId);
-    }
-
     @Override
     public Page<ExhibitionResDTO.ExhibitionLikeSummaryResDTO> getInterestedExhibitions(Long userId, Pageable pageable) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+        User user = getActiveUser(userId);
 
         List<Long> interestedExhibitionIds = exhibitionLikeRepository.findExhibitionIdsByInterestedUser(user);
-
         Page<Exhibition> interestedExhibitions = exhibitionRepository.findByIdIn(interestedExhibitionIds, pageable);
 
-        LocalDate today = LocalDate.now();
-        return interestedExhibitions.map(exhibition -> {
-            String thumbnail = fileUrlResolverPort.toFileUrl(exhibition.getThumbnail());
-            boolean isLiked = interestedExhibitionIds.contains(exhibition.getId());
-            boolean opening = isOpening(exhibition, today);
-            return ExhibitionConverter.toExhibitionLikeSummaryResDTO(exhibition, thumbnail, isLiked, opening);
-        });
+        return interestedExhibitions.map(exhibition -> getExhibitionLikeSummaryResDTO(exhibition, interestedExhibitionIds, LocalDate.now()));
+    }
+
+    private ExhibitionResDTO.ExhibitionLikeSummaryResDTO getExhibitionLikeSummaryResDTO(Exhibition exhibition, List<Long> interestedExhibitionIds, LocalDate today) {
+        String thumbnail = fileUrlResolverPort.toFileUrl(exhibition.getThumbnail());
+        boolean isLiked = interestedExhibitionIds.contains(exhibition.getId());
+        boolean opening = isOpening(exhibition, today);
+        return ExhibitionConverter.toExhibitionLikeSummaryResDTO(exhibition, thumbnail, isLiked, opening);
+    }
+
+    private User getActiveUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
     }
 
     private boolean isOpening(Exhibition exhibition, LocalDate today) {
@@ -203,5 +175,45 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
         return exhibitionImageRepository.findImageUrlsByExhibitionId(exhibitionId).stream()
                 .map(fileUrlResolverPort::toFileUrl)
                 .toList();
+    }
+
+    private Exhibition getApprovedExhibitionWithDetails(Long exhibitionId){
+        return exhibitionRepository.findByIdAndIsDeletedFalseAndStatusApprovedWithUserAndExhibitionFacilities(exhibitionId, Status.APPROVED)
+                .orElseThrow(() -> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
+    }
+
+    private Page<ExhibitionResDTO.ExhibitionSearchResDTO> getExhibitionSearchResDTOPage(Page<Exhibition> exhibitionPage) {
+        return exhibitionPage
+                .map(exhibition -> {
+                    String thumbnail = fileUrlResolverPort.toFileUrl(exhibition.getThumbnail());
+                    return ExhibitionConverter.toExhibitionSearchResDTO(exhibition, thumbnail);
+                });
+    }
+
+    private ExhibitionResDTO.ExhibitionHotNowResDTO getExhibitionHotNowResDTO(Long userId, Exhibition exhibition) {
+        String thumbnail = fileUrlResolverPort.toFileUrl(exhibition.getThumbnail());
+        boolean liked = isExhibitionLiked(userId, exhibition.getId());
+        return ExhibitionConverter.toExhibitionHotNowResDTO(exhibition, liked, thumbnail);
+    }
+
+
+    private ExhibitionResDTO.RegionalPopularExhibitionResDTO getRegionalPopularExhibitionResDTO(Exhibition exhibition) {
+        String thumbnail = fileUrlResolverPort.toFileUrl(exhibition.getThumbnail());
+        return ExhibitionConverter.toRegionalPopularExhibitionResDTO(exhibition, thumbnail);
+    }
+
+    private ExhibitionResDTO.ArtieRecommendationResDTO getArtieRecommendationResDTO(Long userId, Exhibition exhibition) {
+        String thumbnail = fileUrlResolverPort.toFileUrl(exhibition.getThumbnail());
+        boolean liked = isExhibitionLiked(userId, exhibition.getId());
+        return ExhibitionConverter.toArtieRecommendationResDTO(exhibition, liked, thumbnail);
+    }
+
+    private Exhibition getOwnedActiveExhibition(Long userId, Long exhibitionId) {
+        return exhibitionRepository.findByIdAndUserIdAndIsDeletedFalse(userId, exhibitionId)
+                .orElseThrow(() -> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
+    }
+
+    private boolean isExhibitionLiked(Long userId, Long exhibitionId) {
+        return exhibitionLikeRepository.existsByUserIdAndExhibitionId(userId, exhibitionId);
     }
 }
