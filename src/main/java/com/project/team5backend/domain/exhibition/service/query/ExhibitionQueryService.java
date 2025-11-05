@@ -31,7 +31,7 @@ public interface ExhibitionQueryService {
     List<ExhibitionResDTO.ArtieRecommendationResDTO> getTodayArtieRecommendations(Long userId);
 
     //내가 등록한 전시
-    Page<ExhibitionResDTO.ExhibitionSummaryResDTO> getSummaryExhibitionList(Long userId, StatusGroup status, int page);
+    Page<ExhibitionResDTO.ExhibitionSummaryResDTO> getSummaryExhibitionList(Long userId, StatusGroup status, Sort sort, int page, int size);
 
     //내가 등록한 전시 조회
     ExhibitionResDTO.MyExhibitionDetailResDTO getMyDetailExhibition(Long userId, Long exhibitionId);

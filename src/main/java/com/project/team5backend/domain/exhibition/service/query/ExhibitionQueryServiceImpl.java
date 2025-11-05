@@ -39,7 +39,6 @@ import java.util.Random;
 @Transactional
 public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
 
-    private static final int PAGE_SIZE = 4;
     private static final double SEOUL_CITY_HALL_LAT = 37.5665;
     private static final double SEOUL_CITY_HALL_LNG = 126.9780;
 
@@ -133,10 +132,9 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
     }
 
     @Override
-    public Page<ExhibitionResDTO.ExhibitionSummaryResDTO> getSummaryExhibitionList(Long userId, StatusGroup status, int page) {
-        Pageable pageable = PageRequest.of(page, PAGE_SIZE, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt"));
-
-        Page<Exhibition> exhibitionPage = exhibitionRepository.findMyExhibitionsByStatus(userId, status, pageable);
+    public Page<ExhibitionResDTO.ExhibitionSummaryResDTO> getSummaryExhibitionList(Long userId, StatusGroup status, Sort sort, int page, int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Exhibition> exhibitionPage = exhibitionRepository.findMyExhibitionsByStatus(userId, status, sort, pageable);
 
         return exhibitionPage.map(ExhibitionConverter::toExhibitionSummaryResDTO);
     }

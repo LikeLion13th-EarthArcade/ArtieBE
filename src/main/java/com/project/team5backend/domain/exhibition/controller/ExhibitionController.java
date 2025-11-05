@@ -157,10 +157,16 @@ public class ExhibitionController {
     @GetMapping("/my")
     public CustomResponse<PageResponse<ExhibitionResDTO.ExhibitionSummaryResDTO>> getExhibitionList(
             @AuthenticationPrincipal CurrentUser currentUser,
-            @RequestParam(name = "status", required = false, defaultValue = "ALL") StatusGroup status,
-            @RequestParam(name = "page", defaultValue = "0") int page
+            @Parameter(description = "전시 등록 상태")
+            @RequestParam(required = false, defaultValue = "ALL") StatusGroup status,
+            @Parameter(description = "정렬 기준")
+            @RequestParam(defaultValue = "NEW") Sort sort,
+            @Parameter(description = "페이지 번호")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "페이지당 표시할 전시 개수")
+            @RequestParam(defaultValue = "8") int size
     ) {
-        return CustomResponse.onSuccess(PageResponse.of(exhibitionQueryService.getSummaryExhibitionList(currentUser.getId(), status, page)));
+        return CustomResponse.onSuccess(PageResponse.of(exhibitionQueryService.getSummaryExhibitionList(currentUser.getId(), status, sort, page, size)));
     }
 
     @Operation(summary = "내 전시 상세 보기", description = "상태에 상관없이 내 전시 상세 보기 가능")
