@@ -28,8 +28,7 @@ public class ExhibitionRepositoryImpl implements ExhibitionRepositoryCustom {
 
     @Override
     public Page<Exhibition> findExhibitionsWithFilters(
-            ExhibitionCategory exhibitionCategory, String district, ExhibitionMood exhibitionMood, LocalDate localDate,
-            Sort sort, Pageable pageable) {
+            ExhibitionCategory exhibitionCategory, String district, ExhibitionMood exhibitionMood, LocalDate localDate, Sort sort, Pageable pageable) {
 
         QExhibition exhibition = QExhibition.exhibition;
 

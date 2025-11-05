@@ -102,15 +102,22 @@ public class ExhibitionController {
                     + "- `page` : 페이지 번호 (기본값 0)")
     @GetMapping("/search")
     public CustomResponse<ExhibitionResDTO.ExhibitionSearchPageResDTO> searchExhibitions(
-            @RequestParam(name = "exhibitionCategory", required = false) ExhibitionCategory exhibitionCategory,
+            @Parameter(description = "전시 카테고리")
+            @RequestParam(required = false) ExhibitionCategory exhibitionCategory,
+            @Parameter(description = "행정구역")
             @RequestParam(name = "distinct", required = false) String district,
+            @Parameter(description = "전시 분위기")
             @RequestParam(name = "exhibitionMood", required = false) ExhibitionMood exhibitionMood,
             @Parameter(description = "날짜", example = "2025-09-13")
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate localDate,
-            @RequestParam(defaultValue = "POPULAR") Sort sort,   // new | old | popular
-            @RequestParam(name = "page", defaultValue = "0") int page
+            @Parameter(description = "정렬 기준")
+            @RequestParam(defaultValue = "POPULAR") Sort sort,
+            @Parameter(description = "페이지 번호")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "페이지당 표시할 전시 개수")
+            @RequestParam(defaultValue = "8") int size
     ) {
-        return CustomResponse.onSuccess(exhibitionQueryService.searchExhibitions(exhibitionCategory, district, exhibitionMood, localDate, sort, page));
+        return CustomResponse.onSuccess(exhibitionQueryService.searchExhibitions(exhibitionCategory, district, exhibitionMood, localDate, sort, page, size));
     }
 
     @Operation(summary = "지금 뜨는 전시회", description = "현재 진행중인 전시중에서 reviewCount가 가장 높은 전시 반환")

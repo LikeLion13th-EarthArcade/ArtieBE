@@ -52,29 +52,21 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
 
     @Override
     public ExhibitionResDTO.ExhibitionDetailResDTO findExhibitionDetail(Long userId, Long exhibitionId) {
-        Exhibition exhibition = exhibitionRepository.findByIdAndIsDeletedFalseAndStatusApprovedWithUserAndExhibitionFacilities(exhibitionId, Status.APPROVED)
-                .orElseThrow(() -> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
-        // ai 분석을 위한 로그 생성
-        interactLogService.logClick(userId, exhibitionId);
-        // 전시 이미지들의 fileKey만 조회
-        List<String> imageUrls = getFileKeys(exhibitionId);
+        Exhibition exhibition = getApprovedExhibitionWithDetails(exhibitionId);
+
+        interactLogService.logClick(userId, exhibitionId); // ai 분석을 위한 로그 생성
+        List<String> imageUrls = getFileKeys(exhibitionId); // 전시 이미지들의 fileKey만 조회
         boolean liked = exhibitionLikeRepository.existsByUserIdAndExhibitionId(userId, exhibitionId);
         return ExhibitionConverter.toExhibitionDetailResDTO(exhibition, imageUrls, liked);
     }
 
     @Override
     public ExhibitionResDTO.ExhibitionSearchPageResDTO searchExhibitions(
-            ExhibitionCategory exhibitionCategory, String district, ExhibitionMood exhibitionMood, LocalDate localDate, Sort sort, int page) {
+            ExhibitionCategory exhibitionCategory, String district, ExhibitionMood exhibitionMood, LocalDate localDate, Sort sort, int page, int size) {
 
-        Pageable pageable = PageRequest.of(page, PAGE_SIZE, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt"));
-        // 동적 쿼리로 전시 검색
-        Page<Exhibition> exhibitionPage = exhibitionRepository.findExhibitionsWithFilters(
-                exhibitionCategory, district, exhibitionMood, localDate, sort, pageable);
-        Page<ExhibitionResDTO.ExhibitionSearchResDTO> exhibitionSearchResDTOPage = exhibitionPage
-                .map(exhibition -> {
-                    String thumbnail = fileUrlResolverPort.toFileUrl(exhibition.getThumbnail());
-                    return ExhibitionConverter.toExhibitionSearchResDTO(exhibition, thumbnail);
-                });
+        Pageable pageable = PageRequest.of(page, size);
+        Page<Exhibition> exhibitionPage = exhibitionRepository.findExhibitionsWithFilters(exhibitionCategory, district, exhibitionMood, localDate, sort, pageable);
+        Page<ExhibitionResDTO.ExhibitionSearchResDTO> exhibitionSearchResDTOPage = getExhibitionSearchResDTOPage(exhibitionPage);
 
         return ExhibitionConverter.toExhibitionSearchPageResDTO(PageResponse.of(exhibitionSearchResDTOPage), SEOUL_CITY_HALL_LAT, SEOUL_CITY_HALL_LNG);
     }
@@ -203,5 +195,18 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
         return exhibitionImageRepository.findImageUrlsByExhibitionId(exhibitionId).stream()
                 .map(fileUrlResolverPort::toFileUrl)
                 .toList();
+    }
+
+    private Exhibition getApprovedExhibitionWithDetails(Long exhibitionId){
+        return exhibitionRepository.findByIdAndIsDeletedFalseAndStatusApprovedWithUserAndExhibitionFacilities(exhibitionId, Status.APPROVED)
+                .orElseThrow(() -> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
+    }
+
+    private Page<ExhibitionResDTO.ExhibitionSearchResDTO> getExhibitionSearchResDTOPage(Page<Exhibition> exhibitionPage) {
+        return exhibitionPage
+                .map(exhibition -> {
+                    String thumbnail = fileUrlResolverPort.toFileUrl(exhibition.getThumbnail());
+                    return ExhibitionConverter.toExhibitionSearchResDTO(exhibition, thumbnail);
+                });
     }
 }
