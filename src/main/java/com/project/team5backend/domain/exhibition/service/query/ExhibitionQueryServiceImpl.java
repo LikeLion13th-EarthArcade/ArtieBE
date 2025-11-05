@@ -114,10 +114,7 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
         }
         return ExhibitionConverter.toRegionalPopularExhibitionListResDTO(
                 exhibitions.stream()
-                        .map(exhibition -> {
-                            String thumbnail = fileUrlResolverPort.toFileUrl(exhibition.getThumbnail());
-                            return ExhibitionConverter.toRegionalPopularExhibitionResDTO(exhibition, thumbnail);
-                        })
+                        .map(this::getRegionalPopularExhibitionResDTO)
                         .toList()
         );
     }
@@ -131,12 +128,7 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
 
         return candidates.stream()
                 .limit(4)
-                .map(exhibition ->
-                {
-                    String thumbnail = fileUrlResolverPort.toFileUrl(exhibition.getThumbnail());
-                    boolean liked = isExhibitionLiked(userId, exhibition.getId());
-                    return ExhibitionConverter.toArtieRecommendationResDTO(exhibition, liked, thumbnail);
-                })
+                .map(exhibition -> getArtieRecommendationResDTO(userId, exhibition))
                 .toList();
     }
 
@@ -209,5 +201,17 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
         String thumbnail = fileUrlResolverPort.toFileUrl(exhibition.getThumbnail());
         boolean liked = isExhibitionLiked(userId, exhibition.getId());
         return ExhibitionConverter.toExhibitionHotNowResDTO(exhibition, liked, thumbnail);
+    }
+
+
+    private ExhibitionResDTO.RegionalPopularExhibitionResDTO getRegionalPopularExhibitionResDTO(Exhibition exhibition) {
+        String thumbnail = fileUrlResolverPort.toFileUrl(exhibition.getThumbnail());
+        return ExhibitionConverter.toRegionalPopularExhibitionResDTO(exhibition, thumbnail);
+    }
+
+    private ExhibitionResDTO.ArtieRecommendationResDTO getArtieRecommendationResDTO(Long userId, Exhibition exhibition) {
+        String thumbnail = fileUrlResolverPort.toFileUrl(exhibition.getThumbnail());
+        boolean liked = isExhibitionLiked(userId, exhibition.getId());
+        return ExhibitionConverter.toArtieRecommendationResDTO(exhibition, liked, thumbnail);
     }
 }
