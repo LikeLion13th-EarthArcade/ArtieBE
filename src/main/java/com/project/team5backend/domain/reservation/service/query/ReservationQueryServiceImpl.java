@@ -32,11 +32,9 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
     @Override
     public ReservationResDTO.ReservationDetailResDTO getReservationDetail(long userId, long reservationId) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+        User user = getUser(userId);
 
-        Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+        Reservation reservation = getReservation(reservationId);
 
         // 해당 예약의 주인이 아니면 예외
         if (!Objects.equals(user, reservation.getUser())) {
@@ -49,8 +47,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     @Override
     public Page<ReservationResDTO.ReservationDetailResDTO> getReservationListForSpaceOwner(long userId, StatusGroup statusGroup, Pageable pageable) {
 
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+        User user = getUser(userId);
 
         Page<Reservation> reservationPage = customReservationRepository.findBySpaceOwnerWithFilters(user, statusGroup, pageable);
 
@@ -59,12 +56,22 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
     @Override
     public Page<ReservationResDTO.ReservationDetailResDTO> getMyReservationList(long userId, StatusGroup statusGroup, Pageable pageable) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+
+        User user = getUser(userId);
 
         Page<Reservation> reservationPage = customReservationRepository.findByUserWithFilters(user, statusGroup, pageable);
 
         return reservationPage.map(ReservationConverter::toReservationDetailResDTO);
+    }
+
+    private User getUser(long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+    }
+
+    private Reservation getReservation(long reservationId) {
+        return reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
     }
 }
 
