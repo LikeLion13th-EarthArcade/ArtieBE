@@ -49,7 +49,8 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
         if (cookies != null) {
             log.info("[ JwtAuthorizationFilter ] 검색된 쿠키 -----------------------");
             for (Cookie cookie : cookies) {
-                log.info("[ JwtAuthorizationFilter ] 쿠키명 : {}, 값 : {}...", cookie.getName(), cookie.getValue().substring(0, 15));
+//                log.info("[ JwtAuthorizationFilter ] 쿠키명 : {}, 값 : {}...", cookie.getName(), cookie.getValue().substring(0, 15));
+                log.info("[ JwtAuthorizationFilter ] 쿠키명 : {}, 값 : {}...", cookie.getName(), cookie.getValue());
             }
             log.info("[ JwtAuthorizationFilter ] ---------------------------------");
         } else {

@@ -33,10 +33,9 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
     @Override
     public ReservationResDTO.ReservationCreateResDTO createReservation(long spaceId, long userId, ReservationReqDTO.ReservationCreateReqDTO reservationCreateReqDTO) {
-        Space space = spaceRepository.findById(spaceId)
-                .orElseThrow(() -> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+
+        Space space = getSpace(spaceId);
+        User user = getUser(userId);
 
         Reservation reservation = ReservationConverter.toReservation(space, user, reservationCreateReqDTO);
         reservationRepository.save(reservation);
@@ -48,7 +47,6 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     public ReservationResDTO.ReservationStatusResDTO approveRequest(long userId, long reservationId) {
 
         Reservation reservation = validateReservation(userId, reservationId);
-
         Status status = reservation.getStatus();
 
         if (!(status == Status.PENDING || status == Status.BOOKER_CANCEL_REQUESTED)) {
@@ -64,8 +62,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
     @Override
     public ReservationResDTO.ReservationStatusResDTO rejectRequest(long userId, long reservationId, ReservationReqDTO.ReservationRejectReqDTO reservationRejectReqDTO) {
-        Reservation reservation = validateReservation(userId, reservationId);
 
+        Reservation reservation = validateReservation(userId, reservationId);
         Status status = reservation.getStatus();
 
         if (!(status == Status.PENDING || status == Status.BOOKER_CANCEL_REQUESTED || status == Status.APPROVED)) {
@@ -101,17 +99,28 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
     private Reservation validateReservation(long userId, long reservationId) {
 
-        User user =  userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
-
-        Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+        User user =  getUser(userId);
+        Reservation reservation = getReservation(reservationId);
 
         if (!Objects.equals(reservation.getUser(), user)) {
             throw new ReservationException(ReservationErrorCode.RESERVATION_ACCESS_DENIED);
         }
-
         return reservation;
+    }
+
+    private User getUser(long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+    }
+
+    private Space getSpace(long spaceId) {
+        return spaceRepository.findById(spaceId)
+                .orElseThrow(() -> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
+    }
+
+    private Reservation getReservation(long reservationId) {
+        return reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
     }
 }
 
