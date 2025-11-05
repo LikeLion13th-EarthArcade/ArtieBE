@@ -81,12 +81,7 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
             throw new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND);
         }
         return exhibitions.stream()
-                .map(exhibition ->
-                {
-                    String thumbnail = fileUrlResolverPort.toFileUrl(exhibition.getThumbnail());
-                    boolean liked = isExhibitionLiked(userId, exhibition.getId());
-                    return ExhibitionConverter.toExhibitionHotNowResDTO(exhibition, liked, thumbnail);
-                })
+                .map(exhibition -> getExhibitionHotNowResDTO(userId, exhibition))
                 .toList();
     }
 
@@ -208,5 +203,11 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
                     String thumbnail = fileUrlResolverPort.toFileUrl(exhibition.getThumbnail());
                     return ExhibitionConverter.toExhibitionSearchResDTO(exhibition, thumbnail);
                 });
+    }
+
+    private ExhibitionResDTO.ExhibitionHotNowResDTO getExhibitionHotNowResDTO(Long userId, Exhibition exhibition) {
+        String thumbnail = fileUrlResolverPort.toFileUrl(exhibition.getThumbnail());
+        boolean liked = isExhibitionLiked(userId, exhibition.getId());
+        return ExhibitionConverter.toExhibitionHotNowResDTO(exhibition, liked, thumbnail);
     }
 }
