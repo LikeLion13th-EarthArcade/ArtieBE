@@ -7,4 +7,6 @@ import org.springframework.data.domain.Pageable;
 
 public interface AdminReservationQueryService {
     Page<ReservationResDTO.ReservationDetailResDTO> getReservationList(StatusGroup statusGroup, Pageable pageable);
+
+    ReservationResDTO.ReservationDetailResDTO getReservationDetail(long reservationId);
 }

@@ -38,8 +38,8 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         Reservation reservation = reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
 
-        // 관리자가 아니거나, 해당 예약의 주인이 아니면 예외
-        if (!Objects.equals(user, reservation.getUser()) || !Objects.equals(user.getRole(), Role.ROLE_ADMIN)) {
+        // 해당 예약의 주인이 아니면 예외
+        if (!Objects.equals(user, reservation.getUser())) {
             throw new ReservationException(ReservationErrorCode.RESERVATION_ACCESS_DENIED);
         }
 
