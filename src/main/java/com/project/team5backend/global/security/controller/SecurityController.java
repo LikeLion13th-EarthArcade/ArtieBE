@@ -49,7 +49,8 @@ public class SecurityController {
     @Operation(summary = "CSRF 토큰 발급", description = "CSRF 토큰을 쿠키로 발급합니다")
     @GetMapping("/csrf")
     public CustomResponse<String> csrf(
-            HttpServletRequest request
+            HttpServletRequest request,
+            HttpServletResponse response
     ) {
         String origin = request.getHeader("Origin");
         String referer = request.getHeader("Referer");
@@ -66,6 +67,7 @@ public class SecurityController {
         if (token != null) {
             token.getToken(); // 호출 시 쿠키가 Set-Cookie 로 내려감
         }
-        return CustomResponse.onSuccess("CSRF 토큰이 쿠키로 발급되었습니다.");
+
+        return CustomResponse.onSuccess("CSRF 토큰이 쿠키로 발급되었습니다.    " + token.getToken());
     }
 }
