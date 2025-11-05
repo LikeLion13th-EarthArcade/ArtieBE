@@ -117,7 +117,8 @@ public class ExhibitionController {
             @Parameter(description = "페이지당 표시할 전시 개수")
             @RequestParam(defaultValue = "8") int size
     ) {
-        return CustomResponse.onSuccess(exhibitionQueryService.searchExhibitions(exhibitionCategory, district, exhibitionMood, localDate, sort, page, size));
+        Pageable pageable = PageRequest.of(page, size);
+        return CustomResponse.onSuccess(exhibitionQueryService.searchExhibitions(exhibitionCategory, district, exhibitionMood, localDate, sort, pageable));
     }
 
     @Operation(summary = "지금 뜨는 전시회", description = "현재 진행중인 전시중에서 reviewCount가 가장 높은 전시 반환")
@@ -166,7 +167,8 @@ public class ExhibitionController {
             @Parameter(description = "페이지당 표시할 전시 개수")
             @RequestParam(defaultValue = "8") int size
     ) {
-        return CustomResponse.onSuccess(PageResponse.of(exhibitionQueryService.getSummaryExhibitionList(currentUser.getId(), status, sort, page, size)));
+        Pageable pageable = PageRequest.of(page, size);
+        return CustomResponse.onSuccess(PageResponse.of(exhibitionQueryService.getSummaryExhibitionList(currentUser.getId(), status, sort, pageable)));
     }
 
     @Operation(summary = "내 전시 상세 보기", description = "상태에 상관없이 내 전시 상세 보기 가능")
