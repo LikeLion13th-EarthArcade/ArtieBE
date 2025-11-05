@@ -30,9 +30,13 @@ public class AdminReservationQueryServiceImpl implements  AdminReservationQueryS
 
     @Override
     public ReservationResDTO.ReservationDetailResDTO getReservationDetail(long reservationId) {
-        Reservation reservation = reservationRepository.findById(reservationId)
-                .orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+        Reservation reservation = getReservation(reservationId);
 
         return ReservationConverter.toReservationDetailResDTO(reservation);
+    }
+
+    private Reservation getReservation(long reservationId) {
+        return reservationRepository.findById(reservationId)
+                .orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
     }
 }
