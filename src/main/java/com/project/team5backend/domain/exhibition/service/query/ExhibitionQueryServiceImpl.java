@@ -135,21 +135,14 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
     public Page<ExhibitionResDTO.ExhibitionSummaryResDTO> getSummaryExhibitionList(Long userId, StatusGroup status, Sort sort, int page, int size) {
         Pageable pageable = PageRequest.of(page, size);
         Page<Exhibition> exhibitionPage = exhibitionRepository.findMyExhibitionsByStatus(userId, status, sort, pageable);
-
         return exhibitionPage.map(ExhibitionConverter::toExhibitionSummaryResDTO);
     }
 
     @Override
     public ExhibitionResDTO.MyExhibitionDetailResDTO getMyDetailExhibition(Long userId, Long exhibitionId) {
-        Exhibition exhibition = exhibitionRepository.findByIdAndUserIdAndIsDeletedFalse(userId, exhibitionId)
-                .orElseThrow(() -> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
-
+        Exhibition exhibition = getOwnedActiveExhibition(userId, exhibitionId);
         List<String> imageUrls = getFileKeys(exhibitionId);
         return ExhibitionConverter.toMyExhibitionDetailResDTO(exhibition, imageUrls);
-    }
-
-    private boolean isExhibitionLiked(Long userId, Long exhibitionId) {
-        return exhibitionLikeRepository.existsByUserIdAndExhibitionId(userId, exhibitionId);
     }
 
     @Override
@@ -211,5 +204,14 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
         String thumbnail = fileUrlResolverPort.toFileUrl(exhibition.getThumbnail());
         boolean liked = isExhibitionLiked(userId, exhibition.getId());
         return ExhibitionConverter.toArtieRecommendationResDTO(exhibition, liked, thumbnail);
+    }
+
+    private Exhibition getOwnedActiveExhibition(Long userId, Long exhibitionId) {
+        return exhibitionRepository.findByIdAndUserIdAndIsDeletedFalse(userId, exhibitionId)
+                .orElseThrow(() -> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
+    }
+
+    private boolean isExhibitionLiked(Long userId, Long exhibitionId) {
+        return exhibitionLikeRepository.existsByUserIdAndExhibitionId(userId, exhibitionId);
     }
 }
