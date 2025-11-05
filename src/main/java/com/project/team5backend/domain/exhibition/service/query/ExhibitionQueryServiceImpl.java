@@ -61,9 +61,8 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
 
     @Override
     public ExhibitionResDTO.ExhibitionSearchPageResDTO searchExhibitions(
-            ExhibitionCategory exhibitionCategory, String district, ExhibitionMood exhibitionMood, LocalDate localDate, Sort sort, int page, int size) {
+            ExhibitionCategory exhibitionCategory, String district, ExhibitionMood exhibitionMood, LocalDate localDate, Sort sort, Pageable pageable) {
 
-        Pageable pageable = PageRequest.of(page, size);
         Page<Exhibition> exhibitionPage = exhibitionRepository.findExhibitionsWithFilters(exhibitionCategory, district, exhibitionMood, localDate, sort, pageable);
         Page<ExhibitionResDTO.ExhibitionSearchResDTO> exhibitionSearchResDTOPage = getExhibitionSearchResDTOPage(exhibitionPage);
 
@@ -132,8 +131,7 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
     }
 
     @Override
-    public Page<ExhibitionResDTO.ExhibitionSummaryResDTO> getSummaryExhibitionList(Long userId, StatusGroup status, Sort sort, int page, int size) {
-        Pageable pageable = PageRequest.of(page, size);
+    public Page<ExhibitionResDTO.ExhibitionSummaryResDTO> getSummaryExhibitionList(Long userId, StatusGroup status, Sort sort, Pageable pageable) {
         Page<Exhibition> exhibitionPage = exhibitionRepository.findMyExhibitionsByStatus(userId, status, sort, pageable);
         return exhibitionPage.map(ExhibitionConverter::toExhibitionSummaryResDTO);
     }
@@ -147,20 +145,24 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
 
     @Override
     public Page<ExhibitionResDTO.ExhibitionLikeSummaryResDTO> getInterestedExhibitions(Long userId, Pageable pageable) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+        User user = getActiveUser(userId);
 
         List<Long> interestedExhibitionIds = exhibitionLikeRepository.findExhibitionIdsByInterestedUser(user);
-
         Page<Exhibition> interestedExhibitions = exhibitionRepository.findByIdIn(interestedExhibitionIds, pageable);
 
-        LocalDate today = LocalDate.now();
-        return interestedExhibitions.map(exhibition -> {
-            String thumbnail = fileUrlResolverPort.toFileUrl(exhibition.getThumbnail());
-            boolean isLiked = interestedExhibitionIds.contains(exhibition.getId());
-            boolean opening = isOpening(exhibition, today);
-            return ExhibitionConverter.toExhibitionLikeSummaryResDTO(exhibition, thumbnail, isLiked, opening);
-        });
+        return interestedExhibitions.map(exhibition -> getExhibitionLikeSummaryResDTO(exhibition, interestedExhibitionIds, LocalDate.now()));
+    }
+
+    private ExhibitionResDTO.ExhibitionLikeSummaryResDTO getExhibitionLikeSummaryResDTO(Exhibition exhibition, List<Long> interestedExhibitionIds, LocalDate today) {
+        String thumbnail = fileUrlResolverPort.toFileUrl(exhibition.getThumbnail());
+        boolean isLiked = interestedExhibitionIds.contains(exhibition.getId());
+        boolean opening = isOpening(exhibition, today);
+        return ExhibitionConverter.toExhibitionLikeSummaryResDTO(exhibition, thumbnail, isLiked, opening);
+    }
+
+    private User getActiveUser(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
     }
 
     private boolean isOpening(Exhibition exhibition, LocalDate today) {
