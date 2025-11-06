@@ -17,7 +17,7 @@ public interface SpaceQueryService {
 
     SpaceResDTO.SpaceSearchPageResDTO searchSpace(LocalDate requestedStartDate, LocalDate requestedEndDate, String district, SpaceSize size, SpaceType type, SpaceMood mood, List<String> facilities, Sort sort, int page);
 
-    Page<SpaceResDTO.SpaceLikeSummaryResDTO> getInterestedSpaces(long userId, Pageable pageable);
+    Page<SpaceResDTO.SpaceLikeSummaryResDTO> getInterestedSpaces(Long userId, Pageable pageable);
 
     Page<SpaceResDTO.SpaceSummaryResDTO> getMySpaces(Long userId, StatusGroup status, Sort sort, Pageable pageable);
 

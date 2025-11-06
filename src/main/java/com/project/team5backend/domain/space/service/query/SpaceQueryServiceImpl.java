@@ -2,6 +2,8 @@ package com.project.team5backend.domain.space.service.query;
 
 import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
 import com.project.team5backend.domain.exhibition.converter.ExhibitionConverter;
+import com.project.team5backend.domain.exhibition.dto.response.ExhibitionResDTO;
+import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.image.repository.SpaceImageRepository;
 import com.project.team5backend.domain.space.converter.SpaceConverter;
 import com.project.team5backend.domain.space.dto.response.SpaceResDTO;
@@ -83,19 +85,13 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
     }
 
     @Override
-    public Page<SpaceResDTO.SpaceLikeSummaryResDTO> getInterestedSpaces(long userId, Pageable pageable) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+    public Page<SpaceResDTO.SpaceLikeSummaryResDTO> getInterestedSpaces(Long userId, Pageable pageable) {
+        User user = getActiveUser(userId);
 
         List<Long> interestedSpaceIds = spaceLikeRepository.findSpaceIdsByInterestedUser(user);
-
         Page<Space> interestedSpaces = spaceRepository.findByIdIn(interestedSpaceIds, pageable);
 
-        return interestedSpaces.map(space -> {
-            String thumbnail = fileUrlResolverPort.toFileUrl(space.getThumbnail());
-            boolean isLiked = interestedSpaceIds.contains(space.getId());
-            return SpaceConverter.toSpaceLikeSummaryResDTO(space, thumbnail, isLiked);
-        });
+        return interestedSpaces.map(space -> getSpaceLikeSummaryResDTO(space, interestedSpaceIds));
     }
 
     @Override
@@ -135,6 +131,12 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
     private Space getApprovedSpaceWithDetails(long spaceId) {
         return spaceRepository.findByIdAndIsDeletedFalseAndStatusApprovedWithUserAndFacilities(spaceId, Status.APPROVED)
                 .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
+    }
+
+    private SpaceResDTO.SpaceLikeSummaryResDTO getSpaceLikeSummaryResDTO(Space space, List<Long> interestedSpaceIds) {
+        String thumbnail = fileUrlResolverPort.toFileUrl(space.getThumbnail());
+        boolean isLiked = interestedSpaceIds.contains(space.getId());
+        return SpaceConverter.toSpaceLikeSummaryResDTO(space, thumbnail, isLiked);
     }
 
 }
