@@ -1,5 +1,7 @@
 package com.project.team5backend.domain.space.repository;
 
+import com.project.team5backend.domain.exhibition.entity.Exhibition;
+import com.project.team5backend.domain.exhibition.entity.QExhibition;
 import com.project.team5backend.domain.facility.entity.QFacility;
 import com.project.team5backend.domain.facility.entity.QSpaceFacility;
 import com.project.team5backend.domain.reservation.entity.QReservation;
@@ -109,34 +111,31 @@ public class SpaceRepositoryImpl implements SpaceRepositoryCustom {
     }
 
     @Override
-    public Page<Space> findByUserWithFilters(User user, StatusGroup statusGroup, Pageable pageable) {
+    public Page<Space> findMySpacesByStatus(Long userId, StatusGroup status, Sort sort, Pageable pageable){
         QSpace space = QSpace.space;
 
-        BooleanBuilder builder = new BooleanBuilder()
-                .and(space.user.eq(user))
-                .and(statusGroupCondition(statusGroup));
+        Long total = queryFactory
+                .select(space.count())
+                .from(space)
+                .where(
+                        space.user.id.eq(userId),
+                        statusCondition(space, status))
+                .fetchOne();
 
-        List<Space> content = findSpaces(space, builder, pageable);
+        // 정렬, 디폴트 최신순
+        OrderSpecifier<?> order = getOrder(sort, space);
 
-        Long total = countSpace(space, builder);
+        List<Space> content = queryFactory
+                .selectFrom(space)
+                .where(
+                        space.user.id.eq(userId),
+                        statusCondition(space, status))
+                .orderBy(order, space.id.desc()) // 최신순 정렬
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
 
         return new PageImpl<>(content, pageable, total != null ? total : 0L);
-    }
-
-    private BooleanExpression statusGroupCondition(StatusGroup statusGroup) {
-        if (statusGroup == null || statusGroup == StatusGroup.ALL) {
-            return null;
-        }
-        return switch (statusGroup) {
-            case PENDING -> space.status.in(
-                    Status.PENDING
-            );
-            case DONE -> space.status.in(
-                    Status.APPROVED,
-                    Status.REJECTED
-            );
-            default -> null;
-        };
     }
 
     private List<Space> findSpaces(QSpace space, BooleanBuilder builder, Pageable pageable) {
@@ -219,6 +218,14 @@ public class SpaceRepositoryImpl implements SpaceRepositoryCustom {
             case ALL -> space.createdAt.goe(sevenDaysAgo);
             case PENDING -> space.status.eq(Status.PENDING).and(space.createdAt.goe(sevenDaysAgo));
             case DONE -> space.status.in(Status.APPROVED, Status.REJECTED).and(space.createdAt.goe(sevenDaysAgo));
+        };
+    }
+
+    private static OrderSpecifier<?> getOrder(Sort sort, QSpace space) {
+        return switch (sort == null ? Sort.POPULAR : sort) {
+            case OLD -> space.createdAt.asc();
+            case POPULAR -> space.reviewCount.desc().nullsLast();
+            case NEW -> space.createdAt.desc();
         };
     }
 }

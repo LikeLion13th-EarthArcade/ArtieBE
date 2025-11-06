@@ -168,7 +168,7 @@ public class ExhibitionController {
             @RequestParam(defaultValue = "8") int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        return CustomResponse.onSuccess(PageResponse.of(exhibitionQueryService.getSummaryExhibitionList(currentUser.getId(), status, sort, pageable)));
+        return CustomResponse.onSuccess(PageResponse.of(exhibitionQueryService.getMyExhibitions(currentUser.getId(), status, sort, pageable)));
     }
 
     @Operation(summary = "내 전시 상세 보기", description = "상태에 상관없이 내 전시 상세 보기 가능")

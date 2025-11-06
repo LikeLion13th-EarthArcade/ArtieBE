@@ -83,8 +83,10 @@ public class SpaceController {
 
     @Operation(summary = "전시 공간 상세 조회", description = "공간 id를 이용해 공간의 상세 정보 조회")
     @GetMapping("/{spaceId}")
-    public CustomResponse<SpaceResDTO.SpaceDetailResDTO> getSpaceDetail(@PathVariable Long spaceId) {
-        return CustomResponse.onSuccess(spaceQueryService.getSpaceDetail(spaceId));
+    public CustomResponse<SpaceResDTO.SpaceDetailResDTO> getSpaceDetail(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @PathVariable Long spaceId) {
+        return CustomResponse.onSuccess(spaceQueryService.getSpaceDetail(currentUser.getId(), spaceId));
     }
 
     @Operation(
@@ -146,21 +148,30 @@ public class SpaceController {
         return CustomResponse.onSuccess(PageResponse.of(spaceQueryService.getInterestedSpaces(currentUser.getId(), pageable)));
     }
 
-    @Operation(summary = "내가 등록한 공간")
+    @Operation(summary = "내가 등록한 공간",
+            description = "사용자가 등록한 모든 공간를 검색합니다. <br> " +
+                    "[RequestParam statusGroup] : [ALL], [PENDING], [DONE] 3가지 선택<br><br>" +
+                    "ALL : 모든 상태의 공간 <br><br>" +
+                    "PENDING : 대기중 <br>PENDING(호스트의 확정 대기) <br><br>" +
+                    "DONE : 완료됨 <br>APPROVED(호스트의 공간 승인 확정), REJECTED(호스트의 공간 거절 확정), <br>")
     @GetMapping("/my")
-    public CustomResponse<PageResponse<SpaceResDTO.SpaceDetailResDTO>> getMySpaces(
+    public CustomResponse<PageResponse<SpaceResDTO.SpaceSummaryResDTO>> getMySpaces(
             @AuthenticationPrincipal CurrentUser currentUser,
-            @RequestParam(required = false) StatusGroup statusGroup,
+            @RequestParam(required = false, defaultValue = "ALL") StatusGroup status,
+            @Parameter(description = "정렬 기준")
+            @RequestParam(defaultValue = "NEW") Sort sort,
+            @Parameter(description = "페이지 번호")
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @Parameter(description = "페이지당 표시할 공간 개수")
+            @RequestParam(defaultValue = "8") int size
     ) {
-        Pageable pageable = PageRequest.of(page, size, org.springframework.data.domain.Sort.by("createdAt").descending());
-        return CustomResponse.onSuccess(PageResponse.of(spaceQueryService.getMySpace(currentUser.getId(), statusGroup, pageable)));
+        Pageable pageable = PageRequest.of(page, size);
+        return CustomResponse.onSuccess(PageResponse.of(spaceQueryService.getMySpaces(currentUser.getId(), status, sort, pageable)));
     }
 
     @Operation(summary = "내가 등록한 공간 상세 조회")
     @GetMapping("/my/{spaceId}")
-    public CustomResponse<SpaceResDTO.MySpaceDetailResDTO> getDetailSpace(
+    public CustomResponse<SpaceResDTO.MySpaceDetailResDTO> getMySpaceDetail(
             @AuthenticationPrincipal CurrentUser currentUser,
             @PathVariable Long spaceId
     ) {

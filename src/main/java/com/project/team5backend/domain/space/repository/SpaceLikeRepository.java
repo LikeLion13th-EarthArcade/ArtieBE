@@ -12,7 +12,7 @@ import java.util.List;
 
 @Repository
 public interface SpaceLikeRepository extends JpaRepository<SpaceLike, Long> {
-    boolean existsByUserIdAndSpaceId(long spaceId, long userId);
+    boolean existsByUserIdAndSpaceId(long userId, long spaceId);
 
     @Modifying
     @Query("delete from SpaceLike sl where sl.user.id =:userId and sl.space.id =:spaceId")

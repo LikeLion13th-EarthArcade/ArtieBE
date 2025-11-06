@@ -1,6 +1,7 @@
 package com.project.team5backend.domain.space.service.query;
 
 import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
+import com.project.team5backend.domain.exhibition.converter.ExhibitionConverter;
 import com.project.team5backend.domain.image.repository.SpaceImageRepository;
 import com.project.team5backend.domain.space.converter.SpaceConverter;
 import com.project.team5backend.domain.space.dto.response.SpaceResDTO;
@@ -23,11 +24,13 @@ import com.project.team5backend.domain.common.enums.StatusGroup;
 import com.project.team5backend.global.util.PageResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -53,15 +56,11 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
 
     //전시 공간 상세 조회
     @Override
-    public SpaceResDTO.SpaceDetailResDTO getSpaceDetail(long spaceId) {
-        Space space = spaceRepository.findByIdAndIsDeletedFalseAndStatusApprovedWithUserAndFacilities(spaceId, Status.APPROVED)
-                .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
-
-        List<String> imageUrls = spaceImageRepository.findImageUrlsBySpaceId(spaceId).stream()
-                .map(fileUrlResolverPort::toFileUrl)
-                .toList();
-
-        return SpaceConverter.toSpaceDetailResDTO(space, imageUrls);
+    public SpaceResDTO.SpaceDetailResDTO getSpaceDetail(Long userId, Long spaceId) {
+        Space space = getApprovedSpaceWithDetails(spaceId);
+        List<String> imageUrls = getFileKeys(spaceId);
+        boolean liked = spaceLikeRepository.existsByUserIdAndSpaceId(userId, spaceId);
+        return SpaceConverter.toSpaceDetailResDTO(space, imageUrls, liked);
     }
 
     //전시 검색
@@ -99,42 +98,43 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
         });
     }
 
-    public Page<SpaceResDTO.SpaceDetailResDTO> getMySpace(long userId, StatusGroup statusGroup, Pageable pageable) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
-
-        Page<Space> spacePage = spaceRepository.findByUserWithFilters(user, statusGroup, pageable);
-
-        return spacePage.map(space -> {
-            List<String> imageUrls = spaceImageRepository.findImageUrlsBySpaceId(space.getId())
-                    .stream()
-                    .map(fileUrlResolverPort::toFileUrl)
-                    .toList();
-
-            return SpaceConverter.toSpaceDetailResDTO(space, imageUrls);
-        });
+    @Override
+    public Page<SpaceResDTO.SpaceSummaryResDTO> getMySpaces(Long userId, StatusGroup status, Sort sort, Pageable pageable) {
+        Page<Space> spacePage = spaceRepository.findMySpacesByStatus(userId, status, sort, pageable);
+        return spacePage.map(SpaceConverter::toSpaceSummaryResDTO);
     }
 
     @Override
-    public SpaceResDTO.MySpaceDetailResDTO getMySpaceDetail(long userId, long spaceId) {
-        User user = userRepository.findByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
-
-        Space space = spaceRepository.findByIdAndIsDeletedFalse(spaceId)
-                .orElseThrow(() -> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
-
-        if (!Objects.equals(space.getUser(), user)) {
-            throw new SpaceException(SpaceErrorCode.SPACE_FORBIDDEN);
-        }
-
-        List<String> imageUrls = spaceImageRepository.findImageUrlsBySpaceId(spaceId).stream()
-                .map(fileUrlResolverPort::toFileUrl)
-                .toList();
+    public SpaceResDTO.MySpaceDetailResDTO getMySpaceDetail(Long userId, Long spaceId) {
+        Space space = getActiveSpace(spaceId);
+        List<String> imageUrls = getFileKeys(spaceId);
 
         SpaceVerification spaceVerification = space.getSpaceVerification();
         String businessLicenseFile = fileUrlResolverPort.toFileUrl(spaceVerification.getBusinessLicenseKey());
         String buildingRegisterFile = fileUrlResolverPort.toFileUrl(spaceVerification.getBuildingRegisterKey());
-
         return SpaceConverter.toMySpaceDetailResDTO(space, spaceVerification, imageUrls, businessLicenseFile, buildingRegisterFile);
     }
+
+
+    private List<String> getFileKeys(long spaceId) {
+        return spaceImageRepository.findImageUrlsBySpaceId(spaceId).stream()
+                .map(fileUrlResolverPort::toFileUrl)
+                .toList();
+    }
+
+    private Space getActiveSpace(long spaceId) {
+        return spaceRepository.findByIdAndIsDeletedFalse(spaceId)
+                .orElseThrow(() -> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
+    }
+
+    private User getActiveUser(long userId) {
+        return userRepository.findByIdAndIsDeletedFalse(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+    }
+
+    private Space getApprovedSpaceWithDetails(long spaceId) {
+        return spaceRepository.findByIdAndIsDeletedFalseAndStatusApprovedWithUserAndFacilities(spaceId, Status.APPROVED)
+                .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
+    }
+
 }

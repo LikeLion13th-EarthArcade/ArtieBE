@@ -1,5 +1,7 @@
 package com.project.team5backend.domain.space.converter;
 
+import com.project.team5backend.domain.exhibition.dto.response.ExhibitionResDTO;
+import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.facility.entity.Facility;
 import com.project.team5backend.domain.facility.entity.SpaceFacility;
 import com.project.team5backend.domain.space.dto.request.SpaceReqDTO;
@@ -40,6 +42,15 @@ public class SpaceConverter {
                 .build();
     }
 
+    public static SpaceResDTO.SpaceSummaryResDTO toSpaceSummaryResDTO(Space space){
+        return SpaceResDTO.SpaceSummaryResDTO.builder()
+                .spaceId(space.getId())
+                .title(space.getName())
+                .createdAt(space.getCreatedAt())
+                .status(space.getStatus())
+                .build();
+    }
+
     public static SpaceFacility toSpaceFacility(Space space, Facility facility) {
         return SpaceFacility.builder()
                 .space(space)
@@ -63,7 +74,7 @@ public class SpaceConverter {
                 .build();
     }
 
-    public static SpaceResDTO.SpaceDetailResDTO toSpaceDetailResDTO(Space space, List<String> imageUrls){
+    public static SpaceResDTO.SpaceDetailResDTO toSpaceDetailResDTO(Space space, List<String> imageUrls, boolean liked){
         return SpaceResDTO.SpaceDetailResDTO.builder()
                 .spaceId(space.getId())
                 .name(space.getName())
@@ -80,6 +91,7 @@ public class SpaceConverter {
                 .email(space.getEmail())
                 .websiteUrl(space.getWebsiteUrl())
                 .snsUrl(space.getSnsUrl())
+                .liked(liked)
                 .build();
     }
 

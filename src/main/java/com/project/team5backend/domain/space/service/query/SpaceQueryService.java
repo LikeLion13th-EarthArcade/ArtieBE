@@ -13,13 +13,13 @@ import java.time.LocalDate;
 import java.util.List;
 
 public interface SpaceQueryService {
-    SpaceResDTO.SpaceDetailResDTO getSpaceDetail(long spaceId);
+    SpaceResDTO.SpaceDetailResDTO getSpaceDetail(Long userId, Long spaceId);
 
     SpaceResDTO.SpaceSearchPageResDTO searchSpace(LocalDate requestedStartDate, LocalDate requestedEndDate, String district, SpaceSize size, SpaceType type, SpaceMood mood, List<String> facilities, Sort sort, int page);
 
     Page<SpaceResDTO.SpaceLikeSummaryResDTO> getInterestedSpaces(long userId, Pageable pageable);
 
-    Page<SpaceResDTO.SpaceDetailResDTO> getMySpace(long userId, StatusGroup statusGroup, Pageable pageable);
+    Page<SpaceResDTO.SpaceSummaryResDTO> getMySpaces(Long userId, StatusGroup status, Sort sort, Pageable pageable);
 
-    SpaceResDTO.MySpaceDetailResDTO getMySpaceDetail(long userId, long spaceId);
+    SpaceResDTO.MySpaceDetailResDTO getMySpaceDetail(Long userId, Long spaceId);
 }

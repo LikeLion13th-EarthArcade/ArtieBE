@@ -1,6 +1,7 @@
 package com.project.team5backend.domain.space.repository;
 
 
+import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.space.entity.enums.SpaceMood;
 import com.project.team5backend.domain.space.entity.enums.SpaceSize;
@@ -19,6 +20,5 @@ public interface SpaceRepositoryCustom {
 
     Page<Space> findAdminSpacesByStatus(StatusGroup status, Pageable pageable);
 
-    Page<Space> findByUserWithFilters(User user, StatusGroup statusGroup, Pageable pageable);
-
+    Page<Space> findMySpacesByStatus(Long userId, StatusGroup status, Sort sort, Pageable pageable);
 }
