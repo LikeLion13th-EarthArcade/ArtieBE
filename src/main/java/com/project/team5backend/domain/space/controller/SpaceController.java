@@ -45,7 +45,9 @@ public class SpaceController {
 
     @SwaggerBody(content = @Content(
             encoding = {
-                    @Encoding(name = "request", contentType = MediaType.APPLICATION_JSON_VALUE)
+                    @Encoding(name = "request", contentType = MediaType.APPLICATION_JSON_VALUE),
+                    // 선택: 이미지도 의도 명시
+                    @Encoding(name = "images", contentType = "image/*")
             }
     ))
     @PostMapping(
@@ -67,7 +69,7 @@ public class SpaceController {
             @RequestParam(value = "buildingRegisterFile") MultipartFile buildingRegisterFile,
             @RequestPart(value = "images", required = false) List<MultipartFile> images
     ) {
-        return CustomResponse.onSuccess(HttpStatus.CREATED, spaceCommandService.createSpace(spaceCreateReqDTO, currentUser.getId(), businessLicenseFile, buildingRegisterFile, images));
+        return CustomResponse.onSuccess(spaceCommandService.createSpace(spaceCreateReqDTO, currentUser.getId(), businessLicenseFile, buildingRegisterFile, images));
     }
 
     @PostMapping("/{spaceId}/like")

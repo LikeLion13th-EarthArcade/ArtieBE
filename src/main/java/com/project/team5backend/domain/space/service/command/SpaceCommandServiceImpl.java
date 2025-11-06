@@ -1,9 +1,9 @@
 package com.project.team5backend.domain.space.service.command;
 
+import com.project.team5backend.domain.common.cache.CachePort;
 import com.project.team5backend.domain.common.storage.FileStoragePort;
 import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
 import com.project.team5backend.domain.facility.entity.Facility;
-import com.project.team5backend.domain.facility.entity.SpaceFacility;
 import com.project.team5backend.domain.facility.repository.FacilityRepository;
 import com.project.team5backend.domain.image.converter.ImageConverter;
 import com.project.team5backend.domain.image.entity.SpaceImage;
@@ -30,23 +30,17 @@ import com.project.team5backend.domain.user.exception.UserErrorCode;
 import com.project.team5backend.domain.user.exception.UserException;
 import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.address.converter.AddressConverter;
-import com.project.team5backend.global.address.dto.response.AddressResDTO;
 import com.project.team5backend.global.address.service.AddressService;
 import com.project.team5backend.domain.common.embedded.Address;
 import com.project.team5backend.domain.common.enums.Status;
-import com.project.team5backend.global.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Objects;
-
-import static com.project.team5backend.global.constant.redis.RedisConstant.KEY_SCOPE_SUFFIX;
-import static com.project.team5backend.global.constant.scope.ScopeConstant.SCOPE_BIZ_NUMBER;
-
 
 @Service
 @RequiredArgsConstructor
@@ -66,66 +60,38 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
     private final FileStoragePort fileStoragePort;
     private final ImageCommandService imageCommandService;
     private final FileUrlResolverPort fileUrlResolverPort;
-    private final RedisUtils<String> redisUtils;
+    private final CachePort cachePort;
 
     @Override
-    public SpaceResDTO.SpaceCreateResDTO createSpace(SpaceReqDTO.SpaceCreateReqDTO spaceCreateReqDTO,
-                                                     long userId,
-                                                     MultipartFile businessLicenseFile,
-                                                     MultipartFile buildingRegisterFile,
-                                                     List<MultipartFile> images) {
-
+    public SpaceResDTO.SpaceCreateResDTO createSpace(SpaceReqDTO.SpaceCreateReqDTO spaceCreateReqDTO, long userId, MultipartFile businessLicenseFile, MultipartFile buildingRegisterFile, List<MultipartFile> images) {
         // 사업자 번호 검증을 완료 했는지?
         final String bizNumber = spaceCreateReqDTO.bizNumber();
-        if (!Objects.equals(redisUtils.get(bizNumber + KEY_SCOPE_SUFFIX), SCOPE_BIZ_NUMBER)) {
+        if (!cachePort.isValidated(bizNumber)) {
             throw new SpaceException(SpaceErrorCode.BIZ_NUMBER_VALIDATION_DOES_NOT_EXIST);
         }
 
         ExhibitionImageValidator.validateImages(images); // 이미지 검증 (개수, null 여부)
+        User user = getActiveUser(userId);
+        Address address = resolveAddress(spaceCreateReqDTO);
 
-        User user = userRepository.findByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+        var verificationFiles = uploadVerificationFiles(businessLicenseFile, buildingRegisterFile);
+        List<String> imageUrls = uploadImages(images);
 
-        AddressResDTO.AddressCreateResDTO addressResDTO = addressService.resolve(spaceCreateReqDTO.address());
-        Address address = AddressConverter.toAddress(addressResDTO);
+        Space space = saveSpace(spaceCreateReqDTO, user, address, imageUrls.get(0));
+        SpaceVerification spaceVerification = SpaceConverter.toSpaceVerification(space, bizNumber, verificationFiles.getLeft(), verificationFiles.getRight());
 
-        String businessLicenseFileUrl = fileStoragePort.upload(businessLicenseFile,"businessLicenseFile");
-        String buildingRegisterFileUrl = fileStoragePort.upload(buildingRegisterFile,"buildingRegister");
-
-        List<String> imageUrls = images.stream()
-                .map(file -> fileStoragePort.upload(file, "spaces"))
-                .toList();
-
-        String thumbnail = fileUrlResolverPort.toFileKey(imageUrls.get(0));
-        Space space = SpaceConverter.toSpace(spaceCreateReqDTO, user, thumbnail, address);
-
-        SpaceVerification spaceVerification = SpaceConverter.toSpaceVerification(space, spaceCreateReqDTO.bizNumber(), businessLicenseFileUrl, buildingRegisterFileUrl);
-
-        spaceRepository.save(space);
         spaceVerificationRepository.save(spaceVerification);
+        saveSpaceFacilities(spaceCreateReqDTO, space);
+        saveSpaceImages(imageUrls, space);
 
-        List<Facility> facilities = facilityRepository.findByNameIn(spaceCreateReqDTO.facilities());
-        facilities.forEach(facility -> {
-            SpaceFacility sf = SpaceConverter.toSpaceFacility(space, facility);
-            space.getSpaceFacilities().add(sf);
-        });
-
-        for (String url : imageUrls) {
-            spaceImageRepository.save(ImageConverter.toSpaceImage(space, url));
-        }
-
-        redisUtils.delete(bizNumber + KEY_SCOPE_SUFFIX);
-
+        cachePort.invalidate(bizNumber); //redis key 제거
         return SpaceConverter.toSpaceCreateResDTO(space);
     }
 
     @Override
     public SpaceResDTO.SpaceLikeResDTO toggleLike(long spaceId, long userId) {
-        User user = userRepository.findByIdAndIsDeletedFalse(userId)
-                .orElseThrow(()-> new UserException(UserErrorCode.USER_NOT_FOUND));
-        Space space = spaceRepository.findByIdAndIsDeletedFalseAndStatusApproved(spaceId, Status.APPROVED)
-                .orElseThrow(()-> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
-
+        User user = getActiveUser(userId);
+        Space space = getActiveSpace(spaceId);
         boolean alreadyLiked = spaceLikeRepository.existsByUserIdAndSpaceId(user.getId(), spaceId);
         return alreadyLiked ? cancelLike(user, space) : addLike(user, space);
     }
@@ -177,4 +143,57 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
             throw new ImageException(ImageErrorCode.S3_MOVE_TRASH_FAIL);
         }
     }
+
+
+    private Space getActiveSpace(long spaceId) {
+        return spaceRepository.findByIdAndIsDeletedFalseAndStatusApproved(spaceId, Status.APPROVED)
+                .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
+    }
+
+    private Space saveSpace(SpaceReqDTO.SpaceCreateReqDTO spaceCreateReqDTO, User user, Address address, String image) {
+        String thumbnail = fileUrlResolverPort.toFileKey(image);
+        Space space = SpaceConverter.toSpace(spaceCreateReqDTO, user, thumbnail, address);
+        return spaceRepository.save(space);
+    }
+
+    private void saveSpaceImages(List<String> imageUrls, Space space) {
+        for (String url : imageUrls) {
+            spaceImageRepository.save(ImageConverter.toSpaceImage(space, url));
+        }
+    }
+
+    private void saveSpaceFacilities(SpaceReqDTO.SpaceCreateReqDTO spaceCreateReqDTO, Space space) {
+        List<Facility> facilities = facilityRepository.findByNameIn(spaceCreateReqDTO.facilities());
+        space.getSpaceFacilities().addAll(
+                facilities.stream()
+                        .map(facility -> SpaceConverter.toSpaceFacility(space, facility))
+                        .toList()
+        );
+    }
+
+    private User getActiveUser(long userId) {
+        return userRepository.findByIdAndIsDeletedFalse(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+    }
+
+    private Address resolveAddress(SpaceReqDTO.SpaceCreateReqDTO spaceCreateReqDTO) {
+        var addressResDTO = addressService.resolve(spaceCreateReqDTO.address());
+        return AddressConverter.toAddress(addressResDTO);
+    }
+
+    private List<String> uploadImages(List<MultipartFile> images) {
+        return images.stream()
+                .map(file -> fileStoragePort.upload(file, "spaces"))
+                .toList();
+    }
+
+    private Pair<String, String> uploadVerificationFiles(
+            MultipartFile businessLicenseFile,
+            MultipartFile buildingRegisterFile
+    ) {
+        String businessUrl = fileStoragePort.upload(businessLicenseFile, "businessLicenseFile");
+        String registerUrl = fileStoragePort.upload(buildingRegisterFile, "buildingRegisterFile");
+        return Pair.of(businessUrl, registerUrl);
+    }
+
 }

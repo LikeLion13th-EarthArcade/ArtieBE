@@ -144,9 +144,11 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
 
     private void saveExhibitionFacilities(ExhibitionReqDTO.ExhibitionCreateReqDTO exhibitionCreateReqDTO, Exhibition exhibition) {
         List<Facility> facilities = facilityRepository.findByNameIn(exhibitionCreateReqDTO.facilities());
-        facilities.forEach(facility -> {
-            exhibition.getExhibitionFacilities().add(ExhibitionConverter.toCreateExhibitionFacility(exhibition, facility));
-        });
+        exhibition.getExhibitionFacilities().addAll(
+                facilities.stream()
+                        .map(facility -> ExhibitionConverter.toCreateExhibitionFacility(exhibition, facility))
+                        .toList()
+        );
     }
 
     private void saveExhibitionImages(Exhibition exhibition, List<String> imageUrls) {
