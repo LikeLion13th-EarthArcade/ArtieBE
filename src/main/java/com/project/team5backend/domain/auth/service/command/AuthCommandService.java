@@ -7,7 +7,7 @@ public interface AuthCommandService {
 
     void savePassword(User user, String encodedPassword);
 
-    void changePassword(long id, AuthReqDTO.AuthPasswordChangeReqDTO authPasswordChangeReqDTO);
+    void changePassword(Long id, AuthReqDTO.AuthPasswordChangeReqDTO authPasswordChangeReqDTO);
 
     void resetPassword(AuthReqDTO.AuthResetPasswordReqDTO authResetPasswordReqDTO);
 }

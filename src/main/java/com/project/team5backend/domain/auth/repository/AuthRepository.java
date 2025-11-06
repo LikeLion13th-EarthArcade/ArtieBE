@@ -13,7 +13,7 @@ import java.util.Optional;
 public interface AuthRepository extends JpaRepository<Auth, Long> {
     Optional<Auth> findByUser(User user);
 
-    Optional<Auth> findByUserId(long id);
+    Optional<Auth> findByUserId(Long id);
 
     @Query("SELECT a " +
             "FROM Auth a " +

@@ -40,7 +40,7 @@ public class AdminExhibitionQueryServiceImpl implements AdminExhibitionQueryServ
     }
 
     @Override
-    public AdminExhibitionResDTO.ExhibitionDetailResDTO getDetailExhibition(long exhibitionId) {
+    public AdminExhibitionResDTO.ExhibitionDetailResDTO getDetailExhibition(Long exhibitionId) {
         Exhibition exhibition = getExhibition(exhibitionId);
 
         List<String> imageUrls = exhibitionImageRepository.findImageUrlsByExhibitionId(exhibitionId).stream()
@@ -51,7 +51,7 @@ public class AdminExhibitionQueryServiceImpl implements AdminExhibitionQueryServ
 
     }
 
-    private Exhibition getExhibition(long exhibitionId) {
+    private Exhibition getExhibition(Long exhibitionId) {
         return exhibitionRepository.findByIdAndIsDeletedFalse(exhibitionId)
                 .orElseThrow(() -> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
     }

@@ -45,7 +45,7 @@ public class AdminReservationController {
     @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/{reservationId}")
     public CustomResponse<ReservationResDTO.ReservationDetailResDTO> getReservationDetail(
-            @PathVariable long reservationId
+            @PathVariable Long reservationId
     ) {
         return CustomResponse.onSuccess(adminReservationQueryService.getReservationDetail(reservationId));
     }

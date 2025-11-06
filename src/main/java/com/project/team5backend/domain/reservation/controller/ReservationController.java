@@ -42,7 +42,7 @@ public class ReservationController {
     @GetMapping("/reservations/{reservationId}")
     public CustomResponse<ReservationResDTO.ReservationDetailResDTO> getReservationDetail(
             @AuthenticationPrincipal CurrentUser currentUser,
-            @PathVariable long reservationId
+            @PathVariable Long reservationId
     ) {
         return CustomResponse.onSuccess(reservationQueryService.getReservationDetail(currentUser.getId(), reservationId));
     }
@@ -91,7 +91,7 @@ public class ReservationController {
     @PostMapping("/reservations/{reservationId}/host/approval")
     public CustomResponse<ReservationResDTO.ReservationStatusResDTO> approveRequest(
             @AuthenticationPrincipal CurrentUser currentUser,
-            @PathVariable long reservationId
+            @PathVariable Long reservationId
     ) {
         return CustomResponse.onSuccess(reservationCommandService.approveRequest(currentUser.getId(), reservationId));
     }
@@ -104,7 +104,7 @@ public class ReservationController {
     @PostMapping("/reservations/{reservationId}/host/rejection")
     public CustomResponse<ReservationResDTO.ReservationStatusResDTO> rejectRequest(
             @AuthenticationPrincipal CurrentUser currentUser,
-            @PathVariable long reservationId,
+            @PathVariable Long reservationId,
             @RequestBody @Valid ReservationReqDTO.ReservationRejectReqDTO reservationRejectReqDTO
     ) {
         return CustomResponse.onSuccess(reservationCommandService.rejectRequest(currentUser.getId(), reservationId, reservationRejectReqDTO));
@@ -117,7 +117,7 @@ public class ReservationController {
     @PostMapping("/reservations/{reservationId}/booker/cancel-request")
     public CustomResponse<ReservationResDTO.ReservationStatusResDTO> requestCancellation(
             @AuthenticationPrincipal CurrentUser currentUser,
-            @PathVariable long reservationId,
+            @PathVariable Long reservationId,
             @RequestBody @Valid ReservationReqDTO.ReservationCancellationReqDTO reservationCancellationReqDTO
     ) {
         return CustomResponse.onSuccess(reservationCommandService.requestCancellation(currentUser.getId(), reservationId, reservationCancellationReqDTO));

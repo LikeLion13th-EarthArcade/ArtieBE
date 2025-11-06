@@ -53,7 +53,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
 
     //전시 공간 상세 조회
     @Override
-    public SpaceResDTO.SpaceDetailResDTO getSpaceDetail(long spaceId) {
+    public SpaceResDTO.SpaceDetailResDTO getSpaceDetail(Long spaceId) {
         Space space = spaceRepository.findByIdAndIsDeletedFalseAndStatusApprovedWithUserAndFacilities(spaceId, Status.APPROVED)
                 .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
 
@@ -84,7 +84,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
     }
 
     @Override
-    public Page<SpaceResDTO.SpaceLikeSummaryResDTO> getInterestedSpaces(long userId, Pageable pageable) {
+    public Page<SpaceResDTO.SpaceLikeSummaryResDTO> getInterestedSpaces(Long userId, Pageable pageable) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
@@ -99,7 +99,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
         });
     }
 
-    public Page<SpaceResDTO.SpaceDetailResDTO> getMySpace(long userId, StatusGroup statusGroup, Pageable pageable) {
+    public Page<SpaceResDTO.SpaceDetailResDTO> getMySpace(Long userId, StatusGroup statusGroup, Pageable pageable) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
@@ -116,7 +116,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
     }
 
     @Override
-    public SpaceResDTO.MySpaceDetailResDTO getMySpaceDetail(long userId, long spaceId) {
+    public SpaceResDTO.MySpaceDetailResDTO getMySpaceDetail(Long userId, Long spaceId) {
         User user = userRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
 
