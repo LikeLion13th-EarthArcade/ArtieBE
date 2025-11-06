@@ -37,6 +37,8 @@ public class SpaceResDTO {
             SpaceSize spaceSize,
             SpaceMood spaceMood,
             String description,
+            String price,
+            String applicationMethod,
             List<String> facilities,
             String phoneNumber,
             String email,

@@ -63,6 +63,12 @@ public class Space extends BaseTimeEntity {
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted;
 
+    @Column(name = "price", nullable = false)
+    private String price;
+
+    @Column(name = "application_method", nullable = false)
+    private String applicationMethod;
+
     @Embedded
     private Address address; // 공간 주소 (위도, 경도 포함)
 

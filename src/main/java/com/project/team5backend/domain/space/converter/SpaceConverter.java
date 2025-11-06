@@ -37,6 +37,8 @@ public class SpaceConverter {
                 .spaceType(spaceCreateReqDTO.spaceType())
                 .spaceSize(spaceCreateReqDTO.spaceSize())
                 .spaceMood(spaceCreateReqDTO.spaceMood())
+                .price(spaceCreateReqDTO.price())
+                .applicationMethod(spaceCreateReqDTO.applicationMethod())
                 .status(Status.PENDING)
                 .user(user)
                 .build();
@@ -86,6 +88,8 @@ public class SpaceConverter {
                 .spaceSize(space.getSpaceSize())
                 .spaceMood(space.getSpaceMood())
                 .description(space.getDescription())
+                .price(space.getPrice())
+                .applicationMethod(space.getApplicationMethod())
                 .facilities(extractFacility(space))
                 .phoneNumber(space.getPhoneNumber())
                 .email(space.getEmail())

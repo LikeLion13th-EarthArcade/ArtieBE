@@ -51,6 +51,12 @@ public class SpaceReqDTO {
 
             String description,
 
+            @NotBlank
+            String price,
+
+            @NotBlank
+            String applicationMethod,
+
             List<String> facilities,
 
             @NotBlank(message = BLANK_PHONE_NUMBER)
