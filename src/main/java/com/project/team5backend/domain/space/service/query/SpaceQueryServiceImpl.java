@@ -1,9 +1,6 @@
 package com.project.team5backend.domain.space.service.query;
 
 import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
-import com.project.team5backend.domain.exhibition.converter.ExhibitionConverter;
-import com.project.team5backend.domain.exhibition.dto.response.ExhibitionResDTO;
-import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.image.repository.SpaceImageRepository;
 import com.project.team5backend.domain.space.converter.SpaceConverter;
 import com.project.team5backend.domain.space.dto.response.SpaceResDTO;
@@ -26,18 +23,13 @@ import com.project.team5backend.domain.common.enums.StatusGroup;
 import com.project.team5backend.global.util.PageResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
-
 
 @Service
 @RequiredArgsConstructor
@@ -51,7 +43,6 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
     private final UserRepository userRepository;
     private final SpaceLikeRepository spaceLikeRepository;
 
-    private static final int PAGE_SIZE = 4;
     private static final double SEOUL_CENTER_LAT = 37.5665;
     private static final double SEOUL_CENTER_LNG = 126.9780;
 
@@ -69,17 +60,10 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
     @Override
     public SpaceResDTO.SpaceSearchPageResDTO searchSpace(
             LocalDate requestedStartDate, LocalDate requestedEndDate, String district, SpaceSize size,
-            SpaceType type, SpaceMood mood, List<String> facilities, Sort sort, int page) {
+            SpaceType type, SpaceMood mood, List<String> facilities, Sort sort, Pageable pageable) {
 
-        Pageable pageable = PageRequest.of(page, PAGE_SIZE, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt"));
-        // 동적 쿼리로 전시 검색
-        Page<Space> spacePage = spaceRepository.findSpacesWithFilters(
-                requestedStartDate, requestedEndDate, district, size, type, mood, facilities, sort, pageable);
-        Page<SpaceResDTO.SpaceSearchResDTO> spaceSearchResDTOPage = spacePage
-                .map(space -> {
-                    String thumbnail = fileUrlResolverPort.toFileUrl(space.getThumbnail());
-                    return SpaceConverter.toSpaceSearchResDTO(space, thumbnail);
-                });
+        Page<Space> spacePage = spaceRepository.findSpacesWithFilters(requestedStartDate, requestedEndDate, district, size, type, mood, facilities, sort, pageable);
+        Page<SpaceResDTO.SpaceSearchResDTO> spaceSearchResDTOPage = getSpaceSearchResDTOPage(spacePage);
 
         return SpaceConverter.toSpaceSearchPageResDTO(PageResponse.of(spaceSearchResDTOPage), SEOUL_CENTER_LAT, SEOUL_CENTER_LNG);
     }
@@ -137,6 +121,14 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
         String thumbnail = fileUrlResolverPort.toFileUrl(space.getThumbnail());
         boolean isLiked = interestedSpaceIds.contains(space.getId());
         return SpaceConverter.toSpaceLikeSummaryResDTO(space, thumbnail, isLiked);
+    }
+
+    private Page<SpaceResDTO.SpaceSearchResDTO> getSpaceSearchResDTOPage(Page<Space> spacePage) {
+        return spacePage
+                .map(space -> {
+                    String thumbnail = fileUrlResolverPort.toFileUrl(space.getThumbnail());
+                    return SpaceConverter.toSpaceSearchResDTO(space, thumbnail);
+                });
     }
 
 }

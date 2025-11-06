@@ -113,19 +113,25 @@ public class SpaceController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate requestedStartDate,
             @Parameter(description = "대여 종료일", example = "2025-09-13")
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate requestedEndDate,
+            @Parameter(description = "행정구역")
             @RequestParam(name = "distinct", required = false) String district,
-            @RequestParam(name = "size", required = false) SpaceSize size,
-            @RequestParam(name = "type", required = false) SpaceType type,
-            @RequestParam(name = "mood", required = false) SpaceMood mood,
+            @RequestParam(name = "size", required = false) SpaceSize spaceSize,
+            @RequestParam(name = "type", required = false) SpaceType spaceType,
+            @RequestParam(name = "mood", required = false) SpaceMood spaceMood,
             @Parameter(
                     description = "시설 목록 (예: WIFI, RESTROOM, STROLLER_RENTAL)",
                     array = @ArraySchema(schema = @Schema(type = "string"))
             )
             @RequestParam(name = "facilities", required = false) List<String> facilities, // 스웨거 편의성을 위해 enum 설정
+            @Parameter(description = "정렬 기준")
             @RequestParam(defaultValue = "POPULAR") Sort sort,
-            @RequestParam(name = "page", defaultValue = "0") int page
+            @Parameter(description = "페이지 번호")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "페이지당 표시할 전시 개수")
+            @RequestParam(defaultValue = "8") int size
     ) {
-        return CustomResponse.onSuccess(spaceQueryService.searchSpace(requestedStartDate, requestedEndDate, district, size, type, mood, facilities, sort, page));
+        Pageable pageable = PageRequest.of(page, size);
+        return CustomResponse.onSuccess(spaceQueryService.searchSpace(requestedStartDate, requestedEndDate, district, spaceSize, spaceType, spaceMood, facilities, sort, pageable));
     }
 
     @Operation(summary = "전시 공간 삭제")
