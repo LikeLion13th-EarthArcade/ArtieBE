@@ -23,7 +23,7 @@ import java.util.*;
 
 import static com.project.team5backend.global.constant.common.CommonConstant.PASSWORD_SIZE;
 import static com.project.team5backend.global.constant.redis.RedisConstant.KEY_SCOPE_SUFFIX;
-import static com.project.team5backend.global.constant.scope.ScopeConstant.SCOPE_TEMP_PASSWORD;
+import static com.project.team5backend.global.constant.scope.ScopeConstant.SCOPE_RESET_PASSWORD;
 import static com.project.team5backend.global.constant.valid.PatternConstant.*;
 
 @Slf4j
@@ -70,12 +70,12 @@ public class AuthCommandServiceImpl implements AuthCommandService {
     }
 
     @Override
-    public String tempPassword(AuthReqDTO.AuthTempPasswordReqDTO authTempPasswordReqDTO) {
+    public String resetPassword(AuthReqDTO.AuthTempPasswordReqDTO authTempPasswordReqDTO) {
 
         // 이메일 인증이 있는지 확인
         final String email = authTempPasswordReqDTO.email();
         // 해당 인증이 비밀번호 재발급을 위한 것인지 확인
-        if (!Objects.equals(redisUtils.get(email + KEY_SCOPE_SUFFIX), SCOPE_TEMP_PASSWORD)) {
+        if (!Objects.equals(redisUtils.get(email + KEY_SCOPE_SUFFIX), SCOPE_RESET_PASSWORD)) {
             throw new AuthException(AuthErrorCode.EMAIL_VALIDATION_DOES_NOT_EXIST);
         }
         // 임시 비밀번호 발급

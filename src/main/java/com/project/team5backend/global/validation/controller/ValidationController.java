@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import static com.project.team5backend.global.constant.scope.ScopeConstant.SCOPE_SIGNUP;
-import static com.project.team5backend.global.constant.scope.ScopeConstant.SCOPE_TEMP_PASSWORD;
+import static com.project.team5backend.global.constant.scope.ScopeConstant.SCOPE_RESET_PASSWORD;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,12 +40,12 @@ public class ValidationController {
         return CustomResponse.onSuccess("메일 발송 성공! code: " + code);
     }
 
-    @Operation(summary = "비밀번호 찾기 이메일 인증 코드 발송")
-    @PostMapping("/code/temp-password")
-    public CustomResponse<String> sendTempPasswordCode(
+    @Operation(summary = "비밀번호 재설정 이메일 인증 코드 발송")
+    @PostMapping("/code/reset-password")
+    public CustomResponse<String> sendResetPasswordCode(
             @RequestBody @Valid ValidationReqDTO.EmailCodeReqDTO emailCodeReqDTO
     ) {
-        String code = validationService.sendCode(MailType.TEMP_PASSWORD_VERIFICATION, SCOPE_TEMP_PASSWORD, emailCodeReqDTO);
+        String code = validationService.sendCode(MailType.TEMP_PASSWORD_VERIFICATION, SCOPE_RESET_PASSWORD, emailCodeReqDTO);
         return CustomResponse.onSuccess("메일 발송 성공! code: " + code);
     }
 
