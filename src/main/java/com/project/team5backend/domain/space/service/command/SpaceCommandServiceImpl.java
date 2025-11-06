@@ -98,20 +98,26 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
 
     @Override
     public void deleteSpace(long spaceId, long userId) {
-        Space space = spaceRepository.findByIdAndIsDeletedFalseAndStatusApprovedWithUser(spaceId, Status.APPROVED)
+        Space space = getSpaceOwnedByUser(spaceId);
+        performSoftDelete(space);
+        cleanupRelatedDate(spaceId);
+    }
+
+    private Space getSpaceOwnedByUser(long spaceId) {
+        return spaceRepository.findByIdAndIsDeletedFalseAndStatusApprovedWithUser(spaceId, Status.APPROVED)
                 .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
-        if (!space.getUser().getId().equals(userId)) {
-            throw new SpaceException(SpaceErrorCode.SPACE_FORBIDDEN);
-        }
+    }
+
+    private void performSoftDelete(Space space) {
         space.softDelete();
-
-        List<String> fileKeys = deleteSpaceImage(spaceId);
-
-        spaceLikeRepository.deleteBySpaceId(spaceId); // 좋아요 하드 삭제 (벌크)
-        spaceReviewRepository.softDeleteBySpaceId(spaceId); // 리뷰 소프트 삭제 (벌크)
-
+        List<String> fileKeys = deleteSpaceImage(space.getId());
         space.resetCount();
         moveImagesToTrash(fileKeys); // s3 보존 휴지통 prefix로 이동시키기
+    }
+
+    private void cleanupRelatedDate(Long spaceId){
+        spaceLikeRepository.deleteBySpaceId(spaceId); // 좋아요 하드 삭제 (벌크)
+        spaceReviewRepository.softDeleteBySpaceId(spaceId); // 리뷰 소프트 삭제 (벌크)
     }
 
     private SpaceResDTO.SpaceLikeResDTO cancelLike(User user, Space space) {
@@ -137,13 +143,8 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
     }
 
     private void moveImagesToTrash(List<String> fileKeys) {
-        try {
-            imageCommandService.deleteImages(fileKeys);
-        } catch (ImageException e) {
-            throw new ImageException(ImageErrorCode.S3_MOVE_TRASH_FAIL);
-        }
+        imageCommandService.deleteImages(fileKeys);
     }
-
 
     private Space getActiveSpace(long spaceId) {
         return spaceRepository.findByIdAndIsDeletedFalseAndStatusApproved(spaceId, Status.APPROVED)
