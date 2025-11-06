@@ -45,6 +45,7 @@ public class MailService {
         } catch (MessagingException e) {
             throw new MailException(MailErrorCode.MAIL_SEND_ERROR);
         } catch (Exception e) {
+            log.error("[MailError] Unexpected error during mail sending", e);
             throw new MailException(MailErrorCode.NOT_DEFINED_ERROR);
         }
     }

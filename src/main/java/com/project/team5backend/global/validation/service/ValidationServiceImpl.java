@@ -51,10 +51,10 @@ public class ValidationServiceImpl implements ValidationService {
             throw new ValidationException(ValidationErrorCode.ALREADY_USED_EMAIL);
         }
 
-        boolean isTempPasswordVerification = Objects.equals(mailType, MailType.TEMP_PASSWORD_VERIFICATION);
+        boolean isResetPasswordVerification = Objects.equals(mailType, MailType.RESET_PASSWORD_VERIFICATION);
         boolean emailExists = userRepository.findByEmail(email).isPresent();
         // 비밀번호 찾기 이메일 인증인데, 해당 이메일로 가입된 계정이 없는 경우
-        if (isTempPasswordVerification && !emailExists) {
+        if (isResetPasswordVerification && !emailExists) {
             throw new ValidationException(ValidationErrorCode.ACCOUNT_NOT_FOUND);
         }
 

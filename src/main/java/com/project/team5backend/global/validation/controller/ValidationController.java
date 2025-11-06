@@ -45,7 +45,7 @@ public class ValidationController {
     public CustomResponse<String> sendResetPasswordCode(
             @RequestBody @Valid ValidationReqDTO.EmailCodeReqDTO emailCodeReqDTO
     ) {
-        String code = validationService.sendCode(MailType.TEMP_PASSWORD_VERIFICATION, SCOPE_RESET_PASSWORD, emailCodeReqDTO);
+        String code = validationService.sendCode(MailType.RESET_PASSWORD_VERIFICATION, SCOPE_RESET_PASSWORD, emailCodeReqDTO);
         return CustomResponse.onSuccess("메일 발송 성공! code: " + code);
     }
 

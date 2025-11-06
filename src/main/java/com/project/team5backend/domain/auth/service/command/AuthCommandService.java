@@ -9,5 +9,5 @@ public interface AuthCommandService {
 
     void changePassword(long id, AuthReqDTO.AuthPasswordChangeReqDTO authPasswordChangeReqDTO);
 
-    String resetPassword(AuthReqDTO.AuthTempPasswordReqDTO authTempPasswordReqDTO);
+    void resetPassword(AuthReqDTO.AuthResetPasswordReqDTO authResetPasswordReqDTO);
 }

@@ -45,12 +45,12 @@ public class AuthController {
         return CustomResponse.onSuccess("비밀번호 변경 완료");
     }
 
-    @Operation(summary = "비밀번호 재설정(잃어버렸을 때)", description = "비밀번호 재설정 이메일 인증 완료 후 실행 <br> 이메일 전송 구현 완료했지만, 비밀번호는 일단 ResBody로도 제공")
+    @Operation(summary = "비밀번호 재설정(잃어버렸을 때)", description = "비밀번호 재설정 이메일 인증 완료 후 실행 <br> 비밀번호 확인이 일치하지 않거나, 바꾸려는 비밀번호가 현재 비밀번호와 일치할 경우 예외")
     @PostMapping("/reset-password")
     public CustomResponse<String> resetPassword(
-            @RequestBody @Valid AuthReqDTO.AuthTempPasswordReqDTO authTempPasswordReqDto
+            @RequestBody @Valid AuthReqDTO.AuthResetPasswordReqDTO authResetPasswordReqDTO
     ) {
-        String password = authCommandService.resetPassword(authTempPasswordReqDto);
-        return CustomResponse.onSuccess("임시 비빌번호가 이메일로 발송되었습니다. " + password);
+        authCommandService.resetPassword(authResetPasswordReqDTO);
+        return CustomResponse.onSuccess("비밀번호 재설정 완료");
     }
 }
