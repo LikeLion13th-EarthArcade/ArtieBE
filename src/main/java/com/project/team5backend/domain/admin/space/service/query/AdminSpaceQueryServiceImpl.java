@@ -42,8 +42,7 @@ public class AdminSpaceQueryServiceImpl implements AdminSpaceQueryService {
 
     @Override
     public AdminSpaceResDTO.SpaceDetailResDTO getDetailSpace(long spaceId){
-        Space space = spaceRepository.findByIdAndIsDeletedFalse(spaceId)
-                .orElseThrow(() -> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
+        Space space = getSpace(spaceId);
 
         List<String> imageUrls = spaceImageRepository.findImageUrlsBySpaceId(spaceId).stream()
                 .map(fileUrlResolverPort::toFileUrl)
@@ -54,5 +53,10 @@ public class AdminSpaceQueryServiceImpl implements AdminSpaceQueryService {
         String buildingRegisterFile = fileUrlResolverPort.toFileUrl(spaceVerification.getBuildingRegisterKey());
 
         return AdminSpaceConverter.toSpaceDetailResDTO(space, spaceVerification, imageUrls, businessLicenseFile, buildingRegisterFile);
+    }
+
+    private Space getSpace(long spaceId) {
+        return spaceRepository.findByIdAndIsDeletedFalse(spaceId)
+                .orElseThrow(() -> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
     }
 }
