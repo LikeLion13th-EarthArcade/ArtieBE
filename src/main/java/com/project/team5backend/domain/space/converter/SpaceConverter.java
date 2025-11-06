@@ -1,7 +1,5 @@
 package com.project.team5backend.domain.space.converter;
 
-import com.project.team5backend.domain.exhibition.dto.response.ExhibitionResDTO;
-import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.facility.entity.Facility;
 import com.project.team5backend.domain.facility.entity.SpaceFacility;
 import com.project.team5backend.domain.space.dto.request.SpaceReqDTO;

@@ -1,6 +1,5 @@
 package com.project.team5backend.domain.space.dto.response;
 
-import com.project.team5backend.domain.admin.space.dto.response.AdminSpaceResDTO;
 import com.project.team5backend.domain.common.enums.Status;
 import com.project.team5backend.domain.space.entity.enums.SpaceMood;
 import com.project.team5backend.domain.space.entity.enums.SpaceSize;

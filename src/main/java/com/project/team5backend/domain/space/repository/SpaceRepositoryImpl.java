@@ -1,7 +1,5 @@
 package com.project.team5backend.domain.space.repository;
 
-import com.project.team5backend.domain.exhibition.entity.Exhibition;
-import com.project.team5backend.domain.exhibition.entity.QExhibition;
 import com.project.team5backend.domain.facility.entity.QFacility;
 import com.project.team5backend.domain.facility.entity.QSpaceFacility;
 import com.project.team5backend.domain.reservation.entity.QReservation;
@@ -10,7 +8,6 @@ import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.space.entity.enums.SpaceMood;
 import com.project.team5backend.domain.space.entity.enums.SpaceSize;
 import com.project.team5backend.domain.space.entity.enums.SpaceType;
-import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.common.enums.Sort;
 import com.project.team5backend.domain.common.enums.Status;
 import com.project.team5backend.domain.common.enums.StatusGroup;
@@ -136,24 +133,6 @@ public class SpaceRepositoryImpl implements SpaceRepositoryCustom {
                 .fetch();
 
         return new PageImpl<>(content, pageable, total != null ? total : 0L);
-    }
-
-    private List<Space> findSpaces(QSpace space, BooleanBuilder builder, Pageable pageable) {
-        return queryFactory
-                .selectFrom(space)
-                .where(builder)
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .orderBy(space.createdAt.desc())
-                .fetch();
-    }
-
-    private Long countSpace(QSpace space, BooleanBuilder builder) {
-        return queryFactory
-                .select(space.count())
-                .from(space)
-                .where(builder)
-                .fetchOne();
     }
 
     private BooleanExpression noOverlappingReservation(

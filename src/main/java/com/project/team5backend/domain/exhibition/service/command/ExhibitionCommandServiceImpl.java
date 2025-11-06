@@ -152,9 +152,7 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
     }
 
     private void saveExhibitionImages(Exhibition exhibition, List<String> imageUrls) {
-        imageUrls.forEach(imageUrl -> {
-            exhibitionImageRepository.save(ImageConverter.toExhibitionImage(exhibition, imageUrl));
-        });
+        imageUrls.forEach(imageUrl -> exhibitionImageRepository.save(ImageConverter.toExhibitionImage(exhibition, imageUrl)));
     }
 
     private void performSoftDelete(Exhibition exhibition) {

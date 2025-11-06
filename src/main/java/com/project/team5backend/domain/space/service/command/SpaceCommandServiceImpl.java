@@ -1,14 +1,14 @@
 package com.project.team5backend.domain.space.service.command;
 
 import com.project.team5backend.domain.common.cache.CachePort;
+import com.project.team5backend.domain.common.embedded.Address;
+import com.project.team5backend.domain.common.enums.Status;
 import com.project.team5backend.domain.common.storage.FileStoragePort;
 import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
 import com.project.team5backend.domain.facility.entity.Facility;
 import com.project.team5backend.domain.facility.repository.FacilityRepository;
 import com.project.team5backend.domain.image.converter.ImageConverter;
 import com.project.team5backend.domain.image.entity.SpaceImage;
-import com.project.team5backend.domain.image.exception.ImageErrorCode;
-import com.project.team5backend.domain.image.exception.ImageException;
 import com.project.team5backend.domain.image.repository.SpaceImageRepository;
 import com.project.team5backend.domain.image.service.command.ImageCommandService;
 import com.project.team5backend.domain.image.validator.ExhibitionImageValidator;
@@ -31,8 +31,6 @@ import com.project.team5backend.domain.user.exception.UserException;
 import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.address.converter.AddressConverter;
 import com.project.team5backend.global.address.service.AddressService;
-import com.project.team5backend.domain.common.embedded.Address;
-import com.project.team5backend.domain.common.enums.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
