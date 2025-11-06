@@ -18,7 +18,7 @@ public class CookieUtils {
         // JS 에서 쿠키 읽기 불가능 XSS 방지
         jwtCookie.setHttpOnly(true);
         // HTTPS 연결에서만 쿠키 전송
-        jwtCookie.setSecure(false);
+        jwtCookie.setSecure(true);
         // '/' 경로 이하 모든 API 요청에 쿠키가 포함되도록
         jwtCookie.setPath("/");
         // 우리 도메인에서만 사용
@@ -26,7 +26,7 @@ public class CookieUtils {
         // 쿠키 만료 시간 환경변수로 받아옴 (MS -> Sec로 변환 하려고 /1000)
         jwtCookie.setMaxAge((int) (tokenExpMs / 1000));
         // CSRF 설정 -> 개발 중에는 None
-        jwtCookie.setAttribute("SameSite", "Lax");
+        jwtCookie.setAttribute("SameSite", "None");
         // 쿠키 추가
         response.addCookie(jwtCookie);
     }
@@ -36,7 +36,7 @@ public class CookieUtils {
         // csrf 쿠키는 js가 읽어야 헤더에 넣을 수 있음
         csrfCookie.setHttpOnly(false);
         // HTTPS 연결에서만 쿠키 전송
-        csrfCookie.setSecure(false);
+        csrfCookie.setSecure(true);
         // '/' 경로 이하 모든 API 요청에 쿠키가 포함되도록
         csrfCookie.setPath("/");
         // 우리 도메인에서만 사용
@@ -44,7 +44,7 @@ public class CookieUtils {
         // -1 세션이 종료하면 쿠키 삭제
         csrfCookie.setMaxAge(CSRF_COOKIE_MAX_AGE);
         // CSRF 설정 -> 배포 중에는 Lax
-        csrfCookie.setAttribute("SameSite", "Lax");
+        csrfCookie.setAttribute("SameSite", "None");
         // 쿠키 추가
         response.addCookie(csrfCookie);
     }
