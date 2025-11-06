@@ -70,7 +70,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
 
     @Override
     public SpaceResDTO.SpaceCreateResDTO createSpace(SpaceReqDTO.SpaceCreateReqDTO spaceCreateReqDTO,
-                                                     long userId,
+                                                     Long userId,
                                                      MultipartFile businessLicenseFile,
                                                      MultipartFile buildingRegisterFile,
                                                      List<MultipartFile> images) {
@@ -120,7 +120,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
     }
 
     @Override
-    public SpaceResDTO.SpaceLikeResDTO toggleLike(long spaceId, long userId) {
+    public SpaceResDTO.SpaceLikeResDTO toggleLike(Long spaceId, Long userId) {
         User user = userRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(()-> new UserException(UserErrorCode.USER_NOT_FOUND));
         Space space = spaceRepository.findByIdAndIsDeletedFalseAndStatusApproved(spaceId, Status.APPROVED)
@@ -131,7 +131,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
     }
 
     @Override
-    public void deleteSpace(long spaceId, long userId) {
+    public void deleteSpace(Long spaceId, Long userId) {
         Space space = spaceRepository.findByIdAndIsDeletedFalseAndStatusApprovedWithUser(spaceId, Status.APPROVED)
                 .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
         if (!space.getUser().getId().equals(userId)) {

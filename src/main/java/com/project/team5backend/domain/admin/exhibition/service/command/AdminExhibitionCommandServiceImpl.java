@@ -18,7 +18,7 @@ public class AdminExhibitionCommandServiceImpl implements AdminExhibitionCommand
     private final ExhibitionRepository exhibitionRepository;
 
     @Override
-    public AdminExhibitionResDTO.ExhibitionStatusUpdateResDTO approveExhibition(long exhibitionId){
+    public AdminExhibitionResDTO.ExhibitionStatusUpdateResDTO approveExhibition(Long exhibitionId){
         Exhibition exhibition = getExhibition(exhibitionId);
 
         exhibition.approveExhibition();
@@ -26,14 +26,14 @@ public class AdminExhibitionCommandServiceImpl implements AdminExhibitionCommand
     }
 
     @Override
-    public AdminExhibitionResDTO.ExhibitionStatusUpdateResDTO rejectExhibition(long exhibitionId){
+    public AdminExhibitionResDTO.ExhibitionStatusUpdateResDTO rejectExhibition(Long exhibitionId){
         Exhibition exhibition = getExhibition(exhibitionId);
 
         exhibition.rejectExhibition();
         return AdminExhibitionConverter.toExhibitionStatusUpdateResDTO(exhibition, "해당 전시가 거절되었습니다.");
     }
 
-    private Exhibition getExhibition(long exhibitionId){
+    private Exhibition getExhibition(Long exhibitionId){
         return exhibitionRepository.findByIdAndIsDeletedFalse(exhibitionId)
                 .orElseThrow(() -> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
     }

@@ -10,12 +10,12 @@ import java.util.List;
 
 public interface SpaceCommandService {
     SpaceResDTO.SpaceCreateResDTO createSpace(SpaceReqDTO.SpaceCreateReqDTO spaceCreateReqDTO,
-                                              long userId,
+                                              Long userId,
                                               MultipartFile businessLicenseFile,
                                               MultipartFile buildingRegisterFile,
                                               List<MultipartFile> images);
 
-    void deleteSpace(long spaceId, long userId);
+    void deleteSpace(Long spaceId, Long userId);
 
-    SpaceResDTO.SpaceLikeResDTO toggleLike(long spaceId, long userId);
+    SpaceResDTO.SpaceLikeResDTO toggleLike(Long spaceId, Long userId);
 }

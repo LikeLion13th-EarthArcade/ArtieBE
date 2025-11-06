@@ -18,7 +18,7 @@ public class AdminSpaceCommandServiceImpl implements AdminSpaceCommandService {
     private final SpaceRepository spaceRepository;
 
     @Override
-    public AdminSpaceResDTO.SpaceStatusUpdateResDTO approveSpace(long spaceId){
+    public AdminSpaceResDTO.SpaceStatusUpdateResDTO approveSpace(Long spaceId){
         Space space = getSpace(spaceId);
 
         space.approveSpace();
@@ -26,14 +26,14 @@ public class AdminSpaceCommandServiceImpl implements AdminSpaceCommandService {
     }
 
     @Override
-    public AdminSpaceResDTO.SpaceStatusUpdateResDTO rejectSpace(long spaceId){
+    public AdminSpaceResDTO.SpaceStatusUpdateResDTO rejectSpace(Long spaceId){
         Space space = getSpace(spaceId);
 
         space.rejectSpace();
         return AdminSpaceConverter.toSpaceStatusUpdateResDTO(space, "해당 공간이 거절되었습니다.");
     }
 
-    private Space getSpace(long spaceId) {
+    private Space getSpace(Long spaceId) {
         return spaceRepository.findByIdAndIsDeletedFalse(spaceId)
                 .orElseThrow(() -> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
     }

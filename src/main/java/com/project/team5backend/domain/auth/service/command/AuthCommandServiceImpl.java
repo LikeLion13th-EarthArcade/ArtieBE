@@ -41,7 +41,7 @@ public class AuthCommandServiceImpl implements AuthCommandService {
     }
 
     @Override
-    public void changePassword(long id, AuthReqDTO.AuthPasswordChangeReqDTO authPasswordChangeReqDTO) {
+    public void changePassword(Long id, AuthReqDTO.AuthPasswordChangeReqDTO authPasswordChangeReqDTO) {
         // 새 비밀번호와 비밀번호 입력 확인이 다를 경우
         if (!authPasswordChangeReqDTO.newPassword().equals(authPasswordChangeReqDTO.newPasswordConfirmation())) {
             throw new AuthException(AuthErrorCode.NEW_PASSWORD_DOES_NOT_MATCH);

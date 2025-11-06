@@ -24,7 +24,7 @@ public interface SpaceRepository extends JpaRepository<Space, Long>,SpaceReposit
           and s.isDeleted = false
           and s.status =:status
         """)
-    Optional<Space> findByIdAndIsDeletedFalseAndStatusApproved(@Param("spaceId") long spaceId,@Param("status") Status status);
+    Optional<Space> findByIdAndIsDeletedFalseAndStatusApproved(@Param("spaceId") Long spaceId,@Param("status") Status status);
 
     @Query("""
     select distinct s
@@ -34,7 +34,7 @@ public interface SpaceRepository extends JpaRepository<Space, Long>,SpaceReposit
       and s.isDeleted = false
       and s.status = :status
 """)
-    Optional<Space> findByIdAndIsDeletedFalseAndStatusApprovedWithUser(@Param("spaceId") long spaceId, @Param("status") Status status);
+    Optional<Space> findByIdAndIsDeletedFalseAndStatusApprovedWithUser(@Param("spaceId") Long spaceId, @Param("status") Status status);
 
     @Query("""
     select distinct s
@@ -46,7 +46,7 @@ public interface SpaceRepository extends JpaRepository<Space, Long>,SpaceReposit
       and s.isDeleted = false
       and s.status = :status
 """)
-    Optional<Space> findByIdAndIsDeletedFalseAndStatusApprovedWithUserAndFacilities(@Param("spaceId") long spaceId, @Param("status") Status status);
+    Optional<Space> findByIdAndIsDeletedFalseAndStatusApprovedWithUserAndFacilities(@Param("spaceId") Long spaceId, @Param("status") Status status);
 
     @Query("""
         select s
@@ -54,7 +54,7 @@ public interface SpaceRepository extends JpaRepository<Space, Long>,SpaceReposit
         where s.id =:spaceId
           and s.isDeleted = false
         """)
-    Optional<Space> findByIdAndIsDeletedFalse(@Param("spaceId") long spaceId);
+    Optional<Space> findByIdAndIsDeletedFalse(@Param("spaceId") Long spaceId);
 
     // 리뷰 평균/카운트 갱신
     @Modifying

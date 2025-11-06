@@ -32,7 +32,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     private final ReservationRepository reservationRepository;
 
     @Override
-    public ReservationResDTO.ReservationCreateResDTO createReservation(long spaceId, long userId, ReservationReqDTO.ReservationCreateReqDTO reservationCreateReqDTO) {
+    public ReservationResDTO.ReservationCreateResDTO createReservation(Long spaceId, Long userId, ReservationReqDTO.ReservationCreateReqDTO reservationCreateReqDTO) {
 
         Space space = getSpace(spaceId);
         User user = getUser(userId);
@@ -44,7 +44,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     }
 
     @Override
-    public ReservationResDTO.ReservationStatusResDTO approveRequest(long userId, long reservationId) {
+    public ReservationResDTO.ReservationStatusResDTO approveRequest(Long userId, Long reservationId) {
 
         Reservation reservation = validateReservation(userId, reservationId);
         Status status = reservation.getStatus();
@@ -61,7 +61,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     }
 
     @Override
-    public ReservationResDTO.ReservationStatusResDTO rejectRequest(long userId, long reservationId, ReservationReqDTO.ReservationRejectReqDTO reservationRejectReqDTO) {
+    public ReservationResDTO.ReservationStatusResDTO rejectRequest(Long userId, Long reservationId, ReservationReqDTO.ReservationRejectReqDTO reservationRejectReqDTO) {
 
         Reservation reservation = validateReservation(userId, reservationId);
         Status status = reservation.getStatus();
@@ -80,7 +80,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     }
 
     @Override
-    public ReservationResDTO.ReservationStatusResDTO requestCancellation(long userId, long reservationId, ReservationReqDTO.ReservationCancellationReqDTO reservationCancellationReqDTO) {
+    public ReservationResDTO.ReservationStatusResDTO requestCancellation(Long userId, Long reservationId, ReservationReqDTO.ReservationCancellationReqDTO reservationCancellationReqDTO) {
         Reservation reservation = validateReservation(userId, reservationId);
 
         Status status = reservation.getStatus();
@@ -97,7 +97,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         return ReservationConverter.toReservationStatusResDTO(reservation);
     }
 
-    private Reservation validateReservation(long userId, long reservationId) {
+    private Reservation validateReservation(Long userId, Long reservationId) {
 
         User user =  getUser(userId);
         Reservation reservation = getReservation(reservationId);
@@ -108,17 +108,17 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
         return reservation;
     }
 
-    private User getUser(long userId) {
+    private User getUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
     }
 
-    private Space getSpace(long spaceId) {
+    private Space getSpace(Long spaceId) {
         return spaceRepository.findById(spaceId)
                 .orElseThrow(() -> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
     }
 
-    private Reservation getReservation(long reservationId) {
+    private Reservation getReservation(Long reservationId) {
         return reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
     }
