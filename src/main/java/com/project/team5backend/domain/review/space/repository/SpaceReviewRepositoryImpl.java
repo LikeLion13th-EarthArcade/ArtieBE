@@ -55,7 +55,7 @@ public class SpaceReviewRepositoryImpl implements SpaceReviewRepositoryCustom{
                         condition,
                         spaceReview.isDeleted.isFalse()
                 )
-                .orderBy(spaceReview.createdAt.asc()) // 최신순 정렬
+                .orderBy(spaceReview.createdAt.desc()) // 최신순 정렬
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();

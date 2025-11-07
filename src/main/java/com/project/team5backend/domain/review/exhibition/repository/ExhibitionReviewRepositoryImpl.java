@@ -52,7 +52,7 @@ public class ExhibitionReviewRepositoryImpl implements ExhibitionReviewRepositor
                         condition,
                         exhibitionReview.isDeleted.isFalse()
                 )
-                .orderBy(exhibitionReview.createdAt.asc()) // 최신순 정렬
+                .orderBy(exhibitionReview.createdAt.desc()) // 최신순 정렬
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
