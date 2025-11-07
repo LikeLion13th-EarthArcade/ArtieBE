@@ -67,9 +67,13 @@ public class ExhibitionReviewCommandServiceImpl implements ExhibitionReviewComma
 
     private void performsSoftDelete(ExhibitionReview exhibitionReview) {
         exhibitionReview.softDelete();
-        List<String> fileKeys = deleteExhibitionReviewImage(exhibitionReview.getId()); // 전시이미지 소프트 삭제
-        exhibitionRepository.applyReviewDeleted(exhibitionReview.getExhibition().getId(), exhibitionReview.getRate()); // 리뷰 평균/카운트 갱신
+        exhibitionReview.getExhibitionReviewImages().forEach(ExhibitionReviewImage::deleteImage);
 
+        List<String> fileKeys = exhibitionReview.getExhibitionReviewImages().stream()
+                .map(ExhibitionReviewImage::getFileKey)
+                .toList();
+
+        exhibitionRepository.applyReviewDeleted(exhibitionReview.getExhibition().getId(), exhibitionReview.getRate()); // 리뷰 평균/카운트 갱신
         moveImagesToTrash(fileKeys); // s3 보존 휴지통 prefix로 이동시키기
     }
 
@@ -88,14 +92,6 @@ public class ExhibitionReviewCommandServiceImpl implements ExhibitionReviewComma
                 })
                 .toList();
         exhibitionReviewImageRepository.saveAll(exhibitionReviewImages);
-    }
-
-    private List<String> deleteExhibitionReviewImage(Long exhibitionReviewId) {
-        List<ExhibitionReviewImage> images = exhibitionReviewImageRepository.findByExhibitionReviewId(exhibitionReviewId);
-        images.forEach(ExhibitionReviewImage::deleteImage);
-        return images.stream()
-                .map(ExhibitionReviewImage::getFileKey)
-                .toList();
     }
 
     private void moveImagesToTrash(List<String> fileKeys) {

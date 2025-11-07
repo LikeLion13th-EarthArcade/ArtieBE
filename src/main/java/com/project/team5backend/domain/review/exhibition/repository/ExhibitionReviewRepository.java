@@ -20,7 +20,8 @@ public interface ExhibitionReviewRepository extends JpaRepository<ExhibitionRevi
     @Query("""
         select er from ExhibitionReview er
         join er.user u
-        where er.id =:exhibitionReviewId
+        left join fetch er.exhibitionReviewImages eri
+        where er.id = :exhibitionReviewId
         and er.isDeleted == false
         and u.id = :userId
     """)
