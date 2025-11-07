@@ -53,7 +53,8 @@ public class ExhibitionReviewController {
         return CustomResponse.onSuccess(exhibitionReviewCommandService.createExhibitionReview(exhibitionId, currentUser.getId(), request, images));
     }
 
-    @Operation(summary = "내 전시 리뷰 목록 조회")
+    @Operation(summary = "내 전시 리뷰 목록 조회",
+            description = "확장성을 위해 정렬을 선택 가능하게 했지만, 어떤 정렬 방법을 선택하든 무조건 최근 생성 순으로 정렬되게 설정했습니다.")
     @GetMapping("/reviews/my")
     public CustomResponse<PageResponse<ExhibitionReviewResDTO.ExReviewDetailResDTO>> getMyExhibitionReviews(
             @AuthenticationPrincipal CurrentUser currentUser,
