@@ -13,6 +13,7 @@ import lombok.Builder;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 public class ExhibitionResDTO {
@@ -30,6 +31,8 @@ public class ExhibitionResDTO {
             String description,
             LocalDate startDate,
             LocalDate endDate,
+            LocalTime openingTime,
+            LocalTime closingTime,
             String operatingInfo,
             List<String> imageUrls,
             String websiteUrl,

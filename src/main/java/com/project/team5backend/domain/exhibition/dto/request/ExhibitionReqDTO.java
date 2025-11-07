@@ -30,12 +30,12 @@ public class ExhibitionReqDTO {
             LocalDate endDate,
 
             @NotNull(message = BLANK_EXHIBITION_OPERATING_HOURS)
-            LocalTime operatingStartHour,
+            LocalTime openingTime,
 
             @NotNull(message = BLANK_EXHIBITION_OPERATING_HOURS)
-            LocalTime operatingEndHour,
+            LocalTime closingTime,
 
-            String operatingOption,
+            String operatingInfo,
 
             String websiteUrl,
 

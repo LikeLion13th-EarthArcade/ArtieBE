@@ -92,7 +92,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
     }
 
     @Override
-    public SpaceResDTO.SpaceLikeResDTO toggleLike(long spaceId, long userId) {
+    public SpaceResDTO.SpaceLikeResDTO toggleLike(Long spaceId, Long userId) {
         User user = getActiveUser(userId);
         Space space = getActiveSpace(spaceId);
         boolean alreadyLiked = spaceLikeRepository.existsByUserIdAndSpaceId(user.getId(), spaceId);
@@ -100,13 +100,13 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
     }
 
     @Override
-    public void deleteSpace(long spaceId, long userId) {
+    public void deleteSpace(Long spaceId, Long userId) {
         Space space = getSpaceOwnedByUser(spaceId);
         performSoftDelete(space);
         cleanupRelatedDate(spaceId);
     }
 
-    private Space getSpaceOwnedByUser(long spaceId) {
+    private Space getSpaceOwnedByUser(Long spaceId) {
         return spaceRepository.findByIdAndIsDeletedFalseAndStatusApprovedWithUser(spaceId, Status.APPROVED)
                 .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
     }
@@ -149,7 +149,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
         imageCommandService.deleteImages(fileKeys);
     }
 
-    private Space getActiveSpace(long spaceId) {
+    private Space getActiveSpace(Long spaceId) {
         return spaceRepository.findByIdAndIsDeletedFalseAndStatusApproved(spaceId, Status.APPROVED)
                 .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
     }
@@ -175,7 +175,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
         );
     }
 
-    private User getActiveUser(long userId) {
+    private User getActiveUser(Long userId) {
         return userRepository.findByIdAndIsDeletedFalse(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
     }
