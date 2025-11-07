@@ -76,7 +76,7 @@ public class SpaceReviewCommandServiceImpl implements SpaceReviewCommandService 
     }
 
     private SpaceReview getActiveSpaceReview(Long spaceReviewId, Long userId) {
-        return spaceReviewRepository.findByIdAndIsDeletedFalse(spaceReviewId, userId)
+        return spaceReviewRepository.findByIdAndUserIdAndIsDeletedFalse(spaceReviewId, userId)
                 .orElseThrow(() -> new SpaceReviewException(SpaceReviewErrorCode.SPACE_REVIEW_NOT_FOUND));
     }
 

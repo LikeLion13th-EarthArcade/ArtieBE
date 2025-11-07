@@ -33,25 +33,18 @@ public class SpaceReviewQueryServiceImpl implements SpaceReviewQueryService {
 
     @Override
     public SpaceReviewResDTO.SpaceReviewDetailResDTO getSpaceReviewDetail(Long spaceReviewId) {
-        SpaceReview spaceReview = spaceReviewRepository.findByIdAndIsDeletedFalse(spaceReviewId)
-                .orElseThrow(() -> new SpaceReviewException(SpaceReviewErrorCode.SPACE_REVIEW_NOT_FOUND));
+        SpaceReview spaceReview = getActiveSpaceReview(spaceReviewId);
 
-        List<String> imageUrls = spaceReview.getSpaceReviewImages().stream()
-                .map(SpaceReviewImage::getFileKey)
-                .map(fileUrlResolverPort::toFileUrl)
-                .toList();
+        List<String> imageUrls = getFileUrls(spaceReview);
         return SpaceReviewConverter.toSpaceReviewDetailResDTO(spaceReview, imageUrls);
     }
 
-    public Page<SpaceReviewResDTO.SpaceReviewDetailResDTO> getSpaceReviewList(Long spaceId, int page) {
+    public Page<SpaceReviewResDTO.SpaceReviewDetailResDTO> getSpaceReviews(Long spaceId, int page) {
         Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
         Page<SpaceReview> spaceReviewPage = spaceReviewRepository.findBySpaceIdAndIsDeletedFalse(spaceId, pageable);
 
         return spaceReviewPage.map(spaceReview -> {
-            List<String> imageUrls = spaceReview.getSpaceReviewImages().stream()
-                    .map(SpaceReviewImage::getFileKey)
-                    .map(fileUrlResolverPort::toFileUrl)
-                    .toList();
+            List<String> imageUrls = getFileUrls(spaceReview);
             return SpaceReviewConverter.toSpaceReviewDetailResDTO(spaceReview, imageUrls);
         });
     }
@@ -64,11 +57,20 @@ public class SpaceReviewQueryServiceImpl implements SpaceReviewQueryService {
         Page<SpaceReview> spaceReviewPage = spaceReviewRepository.findMySpaceReviewsByIdAndIsDeletedFalse(user, pageable);
 
         return spaceReviewPage.map(review -> {
-            List<String> imageUrls = review.getSpaceReviewImages().stream()
-                    .map(SpaceReviewImage::getFileKey)
-                    .map(fileUrlResolverPort::toFileUrl)
-                    .toList();
+            List<String> imageUrls = getFileUrls(review);
             return SpaceReviewConverter.toSpaceReviewDetailResDTO(review, imageUrls);
         });
+    }
+
+    private List<String> getFileUrls(SpaceReview spaceReview) {
+        return spaceReview.getSpaceReviewImages().stream()
+                .map(SpaceReviewImage::getFileKey)
+                .map(fileUrlResolverPort::toFileUrl)
+                .toList();
+    }
+
+    private SpaceReview getActiveSpaceReview(Long spaceReviewId) {
+        return spaceReviewRepository.findByIdAndIsDeletedFalse(spaceReviewId)
+                .orElseThrow(() -> new SpaceReviewException(SpaceReviewErrorCode.SPACE_REVIEW_NOT_FOUND));
     }
 }

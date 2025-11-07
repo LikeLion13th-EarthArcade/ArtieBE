@@ -25,10 +25,18 @@ public interface SpaceReviewRepository extends JpaRepository<SpaceReview, Long> 
         join sr.user u
         left join fetch sr.spaceReviewImages sri
         where sr.id =:spaceReviewId
-        and sr.isDeleted is false
+        and sr.isDeleted = false
         and u.id = :userId
     """)
-    Optional<SpaceReview> findByIdAndIsDeletedFalse(@Param("spaceReviewId") Long spaceReviewId, @Param("userId") Long userId);
+    Optional<SpaceReview> findByIdAndUserIdAndIsDeletedFalse(@Param("spaceReviewId") Long spaceReviewId, @Param("userId") Long userId);
+
+    @Query("""
+        select sr from SpaceReview sr
+        join fetch sr.user u
+        where sr.id =:spaceReviewId
+        and sr.isDeleted = false
+    """)
+    Optional<SpaceReview> findByIdAndIsDeletedFalse(@Param("spaceReviewId") Long spaceReviewId);
 
     @Query("""
         SELECT DISTINCT sr FROM SpaceReview sr
@@ -44,7 +52,8 @@ public interface SpaceReviewRepository extends JpaRepository<SpaceReview, Long> 
         from SpaceReview sr
         join fetch sr.user u
         left join sr.spaceReviewImages sri
-        where sr.isDeleted is false and sr.user = :user
+        where sr.isDeleted = false
+        and sr.user = :user
     """)
     Page<SpaceReview> findMySpaceReviewsByIdAndIsDeletedFalse(@Param("user") User user, Pageable pageable);
 }

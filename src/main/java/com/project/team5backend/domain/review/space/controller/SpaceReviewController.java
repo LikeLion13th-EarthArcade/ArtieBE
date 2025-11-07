@@ -1,7 +1,6 @@
 package com.project.team5backend.domain.review.space.controller;
 
 
-import com.project.team5backend.domain.review.exhibition.dto.response.ExhibitionReviewResDTO;
 import com.project.team5backend.domain.review.space.dto.request.SpaceReviewReqDTO;
 import com.project.team5backend.domain.review.space.dto.response.SpaceReviewResDTO;
 import com.project.team5backend.domain.review.space.service.command.SpaceReviewCommandService;
@@ -55,13 +54,25 @@ public class SpaceReviewController {
         return CustomResponse.onSuccess(spaceReviewCommandService.createSpaceReview(spaceId, currentUser.getId(), request, images));
     }
 
+    @Operation(summary = "내 공간 리뷰 목록 조회")
+    @GetMapping("/reviews/my")
+    public CustomResponse<PageResponse<SpaceReviewResDTO.SpaceReviewDetailResDTO>> getMySpaceReviews(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        return CustomResponse.onSuccess(PageResponse.of(spaceReviewQueryService.getMySpaceReviews(currentUser.getId(), pageable)));
+
+    }
+
     @Operation(summary = "공간 리뷰 목록 조회")
     @GetMapping("{spaceId}/reviews")
-    public CustomResponse<PageResponse<SpaceReviewResDTO.SpaceReviewDetailResDTO>> getSpaceReviewList(
+    public CustomResponse<PageResponse<SpaceReviewResDTO.SpaceReviewDetailResDTO>> getSpaceReviews(
             @PathVariable Long spaceId,
             @RequestParam(defaultValue = "0") int page
     ) {
-        return CustomResponse.onSuccess(PageResponse.of(spaceReviewQueryService.getSpaceReviewList(spaceId, page)));
+        return CustomResponse.onSuccess(PageResponse.of(spaceReviewQueryService.getSpaceReviews(spaceId, page)));
     }
 
     @Operation(summary = "공간 리뷰 상세 조회")
@@ -77,17 +88,5 @@ public class SpaceReviewController {
             @PathVariable("reviewId") Long spaceReviewId) {
         spaceReviewCommandService.deleteSpaceReview(spaceReviewId, currentUser.getId());
         return CustomResponse.onSuccess("해당 공간 리뷰가 삭제되었습니다.");
-    }
-
-    @Operation(summary = "내 공간 리뷰 목록 조회")
-    @GetMapping("/reviews/my")
-    public CustomResponse<PageResponse<SpaceReviewResDTO.SpaceReviewDetailResDTO>> getMySpaceReviews(
-            @AuthenticationPrincipal CurrentUser currentUser,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        return CustomResponse.onSuccess(PageResponse.of(spaceReviewQueryService.getMySpaceReviews(currentUser.getId(), pageable)));
-
     }
 }
