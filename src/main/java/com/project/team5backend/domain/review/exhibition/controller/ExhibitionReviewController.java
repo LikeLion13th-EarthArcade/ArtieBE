@@ -57,11 +57,15 @@ public class ExhibitionReviewController {
     @GetMapping("/reviews/my")
     public CustomResponse<PageResponse<ExhibitionReviewResDTO.ExReviewDetailResDTO>> getMyExhibitionReviews(
             @AuthenticationPrincipal CurrentUser currentUser,
+            @Parameter(description = "정렬 기준")
+            @RequestParam(defaultValue = "NEW") Sort sort,
+            @Parameter(description = "페이지 번호")
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        return CustomResponse.onSuccess(PageResponse.of(exhibitionReviewQueryService.getMyExhibitionReviews(currentUser.getId(), pageable)));
+            @Parameter(description = "페이지당 표시할 전시 리뷰 개수")
+            @RequestParam(defaultValue = "8") int size) {
+            Pageable pageable = PageRequest.of(page, size);
+            Sort resolved = Sort.NEW;
+        return CustomResponse.onSuccess(PageResponse.of(exhibitionReviewQueryService.getMyExhibitionReviews(currentUser.getId(), resolved, pageable)));
 
     }
 

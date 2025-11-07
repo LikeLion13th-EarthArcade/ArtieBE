@@ -50,5 +50,5 @@ public interface ExhibitionReviewRepository extends JpaRepository<ExhibitionRevi
         left join er.exhibitionReviewImages eri
         where er.isDeleted is false and er.user = :user
     """)
-    Page<ExhibitionReview> findMyExReviewsByIdAndIsDeletedFalse(@Param("user") User user, Pageable pageable);
+    Page<ExhibitionReview> findMyExReviewsByUserIdAndIsDeletedFalse(@Param("user") User user, Pageable pageable);
 }

@@ -1,9 +1,13 @@
 package com.project.team5backend.domain.review.exhibition.repository;
 
+import com.project.team5backend.domain.common.enums.ReviewSearchType;
 import com.project.team5backend.domain.common.enums.Sort;
 import com.project.team5backend.domain.image.entity.QExhibitionReviewImage;
 import com.project.team5backend.domain.review.exhibition.entity.ExhibitionReview;
 import com.project.team5backend.domain.review.exhibition.entity.QExhibitionReview;
+import com.project.team5backend.domain.review.exhibition.exception.ExhibitionReviewErrorCode;
+import com.project.team5backend.domain.review.exhibition.exception.ExhibitionReviewException;
+import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -20,15 +24,21 @@ public class ExhibitionReviewRepositoryImpl implements ExhibitionReviewRepositor
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<ExhibitionReview> findByExhibitionIdAndIsDeletedFalse(Long exhibitionId, Sort sort, Pageable pageable) {
+    public Page<ExhibitionReview> findReviewsByTargetId(Long targetId, ReviewSearchType type, Sort sort, Pageable pageable) {
         QExhibitionReview exhibitionReview = QExhibitionReview.exhibitionReview;
         QExhibitionReviewImage exhibitionReviewImage = QExhibitionReviewImage.exhibitionReviewImage;
+
+        BooleanExpression condition = switch (type) {
+            case SPACE ->  throw new ExhibitionReviewException(ExhibitionReviewErrorCode.EXHIBITION_REVIEW_BAD_REQUEST);
+            case EXHIBITION -> exhibitionReview.exhibition.id.eq(targetId);
+            case USER -> exhibitionReview.user.id.eq(targetId);
+        };
 
         Long total = queryFactory
                 .select(exhibitionReview.count())
                 .from(exhibitionReview)
                 .where(
-                        exhibitionReview.id.eq(exhibitionId),
+                        condition,
                         exhibitionReview.isDeleted.isFalse()
                 )
                 .fetchOne();
@@ -39,7 +49,7 @@ public class ExhibitionReviewRepositoryImpl implements ExhibitionReviewRepositor
                 .distinct()
                 .join(exhibitionReview.exhibitionReviewImages, exhibitionReviewImage).fetchJoin()
                 .where(
-                        exhibitionReview.exhibition.id.eq(exhibitionId),
+                        condition,
                         exhibitionReview.isDeleted.isFalse()
                 )
                 .orderBy(exhibitionReview.createdAt.asc()) // 최신순 정렬

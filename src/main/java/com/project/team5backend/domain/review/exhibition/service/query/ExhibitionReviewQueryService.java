@@ -1,5 +1,6 @@
 package com.project.team5backend.domain.review.exhibition.service.query;
 
+
 import com.project.team5backend.domain.review.exhibition.dto.response.ExhibitionReviewResDTO;
 import com.project.team5backend.domain.common.enums.Sort;
 import org.springframework.data.domain.Page;
@@ -10,5 +11,5 @@ public interface ExhibitionReviewQueryService {
 
     Page<ExhibitionReviewResDTO.ExReviewDetailResDTO> getExhibitionReviews(Long exhibitionId, Sort sort, Pageable pageable);
 
-    Page<ExhibitionReviewResDTO.ExReviewDetailResDTO> getMyExhibitionReviews(Long userId, Pageable pageable);
+    Page<ExhibitionReviewResDTO.ExReviewDetailResDTO> getMyExhibitionReviews(Long userId, Sort sort, Pageable pageable);
 }
