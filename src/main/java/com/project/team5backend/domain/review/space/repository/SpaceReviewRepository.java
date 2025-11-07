@@ -22,11 +22,13 @@ public interface SpaceReviewRepository extends JpaRepository<SpaceReview, Long> 
 
     @Query("""
         select sr from SpaceReview sr
-        join fetch sr.user u
-        left join sr.spaceReviewImages sri
-        where sr.id =:spaceReviewId and sr.isDeleted is false
+        join sr.user u
+        left join fetch sr.spaceReviewImages sri
+        where sr.id =:spaceReviewId
+        and sr.isDeleted is false
+        and u.id = :userId
     """)
-    Optional<SpaceReview> findByIdAndIsDeletedFalse(@Param("spaceReviewId") Long spaceReviewId);
+    Optional<SpaceReview> findByIdAndIsDeletedFalse(@Param("spaceReviewId") Long spaceReviewId, @Param("userId") Long userId);
 
     @Query("""
         SELECT DISTINCT sr FROM SpaceReview sr

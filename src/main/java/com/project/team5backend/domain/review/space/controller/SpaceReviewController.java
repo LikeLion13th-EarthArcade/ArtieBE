@@ -37,12 +37,14 @@ public class SpaceReviewController {
 
     @SwaggerBody(content = @Content(
             encoding = {
-                    @Encoding(name = "request", contentType = MediaType.APPLICATION_JSON_VALUE)
+                    @Encoding(name = "request", contentType = MediaType.APPLICATION_JSON_VALUE),
+                    @Encoding(name = "images", contentType = "image/*")
             }
     ))
     @PostMapping(
             value = "/{spaceId}/reviews",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     @Operation(summary = "공간 리뷰 생성", description = "공간 리뷰 생성 API - 이미지 선택 안해도 생성 가능")
     public CustomResponse<SpaceReviewResDTO.SpaceReviewCreateResDTO> createSpaceReview(
             @AuthenticationPrincipal CurrentUser currentUser,
