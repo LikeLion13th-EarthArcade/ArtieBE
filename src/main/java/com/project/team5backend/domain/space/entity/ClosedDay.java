@@ -40,13 +40,10 @@ public class ClosedDay {
     private Integer date;
 
     /**
-     * 몇째 주인지 (예: [2,4] → 둘째, 넷째)
+     * 몇째 주 (1~5)
      * - MONTHLY_NTH_WEEKDAY
      */
-//    @ElementCollection
-//    @CollectionTable(name = "closed_day_weeks", joinColumns = @JoinColumn(name = "closed_day_id"))
-//    @Column(name = "week_of_month")
-    private List<Integer> weekOfMonth;
+    private Integer weekOfMonth;
 
     /**
      * 단일 특정일 휴무
@@ -63,28 +60,48 @@ public class ClosedDay {
 
     // == 비즈니스 로직 ==
     public boolean isClosedOn(LocalDate targetDate) {
+        if (type == null) return false;
+
         switch (this.type) {
+            // 매주 반복 휴무 (예: 매주 일요일)
             case WEEKLY_RECURRING -> {
-                return targetDate.getDayOfWeek().getValue() % 7 == this.dayOfWeek;
+                if (this.dayOfWeek == null) return false;
+                int targetDay = targetDate.getDayOfWeek().getValue() % 7;
+                return targetDay == this.dayOfWeek;
             }
+
+            // 매월 특정 날짜 (예: 매월 10일)
             case MONTHLY_FIXED_DATE -> {
+                if (this.date == null) return false;
                 return targetDate.getDayOfMonth() == this.date;
             }
+
+            // 매월 N번째 특정 요일 (예: 매월 둘째 토요일)
             case MONTHLY_WEEK_PATTERN -> {
-                int weekIndex = (targetDate.getDayOfMonth() - 1) / 7 + 1;
-                return this.dayOfWeek != null
-                        && targetDate.getDayOfWeek().getValue() % 7 == this.dayOfWeek
-                        && this.weekOfMonth != null
-                        && this.weekOfMonth.contains(weekIndex);
+                if (this.dayOfWeek == null || this.weekOfMonth == null) return false;
+
+                int targetDay = targetDate.getDayOfWeek().getValue() % 7;
+                int targetWeek = (targetDate.getDayOfMonth() - 1) / 7 + 1;
+
+                return targetDay == this.dayOfWeek && targetWeek == this.weekOfMonth;
             }
+
+            // 특정일 (임시 휴무, 공휴일 등)
             case SINGLE_DATE -> {
+                if (this.specificDate == null) return false;
                 return targetDate.equals(this.specificDate);
             }
+
+            // 특정 기간 전체 휴무
             case PERIOD_RANGE -> {
+                if (this.startDate == null || this.endDate == null) return false;
                 return !targetDate.isBefore(this.startDate)
                         && !targetDate.isAfter(this.endDate);
             }
+
+            default -> {
+                return false;
+            }
         }
-        return false;
     }
 }
