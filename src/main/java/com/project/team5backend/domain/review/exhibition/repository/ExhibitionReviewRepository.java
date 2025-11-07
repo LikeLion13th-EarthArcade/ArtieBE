@@ -9,6 +9,7 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ExhibitionReviewRepository extends JpaRepository<ExhibitionReview, Long> {
@@ -23,7 +24,14 @@ public interface ExhibitionReviewRepository extends JpaRepository<ExhibitionRevi
         and er.isDeleted == false
         and u.id = :userId
     """)
-    Optional<ExhibitionReview> findByIdAndIsDeletedFalse(@Param("exhibitionReviewId") Long exhibitionReviewId, @Param("userId") Long userId);
+    Optional<ExhibitionReview> findByIdAndIsDeletedFalseWithUser(@Param("exhibitionReviewId") Long exhibitionReviewId, @Param("userId") Long userId);
+
+    @Query("""
+        select er from ExhibitionReview er
+        where er.id =:exhibitionReviewId
+        and er.isDeleted == false
+    """)
+    Optional<ExhibitionReview> findByIdAndIsDeletedFalse(@Param("exhibitionReviewId") Long exhibitionReviewId);
 
     @Query("""
         SELECT DISTINCT er FROM ExhibitionReview er

@@ -2,6 +2,7 @@ package com.project.team5backend.domain.review.exhibition.service.query;
 
 import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
 import com.project.team5backend.domain.image.entity.ExhibitionReviewImage;
+import com.project.team5backend.domain.image.repository.ExhibitionReviewImageRepository;
 import com.project.team5backend.domain.review.exhibition.converter.ExhibitionReviewConverter;
 import com.project.team5backend.domain.review.exhibition.dto.response.ExhibitionReviewResDTO;
 import com.project.team5backend.domain.review.exhibition.entity.ExhibitionReview;
@@ -30,18 +31,15 @@ import java.util.List;
 public class ExhibitionReviewQueryServiceImpl implements ExhibitionReviewQueryService {
 
     private final ExhibitionReviewRepository exhibitionReviewRepository;
+    private final ExhibitionReviewImageRepository exhibitionReviewImageRepository;
     private final FileUrlResolverPort fileUrlResolverPort;
     private final UserRepository userRepository;
 
     @Override
     public ExhibitionReviewResDTO.ExReviewDetailResDTO getExhibitionReviewDetail(Long exhibitionReviewId) {
-        ExhibitionReview exhibitionReview = exhibitionReviewRepository.findByIdAndIsDeletedFalse(exhibitionReviewId)
-                .orElseThrow(()-> new ExhibitionReviewException(ExhibitionReviewErrorCode.EXHIBITION_REVIEW_NOT_FOUND));
+        ExhibitionReview exhibitionReview = getActiveExhibitionReview(exhibitionReviewId);
 
-        List<String> imageUrls = exhibitionReview.getExhibitionReviewImages().stream()
-                .map(ExhibitionReviewImage::getFileKey)
-                .map(fileUrlResolverPort::toFileUrl)
-                .toList();
+        List<String> imageUrls = getFileUrls(exhibitionReview);
         return ExhibitionReviewConverter.toExReviewDetailResDTO(exhibitionReview, imageUrls);
     }
 
@@ -74,5 +72,17 @@ public class ExhibitionReviewQueryServiceImpl implements ExhibitionReviewQuerySe
                     .toList();
             return ExhibitionReviewConverter.toExReviewDetailResDTO(review, imageUrls);
         });
+    }
+
+
+    private List<String> getFileUrls(ExhibitionReview exhibitionReview) {
+        return exhibitionReviewImageRepository.findImageUrlsByExhibitionReviewId(exhibitionReview.getId()).stream()
+                .map(fileUrlResolverPort::toFileUrl)
+                .toList();
+    }
+
+    private ExhibitionReview getActiveExhibitionReview(Long exhibitionReviewId) {
+        return exhibitionReviewRepository.findByIdAndIsDeletedFalse(exhibitionReviewId)
+                .orElseThrow(() -> new ExhibitionReviewException(ExhibitionReviewErrorCode.EXHIBITION_REVIEW_NOT_FOUND));
     }
 }

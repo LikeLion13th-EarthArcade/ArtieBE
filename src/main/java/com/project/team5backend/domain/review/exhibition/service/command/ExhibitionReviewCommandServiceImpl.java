@@ -74,7 +74,7 @@ public class ExhibitionReviewCommandServiceImpl implements ExhibitionReviewComma
     }
 
     private ExhibitionReview getActiveExhibition(Long exhibitionReviewId, Long userId) {
-        return exhibitionReviewRepository.findByIdAndIsDeletedFalse(exhibitionReviewId, userId)
+        return exhibitionReviewRepository.findByIdAndIsDeletedFalseWithUser(exhibitionReviewId, userId)
                 .orElseThrow(() -> new ExhibitionReviewException(ExhibitionReviewErrorCode.EXHIBITION_REVIEW_NOT_FOUND));
     }
 
