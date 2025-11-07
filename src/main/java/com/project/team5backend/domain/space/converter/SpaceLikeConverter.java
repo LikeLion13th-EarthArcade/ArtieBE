@@ -17,7 +17,7 @@ public class SpaceLikeConverter {
                 .build();
     }
 
-    public static SpaceResDTO.SpaceLikeResDTO toLikeSpaceResDTO(long spaceId, String message) {
+    public static SpaceResDTO.SpaceLikeResDTO toLikeSpaceResDTO(Long spaceId, String message) {
         return SpaceResDTO.SpaceLikeResDTO.builder()
                 .spaceId(spaceId)
                 .message(message)

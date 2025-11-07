@@ -49,20 +49,20 @@ public class UserCommandServiceImpl implements UserCommandService {
     }
 
     @Override
-    public void updateUser(long id, UserReqDTO.UserUpdateReqDTO userUpdateReqDTO) {
+    public void updateUser(Long id, UserReqDTO.UserUpdateReqDTO userUpdateReqDTO) {
         User user = getUser(id);
 
         updateIfChanged(userUpdateReqDTO.name(), user.getName(), user::updateName);
     }
 
     @Override
-    public void withdrawalUser(long id, String accessToken, String refreshToken) {
+    public void withdrawalUser(Long id, String accessToken, String refreshToken) {
         User user = getUser(id);
         user.delete();
         jwtUtil.saveBlackListToken(user.getEmail(), accessToken, refreshToken);
     }
 
-    private User getUser(long id) {
+    private User getUser(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
     }

@@ -17,13 +17,13 @@ public class UserQueryServiceImpl implements UserQueryService {
     private final UserRepository userRepository;
 
     @Override
-    public UserResDTO.UserProfileResDTO getUserProfile(long id) {
+    public UserResDTO.UserProfileResDTO getUserProfile(Long id) {
         User user = getUser(id);
 
         return UserConverter.toUserProfileResDTO(user);
     }
 
-    private User getUser(long id) {
+    private User getUser(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
     }

@@ -23,7 +23,7 @@ public class SpaceReviewConverter {
                 .build();
     }
 
-    public static SpaceReviewResDTO.SpaceReviewCreateResDTO toSpaceReviewCreateResDTO(long spaceReviewId){
+    public static SpaceReviewResDTO.SpaceReviewCreateResDTO toSpaceReviewCreateResDTO(Long spaceReviewId){
         return SpaceReviewResDTO.SpaceReviewCreateResDTO.builder()
                 .spaceReviewId(spaceReviewId)
                 .message("공간 리뷰가 생성되었습니다.")

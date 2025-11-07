@@ -61,7 +61,12 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
     private final CachePort cachePort;
 
     @Override
-    public SpaceResDTO.SpaceCreateResDTO createSpace(SpaceReqDTO.SpaceCreateReqDTO spaceCreateReqDTO, long userId, MultipartFile businessLicenseFile, MultipartFile buildingRegisterFile, List<MultipartFile> images) {
+    public SpaceResDTO.SpaceCreateResDTO createSpace(SpaceReqDTO.SpaceCreateReqDTO spaceCreateReqDTO,
+                                                     Long userId,
+                                                     MultipartFile businessLicenseFile,
+                                                     MultipartFile buildingRegisterFile,
+                                                     List<MultipartFile> images) {
+
         // 사업자 번호 검증을 완료 했는지?
         final String bizNumber = spaceCreateReqDTO.bizNumber();
         if (!cachePort.isValidated(bizNumber)) {

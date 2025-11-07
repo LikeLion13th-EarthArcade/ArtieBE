@@ -9,7 +9,7 @@ public class ReservationResDTO {
 
     @Builder
     public record ReservationCreateResDTO(
-            long id,
+            Long id,
             LocalDate startDate,
             LocalDate endDate
     ) {
@@ -17,8 +17,8 @@ public class ReservationResDTO {
 
     @Builder
     public record ReservationDetailResDTO(
-            long spaceId,
-            long reservationId,
+            Long spaceId,
+            Long reservationId,
             LocalDate startDate,
             LocalDate endDate,
             String name,
@@ -33,8 +33,8 @@ public class ReservationResDTO {
 
     @Builder
     public record ReservationStatusResDTO(
-            long spaceId,
-            long reservationId,
+            Long spaceId,
+            Long reservationId,
             Status status
     ) {
     }

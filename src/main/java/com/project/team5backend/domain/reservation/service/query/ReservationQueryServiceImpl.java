@@ -31,7 +31,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     private final CustomReservationRepository customReservationRepository;
 
     @Override
-    public ReservationResDTO.ReservationDetailResDTO getReservationDetail(long userId, long reservationId) {
+    public ReservationResDTO.ReservationDetailResDTO getReservationDetail(Long userId, Long reservationId) {
         User user = getUser(userId);
 
         Reservation reservation = getReservation(reservationId);
@@ -45,7 +45,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     }
 
     @Override
-    public Page<ReservationResDTO.ReservationDetailResDTO> getReservationListForSpaceOwner(long userId, StatusGroup statusGroup, Pageable pageable) {
+    public Page<ReservationResDTO.ReservationDetailResDTO> getReservationListForSpaceOwner(Long userId, StatusGroup statusGroup, Pageable pageable) {
 
         User user = getUser(userId);
 
@@ -55,7 +55,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     }
 
     @Override
-    public Page<ReservationResDTO.ReservationDetailResDTO> getMyReservationList(long userId, StatusGroup statusGroup, Pageable pageable) {
+    public Page<ReservationResDTO.ReservationDetailResDTO> getMyReservationList(Long userId, StatusGroup statusGroup, Pageable pageable) {
 
         User user = getUser(userId);
 
@@ -64,12 +64,12 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
         return reservationPage.map(ReservationConverter::toReservationDetailResDTO);
     }
 
-    private User getUser(long userId) {
+    private User getUser(Long userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
     }
 
-    private Reservation getReservation(long reservationId) {
+    private Reservation getReservation(Long reservationId) {
         return reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
     }

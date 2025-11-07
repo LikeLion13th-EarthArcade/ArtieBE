@@ -15,6 +15,7 @@ import java.util.List;
 public interface SpaceQueryService {
     SpaceResDTO.SpaceDetailResDTO getSpaceDetail(Long userId, Long spaceId);
 
+
     SpaceResDTO.SpaceSearchPageResDTO searchSpace(LocalDate requestedStartDate, LocalDate requestedEndDate,
                                                   String district, SpaceSize size, SpaceType type, SpaceMood mood,
                                                   List<String> facilities, Sort sort, Pageable pageable);
