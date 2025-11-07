@@ -31,7 +31,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -45,58 +44,53 @@ public class ExhibitionReviewCommandServiceImpl implements ExhibitionReviewComma
     private final ExhibitionReviewImageRepository exhibitionReviewImageRepository;
     private final ImageCommandService imageCommandService;
     private final FileStoragePort fileStoragePort;
+
     @Override
     public ExhibitionReviewResDTO.ExReviewCreateResDTO createExhibitionReview(Long exhibitionId, Long userId, ExhibitionReviewReqDTO.createExReviewReqDTO createExhibitionReviewReqDTO, List<MultipartFile> images) {
-        Exhibition exhibition = exhibitionRepository.findByIdAndIsDeletedFalseAndStatusApproveAndOpening(exhibitionId, LocalDate.now(), Status.APPROVED)
-                .orElseThrow(()-> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
-        User user = userRepository.findByIdAndIsDeletedFalse(userId)
-                .orElseThrow(()-> new UserException(UserErrorCode.USER_NOT_FOUND));
+        Exhibition exhibition = getActiveOpeningExhibition(exhibitionId);
+        User user = getActiveUser(userId);
 
         ExhibitionReview exhibitionReview = ExhibitionReviewConverter.toEntity(createExhibitionReviewReqDTO, exhibition, user);
         exhibitionReviewRepository.save(exhibitionReview);
 
         saveReviewImages(images, exhibitionReview);
-
         exhibitionRepository.applyReviewCreated(exhibitionId, exhibitionReview.getRate()); // 리뷰 평균/카운트 갱신
-
         return ExhibitionReviewConverter.toExReviewCreateResDTO(exhibitionReview.getId());
     }
+
     @Override
     public void deleteExhibitionReview(Long exhibitionReviewId, Long userId) {
-        ExhibitionReview exhibitionReview = exhibitionReviewRepository.findByIdAndIsDeletedFalse(exhibitionReviewId)
-                .orElseThrow(() -> new ExhibitionReviewException(ExhibitionReviewErrorCode.EXHIBITION_REVIEW_NOT_FOUND));
-        if (!exhibitionReview.getUser().getId().equals(userId)) {
-            throw new ExhibitionReviewException(ExhibitionReviewErrorCode.EXHIBITION_REVIEW_FORBIDDEN);
-        }
+        ExhibitionReview exhibitionReview = getActiveExhibition(exhibitionReviewId, userId);
+        performsSoftDelete(exhibitionReview);
+    }
+
+    private void performsSoftDelete(ExhibitionReview exhibitionReview) {
         exhibitionReview.softDelete();
-        List<String> fileKeys = deleteExhibitionReviewImage(exhibitionReview.getId()); // 전시이미지 소프트 삭제
+        exhibitionReview.getExhibitionReviewImages().forEach(ExhibitionReviewImage::deleteImage);
+
+        List<String> fileKeys = exhibitionReview.getExhibitionReviewImages().stream()
+                .map(ExhibitionReviewImage::getFileKey)
+                .toList();
 
         exhibitionRepository.applyReviewDeleted(exhibitionReview.getExhibition().getId(), exhibitionReview.getRate()); // 리뷰 평균/카운트 갱신
-
         moveImagesToTrash(fileKeys); // s3 보존 휴지통 prefix로 이동시키기
     }
 
+    private ExhibitionReview getActiveExhibition(Long exhibitionReviewId, Long userId) {
+        return exhibitionReviewRepository.findByIdAndIsDeletedFalseWithUser(exhibitionReviewId, userId)
+                .orElseThrow(() -> new ExhibitionReviewException(ExhibitionReviewErrorCode.EXHIBITION_REVIEW_NOT_FOUND));
+    }
+
     private void saveReviewImages(List<MultipartFile> images, ExhibitionReview exhibitionReview) {
-        List<ExhibitionReviewImage> exhibitionImages = Optional.ofNullable(images)
-                .orElseGet(List::of)
-                .stream()
-                .map(file -> {
-                    String url = fileStoragePort.upload(file, "exhibitionReviews");
+        if(images == null || images.isEmpty()) return;
+
+        List<ExhibitionReviewImage> exhibitionReviewImages = images.stream()
+                .map(image -> {
+                    String url = fileStoragePort.upload(image, "exhibitionReviews");
                     return ImageConverter.toExhibitionReviewImage(exhibitionReview, url);
                 })
                 .toList();
-
-        if (!exhibitionImages.isEmpty()) {
-            exhibitionReviewImageRepository.saveAll(exhibitionImages);
-        }
-    }
-
-    private List<String> deleteExhibitionReviewImage(Long exhibitionReviewId) {
-        List<ExhibitionReviewImage> images = exhibitionReviewImageRepository.findByExhibitionReviewId(exhibitionReviewId);
-        images.forEach(ExhibitionReviewImage::deleteImage);
-        return images.stream()
-                .map(ExhibitionReviewImage::getFileKey)
-                .toList();
+        exhibitionReviewImageRepository.saveAll(exhibitionReviewImages);
     }
 
     private void moveImagesToTrash(List<String> fileKeys) {
@@ -105,5 +99,15 @@ public class ExhibitionReviewCommandServiceImpl implements ExhibitionReviewComma
         } catch (ImageException e) {
             throw new ImageException(ImageErrorCode.S3_MOVE_TRASH_FAIL);
         }
+    }
+
+    private Exhibition getActiveOpeningExhibition(Long exhibitionId) {
+        return exhibitionRepository.findByIdAndIsDeletedFalseAndStatusApproveAndOpening(exhibitionId, LocalDate.now(), Status.APPROVED)
+                .orElseThrow(() -> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
+    }
+
+    private User getActiveUser(Long userId) {
+        return userRepository.findByIdAndIsDeletedFalse(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
     }
 }

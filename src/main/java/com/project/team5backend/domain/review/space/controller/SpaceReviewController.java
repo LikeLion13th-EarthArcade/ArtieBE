@@ -1,16 +1,17 @@
 package com.project.team5backend.domain.review.space.controller;
 
 
-import com.project.team5backend.domain.review.exhibition.dto.response.ExhibitionReviewResDTO;
 import com.project.team5backend.domain.review.space.dto.request.SpaceReviewReqDTO;
 import com.project.team5backend.domain.review.space.dto.response.SpaceReviewResDTO;
 import com.project.team5backend.domain.review.space.service.command.SpaceReviewCommandService;
 import com.project.team5backend.domain.review.space.service.query.SpaceReviewQueryService;
+import com.project.team5backend.domain.common.enums.Sort;
 import com.project.team5backend.global.SwaggerBody;
 import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.global.security.userdetails.CurrentUser;
 import com.project.team5backend.global.util.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -18,7 +19,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -37,12 +37,14 @@ public class SpaceReviewController {
 
     @SwaggerBody(content = @Content(
             encoding = {
-                    @Encoding(name = "request", contentType = MediaType.APPLICATION_JSON_VALUE)
+                    @Encoding(name = "request", contentType = MediaType.APPLICATION_JSON_VALUE),
+                    @Encoding(name = "images", contentType = "image/*")
             }
     ))
     @PostMapping(
             value = "/{spaceId}/reviews",
-            consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+            consumes = MediaType.MULTIPART_FORM_DATA_VALUE
+    )
     @Operation(summary = "공간 리뷰 생성", description = "공간 리뷰 생성 API - 이미지 선택 안해도 생성 가능")
     public CustomResponse<SpaceReviewResDTO.SpaceReviewCreateResDTO> createSpaceReview(
             @AuthenticationPrincipal CurrentUser currentUser,
@@ -53,13 +55,35 @@ public class SpaceReviewController {
         return CustomResponse.onSuccess(spaceReviewCommandService.createSpaceReview(spaceId, currentUser.getId(), request, images));
     }
 
+    @Operation(summary = "내 공간 리뷰 목록 조회")
+    @GetMapping("/reviews/my")
+    public CustomResponse<PageResponse<SpaceReviewResDTO.SpaceReviewDetailResDTO>> getMySpaceReviews(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @Parameter(description = "정렬 기준")
+            @RequestParam(defaultValue = "NEW") com.project.team5backend.domain.common.enums.Sort sort,
+            @Parameter(description = "페이지 번호")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "페이지당 표시할 공간 리뷰 개수")
+            @RequestParam(defaultValue = "8") int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Sort resolved = Sort.NEW;
+        return CustomResponse.onSuccess(PageResponse.of(spaceReviewQueryService.getMySpaceReviews(currentUser.getId(), resolved, pageable)));
+
+    }
+
     @Operation(summary = "공간 리뷰 목록 조회")
     @GetMapping("{spaceId}/reviews")
-    public CustomResponse<PageResponse<SpaceReviewResDTO.SpaceReviewDetailResDTO>> getSpaceReviewList(
+    public CustomResponse<PageResponse<SpaceReviewResDTO.SpaceReviewDetailResDTO>> getSpaceReviews(
             @PathVariable Long spaceId,
-            @RequestParam(defaultValue = "0") int page
-    ) {
-        return CustomResponse.onSuccess(PageResponse.of(spaceReviewQueryService.getSpaceReviewList(spaceId, page)));
+            @Parameter(description = "정렬 기준")
+            @RequestParam(defaultValue = "NEW") com.project.team5backend.domain.common.enums.Sort sort,
+            @Parameter(description = "페이지 번호")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "페이지당 표시할 공간 리뷰 개수")
+            @RequestParam(defaultValue = "8") int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Sort resolved = Sort.NEW;
+        return CustomResponse.onSuccess(PageResponse.of(spaceReviewQueryService.getSpaceReviews(spaceId, resolved, pageable)));
     }
 
     @Operation(summary = "공간 리뷰 상세 조회")
@@ -75,17 +99,5 @@ public class SpaceReviewController {
             @PathVariable("reviewId") Long spaceReviewId) {
         spaceReviewCommandService.deleteSpaceReview(spaceReviewId, currentUser.getId());
         return CustomResponse.onSuccess("해당 공간 리뷰가 삭제되었습니다.");
-    }
-
-    @Operation(summary = "내 공간 리뷰 목록 조회")
-    @GetMapping("/reviews/my")
-    public CustomResponse<PageResponse<SpaceReviewResDTO.SpaceReviewDetailResDTO>> getMySpaceReviews(
-            @AuthenticationPrincipal CurrentUser currentUser,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        return CustomResponse.onSuccess(PageResponse.of(spaceReviewQueryService.getMySpaceReviews(currentUser.getId(), pageable)));
-
     }
 }

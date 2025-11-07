@@ -7,7 +7,8 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface ExhibitionReviewCommandService {
-    ExhibitionReviewResDTO.ExReviewCreateResDTO createExhibitionReview(Long exhibitionId, Long userId, ExhibitionReviewReqDTO.createExReviewReqDTO createExReviewReqDTO, List<MultipartFile> images);
+    ExhibitionReviewResDTO.ExReviewCreateResDTO createExhibitionReview(
+            Long exhibitionId, Long userId, ExhibitionReviewReqDTO.createExReviewReqDTO createExReviewReqDTO, List<MultipartFile> images);
 
     void deleteExhibitionReview(Long exhibitionReviewId, Long userId);
 }
