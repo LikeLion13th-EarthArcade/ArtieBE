@@ -18,11 +18,12 @@ public interface ExhibitionReviewRepository extends JpaRepository<ExhibitionRevi
 
     @Query("""
         select er from ExhibitionReview er
-        join fetch er.user u
-        left join er.exhibitionReviewImages eri
-        where er.id =:exhibitionReviewId and er.isDeleted is false
+        join er.user u
+        where er.id =:exhibitionReviewId
+        and er.isDeleted == false
+        and u.id = :userId
     """)
-    Optional<ExhibitionReview> findByIdAndIsDeletedFalse(@Param("exhibitionReviewId") Long exhibitionReviewId);
+    Optional<ExhibitionReview> findByIdAndIsDeletedFalse(@Param("exhibitionReviewId") Long exhibitionReviewId, @Param("userId") Long userId);
 
     @Query("""
         SELECT DISTINCT er FROM ExhibitionReview er

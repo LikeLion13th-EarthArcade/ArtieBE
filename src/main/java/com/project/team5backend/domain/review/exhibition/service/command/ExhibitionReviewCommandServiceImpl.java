@@ -59,29 +59,23 @@ public class ExhibitionReviewCommandServiceImpl implements ExhibitionReviewComma
         return ExhibitionReviewConverter.toExReviewCreateResDTO(exhibitionReview.getId());
     }
 
-    private Exhibition getActiveOpeningExhibition(Long exhibitionId) {
-        return exhibitionRepository.findByIdAndIsDeletedFalseAndStatusApproveAndOpening(exhibitionId, LocalDate.now(), Status.APPROVED)
-                .orElseThrow(() -> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
-    }
-
-    private User getActiveUser(Long userId) {
-        return userRepository.findByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
-    }
-
     @Override
     public void deleteExhibitionReview(Long exhibitionReviewId, Long userId) {
-        ExhibitionReview exhibitionReview = exhibitionReviewRepository.findByIdAndIsDeletedFalse(exhibitionReviewId)
-                .orElseThrow(() -> new ExhibitionReviewException(ExhibitionReviewErrorCode.EXHIBITION_REVIEW_NOT_FOUND));
-        if (!exhibitionReview.getUser().getId().equals(userId)) {
-            throw new ExhibitionReviewException(ExhibitionReviewErrorCode.EXHIBITION_REVIEW_FORBIDDEN);
-        }
+        ExhibitionReview exhibitionReview = getActiveExhibition(exhibitionReviewId, userId);
+        performsSoftDelete(exhibitionReview);
+    }
+
+    private void performsSoftDelete(ExhibitionReview exhibitionReview) {
         exhibitionReview.softDelete();
         List<String> fileKeys = deleteExhibitionReviewImage(exhibitionReview.getId()); // 전시이미지 소프트 삭제
-
         exhibitionRepository.applyReviewDeleted(exhibitionReview.getExhibition().getId(), exhibitionReview.getRate()); // 리뷰 평균/카운트 갱신
 
         moveImagesToTrash(fileKeys); // s3 보존 휴지통 prefix로 이동시키기
+    }
+
+    private ExhibitionReview getActiveExhibition(Long exhibitionReviewId, Long userId) {
+        return exhibitionReviewRepository.findByIdAndIsDeletedFalse(exhibitionReviewId, userId)
+                .orElseThrow(() -> new ExhibitionReviewException(ExhibitionReviewErrorCode.EXHIBITION_REVIEW_NOT_FOUND));
     }
 
     private void saveReviewImages(List<MultipartFile> images, ExhibitionReview exhibitionReview) {
@@ -110,5 +104,15 @@ public class ExhibitionReviewCommandServiceImpl implements ExhibitionReviewComma
         } catch (ImageException e) {
             throw new ImageException(ImageErrorCode.S3_MOVE_TRASH_FAIL);
         }
+    }
+
+    private Exhibition getActiveOpeningExhibition(Long exhibitionId) {
+        return exhibitionRepository.findByIdAndIsDeletedFalseAndStatusApproveAndOpening(exhibitionId, LocalDate.now(), Status.APPROVED)
+                .orElseThrow(() -> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
+    }
+
+    private User getActiveUser(Long userId) {
+        return userRepository.findByIdAndIsDeletedFalse(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
     }
 }
