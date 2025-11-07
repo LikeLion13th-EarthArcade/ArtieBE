@@ -33,6 +33,8 @@ public class Space extends BaseTimeEntity {
     @Column(name = "thumbnail", nullable = false)
     private String thumbnail; // 썸네일
 
+
+
     @Column(name = "operating_info", nullable = false)
     private String operatingInfo; // 운영 시간
 
