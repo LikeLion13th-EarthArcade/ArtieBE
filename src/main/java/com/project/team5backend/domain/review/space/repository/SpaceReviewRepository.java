@@ -1,7 +1,6 @@
 package com.project.team5backend.domain.review.space.repository;
 
 
-import com.project.team5backend.domain.review.exhibition.entity.ExhibitionReview;
 import com.project.team5backend.domain.review.space.entity.SpaceReview;
 import com.project.team5backend.domain.user.entity.User;
 import org.springframework.data.domain.Page;

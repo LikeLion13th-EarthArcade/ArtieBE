@@ -26,7 +26,6 @@ import java.util.List;
 public class SpaceReviewQueryServiceImpl implements SpaceReviewQueryService {
     private final SpaceReviewRepository spaceReviewRepository;
     private final FileUrlResolverPort fileUrlResolverPort;
-    private final UserRepository userRepository;
 
     @Override
     public SpaceReviewResDTO.SpaceReviewDetailResDTO getSpaceReviewDetail(Long spaceReviewId) {
