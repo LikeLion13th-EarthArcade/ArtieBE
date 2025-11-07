@@ -24,15 +24,12 @@ import com.project.team5backend.global.util.PageResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Objects;
-
 
 @Service
 @RequiredArgsConstructor
@@ -46,95 +43,92 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
     private final UserRepository userRepository;
     private final SpaceLikeRepository spaceLikeRepository;
 
-    private static final int PAGE_SIZE = 4;
     private static final double SEOUL_CENTER_LAT = 37.5665;
     private static final double SEOUL_CENTER_LNG = 126.9780;
 
 
     //전시 공간 상세 조회
     @Override
-    public SpaceResDTO.SpaceDetailResDTO getSpaceDetail(Long spaceId) {
-        Space space = spaceRepository.findByIdAndIsDeletedFalseAndStatusApprovedWithUserAndFacilities(spaceId, Status.APPROVED)
-                .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
-
-        List<String> imageUrls = spaceImageRepository.findImageUrlsBySpaceId(spaceId).stream()
-                .map(fileUrlResolverPort::toFileUrl)
-                .toList();
-
-        return SpaceConverter.toSpaceDetailResDTO(space, imageUrls);
+    public SpaceResDTO.SpaceDetailResDTO getSpaceDetail(Long userId, Long spaceId) {
+        Space space = getApprovedSpaceWithDetails(spaceId);
+        List<String> imageUrls = getFileKeys(spaceId);
+        boolean liked = spaceLikeRepository.existsByUserIdAndSpaceId(userId, spaceId);
+        return SpaceConverter.toSpaceDetailResDTO(space, imageUrls, liked);
     }
 
     //전시 검색
     @Override
     public SpaceResDTO.SpaceSearchPageResDTO searchSpace(
             LocalDate requestedStartDate, LocalDate requestedEndDate, String district, SpaceSize size,
-            SpaceType type, SpaceMood mood, List<String> facilities, Sort sort, int page) {
+            SpaceType type, SpaceMood mood, List<String> facilities, Sort sort, Pageable pageable) {
 
-        Pageable pageable = PageRequest.of(page, PAGE_SIZE, org.springframework.data.domain.Sort.by(org.springframework.data.domain.Sort.Direction.DESC, "createdAt"));
-        // 동적 쿼리로 전시 검색
-        Page<Space> spacePage = spaceRepository.findSpacesWithFilters(
-                requestedStartDate, requestedEndDate, district, size, type, mood, facilities, sort, pageable);
-        Page<SpaceResDTO.SpaceSearchResDTO> spaceSearchResDTOPage = spacePage
-                .map(space -> {
-                    String thumbnail = fileUrlResolverPort.toFileUrl(space.getThumbnail());
-                    return SpaceConverter.toSpaceSearchResDTO(space, thumbnail);
-                });
+        Page<Space> spacePage = spaceRepository.findSpacesWithFilters(requestedStartDate, requestedEndDate, district, size, type, mood, facilities, sort, pageable);
+        Page<SpaceResDTO.SpaceSearchResDTO> spaceSearchResDTOPage = getSpaceSearchResDTOPage(spacePage);
 
         return SpaceConverter.toSpaceSearchPageResDTO(PageResponse.of(spaceSearchResDTOPage), SEOUL_CENTER_LAT, SEOUL_CENTER_LNG);
     }
 
     @Override
     public Page<SpaceResDTO.SpaceLikeSummaryResDTO> getInterestedSpaces(Long userId, Pageable pageable) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+        User user = getActiveUser(userId);
 
         List<Long> interestedSpaceIds = spaceLikeRepository.findSpaceIdsByInterestedUser(user);
-
         Page<Space> interestedSpaces = spaceRepository.findByIdIn(interestedSpaceIds, pageable);
 
-        return interestedSpaces.map(space -> {
-            String thumbnail = fileUrlResolverPort.toFileUrl(space.getThumbnail());
-            boolean isLiked = interestedSpaceIds.contains(space.getId());
-            return SpaceConverter.toSpaceLikeSummaryResDTO(space, thumbnail, isLiked);
-        });
+        return interestedSpaces.map(space -> getSpaceLikeSummaryResDTO(space, interestedSpaceIds));
     }
 
-    public Page<SpaceResDTO.SpaceDetailResDTO> getMySpace(Long userId, StatusGroup statusGroup, Pageable pageable) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
-
-        Page<Space> spacePage = spaceRepository.findByUserWithFilters(user, statusGroup, pageable);
-
-        return spacePage.map(space -> {
-            List<String> imageUrls = spaceImageRepository.findImageUrlsBySpaceId(space.getId())
-                    .stream()
-                    .map(fileUrlResolverPort::toFileUrl)
-                    .toList();
-
-            return SpaceConverter.toSpaceDetailResDTO(space, imageUrls);
-        });
+    @Override
+    public Page<SpaceResDTO.SpaceSummaryResDTO> getMySpaces(Long userId, StatusGroup status, Sort sort, Pageable pageable) {
+        Page<Space> spacePage = spaceRepository.findMySpacesByStatus(userId, status, sort, pageable);
+        return spacePage.map(SpaceConverter::toSpaceSummaryResDTO);
     }
 
     @Override
     public SpaceResDTO.MySpaceDetailResDTO getMySpaceDetail(Long userId, Long spaceId) {
-        User user = userRepository.findByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
-
-        Space space = spaceRepository.findByIdAndIsDeletedFalse(spaceId)
-                .orElseThrow(() -> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
-
-        if (!Objects.equals(space.getUser(), user)) {
-            throw new SpaceException(SpaceErrorCode.SPACE_FORBIDDEN);
-        }
-
-        List<String> imageUrls = spaceImageRepository.findImageUrlsBySpaceId(spaceId).stream()
-                .map(fileUrlResolverPort::toFileUrl)
-                .toList();
+        Space space = getActiveSpace(spaceId);
+        List<String> imageUrls = getFileKeys(spaceId);
 
         SpaceVerification spaceVerification = space.getSpaceVerification();
         String businessLicenseFile = fileUrlResolverPort.toFileUrl(spaceVerification.getBusinessLicenseKey());
         String buildingRegisterFile = fileUrlResolverPort.toFileUrl(spaceVerification.getBuildingRegisterKey());
-
         return SpaceConverter.toMySpaceDetailResDTO(space, spaceVerification, imageUrls, businessLicenseFile, buildingRegisterFile);
     }
+
+
+    private List<String> getFileKeys(long spaceId) {
+        return spaceImageRepository.findImageUrlsBySpaceId(spaceId).stream()
+                .map(fileUrlResolverPort::toFileUrl)
+                .toList();
+    }
+
+    private Space getActiveSpace(long spaceId) {
+        return spaceRepository.findByIdAndIsDeletedFalse(spaceId)
+                .orElseThrow(() -> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
+    }
+
+    private User getActiveUser(long userId) {
+        return userRepository.findByIdAndIsDeletedFalse(userId)
+                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
+    }
+
+    private Space getApprovedSpaceWithDetails(long spaceId) {
+        return spaceRepository.findByIdAndIsDeletedFalseAndStatusApprovedWithUserAndFacilities(spaceId, Status.APPROVED)
+                .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
+    }
+
+    private SpaceResDTO.SpaceLikeSummaryResDTO getSpaceLikeSummaryResDTO(Space space, List<Long> interestedSpaceIds) {
+        String thumbnail = fileUrlResolverPort.toFileUrl(space.getThumbnail());
+        boolean isLiked = interestedSpaceIds.contains(space.getId());
+        return SpaceConverter.toSpaceLikeSummaryResDTO(space, thumbnail, isLiked);
+    }
+
+    private Page<SpaceResDTO.SpaceSearchResDTO> getSpaceSearchResDTOPage(Page<Space> spacePage) {
+        return spacePage
+                .map(space -> {
+                    String thumbnail = fileUrlResolverPort.toFileUrl(space.getThumbnail());
+                    return SpaceConverter.toSpaceSearchResDTO(space, thumbnail);
+                });
+    }
+
 }

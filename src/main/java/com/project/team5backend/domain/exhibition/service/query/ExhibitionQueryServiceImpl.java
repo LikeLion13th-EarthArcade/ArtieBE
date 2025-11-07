@@ -131,7 +131,7 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
     }
 
     @Override
-    public Page<ExhibitionResDTO.ExhibitionSummaryResDTO> getSummaryExhibitionList(Long userId, StatusGroup status, Sort sort, Pageable pageable) {
+    public Page<ExhibitionResDTO.ExhibitionSummaryResDTO> getMyExhibitions(Long userId, StatusGroup status, Sort sort, Pageable pageable) {
         Page<Exhibition> exhibitionPage = exhibitionRepository.findMyExhibitionsByStatus(userId, status, sort, pageable);
         return exhibitionPage.map(ExhibitionConverter::toExhibitionSummaryResDTO);
     }

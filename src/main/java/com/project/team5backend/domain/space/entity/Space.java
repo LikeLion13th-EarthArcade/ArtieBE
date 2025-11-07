@@ -1,13 +1,13 @@
 package com.project.team5backend.domain.space.entity;
 
+import com.project.team5backend.domain.common.BaseTimeEntity;
+import com.project.team5backend.domain.common.embedded.Address;
+import com.project.team5backend.domain.common.enums.Status;
 import com.project.team5backend.domain.facility.entity.SpaceFacility;
 import com.project.team5backend.domain.space.entity.enums.SpaceMood;
 import com.project.team5backend.domain.space.entity.enums.SpaceSize;
 import com.project.team5backend.domain.space.entity.enums.SpaceType;
 import com.project.team5backend.domain.user.entity.User;
-import com.project.team5backend.domain.common.BaseTimeEntity;
-import com.project.team5backend.domain.common.embedded.Address;
-import com.project.team5backend.domain.common.enums.Status;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -62,6 +62,12 @@ public class Space extends BaseTimeEntity {
 
     @Column(name = "is_deleted", nullable = false)
     private boolean isDeleted;
+
+    @Column(name = "price", nullable = false)
+    private String price;
+
+    @Column(name = "application_method", nullable = false)
+    private String applicationMethod;
 
     @Embedded
     private Address address; // 공간 주소 (위도, 경도 포함)

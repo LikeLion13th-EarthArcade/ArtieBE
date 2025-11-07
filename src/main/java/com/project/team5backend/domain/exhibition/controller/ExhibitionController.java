@@ -1,5 +1,7 @@
 package com.project.team5backend.domain.exhibition.controller;
 
+import com.project.team5backend.domain.common.enums.Sort;
+import com.project.team5backend.domain.common.enums.StatusGroup;
 import com.project.team5backend.domain.exhibition.dto.request.ExhibitionReqDTO;
 import com.project.team5backend.domain.exhibition.dto.response.ExhibitionResDTO;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionCategory;
@@ -8,8 +10,6 @@ import com.project.team5backend.domain.exhibition.service.command.ExhibitionComm
 import com.project.team5backend.domain.exhibition.service.query.ExhibitionQueryService;
 import com.project.team5backend.global.SwaggerBody;
 import com.project.team5backend.global.apiPayload.CustomResponse;
-import com.project.team5backend.domain.common.enums.Sort;
-import com.project.team5backend.domain.common.enums.StatusGroup;
 import com.project.team5backend.global.security.userdetails.CurrentUser;
 import com.project.team5backend.global.util.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -168,7 +168,7 @@ public class ExhibitionController {
             @RequestParam(defaultValue = "8") int size
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        return CustomResponse.onSuccess(PageResponse.of(exhibitionQueryService.getSummaryExhibitionList(currentUser.getId(), status, sort, pageable)));
+        return CustomResponse.onSuccess(PageResponse.of(exhibitionQueryService.getMyExhibitions(currentUser.getId(), status, sort, pageable)));
     }
 
     @Operation(summary = "내 전시 상세 보기", description = "상태에 상관없이 내 전시 상세 보기 가능")

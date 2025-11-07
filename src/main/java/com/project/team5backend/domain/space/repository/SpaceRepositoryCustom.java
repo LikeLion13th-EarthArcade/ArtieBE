@@ -1,13 +1,12 @@
 package com.project.team5backend.domain.space.repository;
 
 
+import com.project.team5backend.domain.common.enums.Sort;
+import com.project.team5backend.domain.common.enums.StatusGroup;
 import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.space.entity.enums.SpaceMood;
 import com.project.team5backend.domain.space.entity.enums.SpaceSize;
 import com.project.team5backend.domain.space.entity.enums.SpaceType;
-import com.project.team5backend.domain.user.entity.User;
-import com.project.team5backend.domain.common.enums.Sort;
-import com.project.team5backend.domain.common.enums.StatusGroup;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -19,6 +18,5 @@ public interface SpaceRepositoryCustom {
 
     Page<Space> findAdminSpacesByStatus(StatusGroup status, Pageable pageable);
 
-    Page<Space> findByUserWithFilters(User user, StatusGroup statusGroup, Pageable pageable);
-
+    Page<Space> findMySpacesByStatus(Long userId, StatusGroup status, Sort sort, Pageable pageable);
 }
