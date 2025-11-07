@@ -9,7 +9,8 @@ import org.springframework.http.HttpStatus;
 @AllArgsConstructor
 public enum SpaceReviewErrorCode implements BaseErrorCode {
     SPACE_REVIEW_NOT_FOUND(HttpStatus.NOT_FOUND, "SPACE_REVIEW404_1", "공간 리뷰를 찾을 수 없습니다."),
-    SPACE_REVIEW_FORBIDDEN(HttpStatus.FORBIDDEN, "SPACE_REVIEW403_1", "해당 공간 리뷰에 대한 권한이 없습니다.")
+    SPACE_REVIEW_FORBIDDEN(HttpStatus.FORBIDDEN, "SPACE_REVIEW403_1", "해당 공간 리뷰에 대한 권한이 없습니다."),
+    SPACE_REVIEW_BAD_REQUEST(HttpStatus.BAD_REQUEST, "SPACE_REVIEW400_1", "목록 요청시, ReviewSearchType이 Exhibition 입니다."),
     ;
 
     private final HttpStatus httpStatus;

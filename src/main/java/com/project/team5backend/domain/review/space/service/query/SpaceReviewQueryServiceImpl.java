@@ -1,7 +1,9 @@
 package com.project.team5backend.domain.review.space.service.query;
 
 
+import com.project.team5backend.domain.common.enums.ReviewSearchType;
 import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
+import com.project.team5backend.domain.common.enums.Sort;
 import com.project.team5backend.domain.image.entity.SpaceReviewImage;
 import com.project.team5backend.domain.review.space.converter.SpaceReviewConverter;
 import com.project.team5backend.domain.review.space.dto.response.SpaceReviewResDTO;
@@ -9,15 +11,10 @@ import com.project.team5backend.domain.review.space.entity.SpaceReview;
 import com.project.team5backend.domain.review.space.exception.SpaceReviewErrorCode;
 import com.project.team5backend.domain.review.space.exception.SpaceReviewException;
 import com.project.team5backend.domain.review.space.repository.SpaceReviewRepository;
-import com.project.team5backend.domain.user.entity.User;
-import com.project.team5backend.domain.user.exception.UserErrorCode;
-import com.project.team5backend.domain.user.exception.UserException;
 import com.project.team5backend.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,27 +36,15 @@ public class SpaceReviewQueryServiceImpl implements SpaceReviewQueryService {
         return SpaceReviewConverter.toSpaceReviewDetailResDTO(spaceReview, imageUrls);
     }
 
-    public Page<SpaceReviewResDTO.SpaceReviewDetailResDTO> getSpaceReviews(Long spaceId, int page) {
-        Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
-        Page<SpaceReview> spaceReviewPage = spaceReviewRepository.findBySpaceIdAndIsDeletedFalse(spaceId, pageable);
-
-        return spaceReviewPage.map(spaceReview -> {
-            List<String> imageUrls = getFileUrls(spaceReview);
-            return SpaceReviewConverter.toSpaceReviewDetailResDTO(spaceReview, imageUrls);
-        });
+    public Page<SpaceReviewResDTO.SpaceReviewDetailResDTO> getSpaceReviews(Long spaceId, Sort sort, Pageable pageable) {
+        Page<SpaceReview> spaceReviewPage = spaceReviewRepository.findReviewsByTargetId(spaceId, ReviewSearchType.SPACE, sort, pageable);
+        return toReviewDetailPage(spaceReviewPage);
     }
 
     @Override
-    public Page<SpaceReviewResDTO.SpaceReviewDetailResDTO> getMySpaceReviews(Long userId, Pageable pageable) {
-        User user = userRepository.findByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
-
-        Page<SpaceReview> spaceReviewPage = spaceReviewRepository.findMySpaceReviewsByIdAndIsDeletedFalse(user, pageable);
-
-        return spaceReviewPage.map(review -> {
-            List<String> imageUrls = getFileUrls(review);
-            return SpaceReviewConverter.toSpaceReviewDetailResDTO(review, imageUrls);
-        });
+    public Page<SpaceReviewResDTO.SpaceReviewDetailResDTO> getMySpaceReviews(Long userId, Sort sort, Pageable pageable) {
+        Page<SpaceReview> spaceReviewPage = spaceReviewRepository.findReviewsByTargetId(userId, ReviewSearchType.USER, sort, pageable);
+        return toReviewDetailPage(spaceReviewPage);
     }
 
     private List<String> getFileUrls(SpaceReview spaceReview) {
@@ -72,5 +57,12 @@ public class SpaceReviewQueryServiceImpl implements SpaceReviewQueryService {
     private SpaceReview getActiveSpaceReview(Long spaceReviewId) {
         return spaceReviewRepository.findByIdAndIsDeletedFalse(spaceReviewId)
                 .orElseThrow(() -> new SpaceReviewException(SpaceReviewErrorCode.SPACE_REVIEW_NOT_FOUND));
+    }
+
+    private Page<SpaceReviewResDTO.SpaceReviewDetailResDTO> toReviewDetailPage(Page<SpaceReview> spaceReviewPage) {
+        return spaceReviewPage.map(spaceReview -> {
+            List<String> imageUrls = getFileUrls(spaceReview);
+            return SpaceReviewConverter.toSpaceReviewDetailResDTO(spaceReview, imageUrls);
+        });
     }
 }

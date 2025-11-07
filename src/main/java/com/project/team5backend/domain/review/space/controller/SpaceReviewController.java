@@ -5,11 +5,13 @@ import com.project.team5backend.domain.review.space.dto.request.SpaceReviewReqDT
 import com.project.team5backend.domain.review.space.dto.response.SpaceReviewResDTO;
 import com.project.team5backend.domain.review.space.service.command.SpaceReviewCommandService;
 import com.project.team5backend.domain.review.space.service.query.SpaceReviewQueryService;
+import com.project.team5backend.domain.common.enums.Sort;
 import com.project.team5backend.global.SwaggerBody;
 import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.global.security.userdetails.CurrentUser;
 import com.project.team5backend.global.util.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -17,7 +19,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -58,11 +59,15 @@ public class SpaceReviewController {
     @GetMapping("/reviews/my")
     public CustomResponse<PageResponse<SpaceReviewResDTO.SpaceReviewDetailResDTO>> getMySpaceReviews(
             @AuthenticationPrincipal CurrentUser currentUser,
+            @Parameter(description = "정렬 기준")
+            @RequestParam(defaultValue = "NEW") com.project.team5backend.domain.common.enums.Sort sort,
+            @Parameter(description = "페이지 번호")
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        return CustomResponse.onSuccess(PageResponse.of(spaceReviewQueryService.getMySpaceReviews(currentUser.getId(), pageable)));
+            @Parameter(description = "페이지당 표시할 공간 리뷰 개수")
+            @RequestParam(defaultValue = "8") int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Sort resolved = Sort.NEW;
+        return CustomResponse.onSuccess(PageResponse.of(spaceReviewQueryService.getMySpaceReviews(currentUser.getId(), resolved, pageable)));
 
     }
 
@@ -70,9 +75,15 @@ public class SpaceReviewController {
     @GetMapping("{spaceId}/reviews")
     public CustomResponse<PageResponse<SpaceReviewResDTO.SpaceReviewDetailResDTO>> getSpaceReviews(
             @PathVariable Long spaceId,
-            @RequestParam(defaultValue = "0") int page
-    ) {
-        return CustomResponse.onSuccess(PageResponse.of(spaceReviewQueryService.getSpaceReviews(spaceId, page)));
+            @Parameter(description = "정렬 기준")
+            @RequestParam(defaultValue = "NEW") com.project.team5backend.domain.common.enums.Sort sort,
+            @Parameter(description = "페이지 번호")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "페이지당 표시할 공간 리뷰 개수")
+            @RequestParam(defaultValue = "8") int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Sort resolved = Sort.NEW;
+        return CustomResponse.onSuccess(PageResponse.of(spaceReviewQueryService.getSpaceReviews(spaceId, resolved, pageable)));
     }
 
     @Operation(summary = "공간 리뷰 상세 조회")

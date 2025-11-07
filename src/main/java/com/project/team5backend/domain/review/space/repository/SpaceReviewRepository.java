@@ -15,7 +15,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface SpaceReviewRepository extends JpaRepository<SpaceReview, Long> {
+public interface SpaceReviewRepository extends JpaRepository<SpaceReview, Long>, SpaceReviewRepositoryCustom {
     @Modifying
     @Query("update SpaceReview sr set sr.isDeleted = true where sr.space.id =:spaceId")
     void softDeleteBySpaceId(@Param("spaceId") Long spaceId);
