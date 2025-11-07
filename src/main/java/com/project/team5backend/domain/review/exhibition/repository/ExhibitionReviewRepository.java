@@ -19,7 +19,7 @@ public interface ExhibitionReviewRepository extends JpaRepository<ExhibitionRevi
         join er.user u
         left join fetch er.exhibitionReviewImages eri
         where er.id = :exhibitionReviewId
-        and er.isDeleted == false
+        and er.isDeleted = false
         and u.id = :userId
     """)
     Optional<ExhibitionReview> findByIdAndIsDeletedFalseWithUser(@Param("exhibitionReviewId") Long exhibitionReviewId, @Param("userId") Long userId);
@@ -28,7 +28,7 @@ public interface ExhibitionReviewRepository extends JpaRepository<ExhibitionRevi
         select er from ExhibitionReview er
         left join fetch er.exhibitionReviewImages eri
         where er.id =:exhibitionReviewId
-        and er.isDeleted == false
+        and er.isDeleted = false
     """)
     Optional<ExhibitionReview> findByIdAndIsDeletedFalse(@Param("exhibitionReviewId") Long exhibitionReviewId);
 }
