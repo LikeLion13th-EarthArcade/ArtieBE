@@ -7,5 +7,5 @@ import org.springframework.data.domain.Page;
 public interface AdminSpaceQueryService {
     Page<AdminSpaceResDTO.SpaceSummaryResDTO> getSpaceList(StatusGroup status, int page);
 
-    AdminSpaceResDTO.SpaceDetailResDTO getDetailSpace(long spaceId);
+    AdminSpaceResDTO.SpaceDetailResDTO getDetailSpace(Long spaceId);
 }

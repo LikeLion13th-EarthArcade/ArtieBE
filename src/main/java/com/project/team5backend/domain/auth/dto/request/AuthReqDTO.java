@@ -31,10 +31,18 @@ public class AuthReqDTO {
     ) {
     }
 
-    public record AuthTempPasswordReqDTO(
+    public record AuthResetPasswordReqDTO(
             @NotBlank(message = BLANK_PHONE_NUMBER)
             @Email
-            String email
+            String email,
+
+            @NotBlank
+            @Pattern(regexp = PASSWORD_PATTERN, message = WRONG_PASSWORD_PATTERN)
+            String newPassword,
+
+            @NotBlank
+            @Pattern(regexp = PASSWORD_PATTERN, message = WRONG_PASSWORD_PATTERN)
+            String newPasswordConfirmation
     ) {
     }
 }

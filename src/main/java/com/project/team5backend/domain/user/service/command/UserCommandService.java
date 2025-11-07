@@ -6,7 +6,7 @@ public interface UserCommandService {
 
     void createUser(UserReqDTO.UserCreateReqDTO userCreateReqDTO);
 
-    void updateUser(long id, UserReqDTO.UserUpdateReqDTO userUpdateReqDTO);
+    void updateUser(Long id, UserReqDTO.UserUpdateReqDTO userUpdateReqDTO);
 
-    void withdrawalUser(long id, String accessToken, String refreshToken);
+    void withdrawalUser(Long id, String accessToken, String refreshToken);
 }

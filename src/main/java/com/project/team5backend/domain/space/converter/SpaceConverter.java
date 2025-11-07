@@ -35,8 +35,19 @@ public class SpaceConverter {
                 .spaceType(spaceCreateReqDTO.spaceType())
                 .spaceSize(spaceCreateReqDTO.spaceSize())
                 .spaceMood(spaceCreateReqDTO.spaceMood())
+                .price(spaceCreateReqDTO.price())
+                .applicationMethod(spaceCreateReqDTO.applicationMethod())
                 .status(Status.PENDING)
                 .user(user)
+                .build();
+    }
+
+    public static SpaceResDTO.SpaceSummaryResDTO toSpaceSummaryResDTO(Space space){
+        return SpaceResDTO.SpaceSummaryResDTO.builder()
+                .spaceId(space.getId())
+                .title(space.getName())
+                .createdAt(space.getCreatedAt())
+                .status(space.getStatus())
                 .build();
     }
 
@@ -63,7 +74,7 @@ public class SpaceConverter {
                 .build();
     }
 
-    public static SpaceResDTO.SpaceDetailResDTO toSpaceDetailResDTO(Space space, List<String> imageUrls){
+    public static SpaceResDTO.SpaceDetailResDTO toSpaceDetailResDTO(Space space, List<String> imageUrls, boolean liked){
         return SpaceResDTO.SpaceDetailResDTO.builder()
                 .spaceId(space.getId())
                 .name(space.getName())
@@ -75,11 +86,14 @@ public class SpaceConverter {
                 .spaceSize(space.getSpaceSize())
                 .spaceMood(space.getSpaceMood())
                 .description(space.getDescription())
+                .price(space.getPrice())
+                .applicationMethod(space.getApplicationMethod())
                 .facilities(extractFacility(space))
                 .phoneNumber(space.getPhoneNumber())
                 .email(space.getEmail())
                 .websiteUrl(space.getWebsiteUrl())
                 .snsUrl(space.getSnsUrl())
+                .liked(liked)
                 .build();
     }
 

@@ -8,7 +8,6 @@ import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.space.entity.enums.SpaceMood;
 import com.project.team5backend.domain.space.entity.enums.SpaceSize;
 import com.project.team5backend.domain.space.entity.enums.SpaceType;
-import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.common.enums.Sort;
 import com.project.team5backend.domain.common.enums.Status;
 import com.project.team5backend.domain.common.enums.StatusGroup;
@@ -109,52 +108,31 @@ public class SpaceRepositoryImpl implements SpaceRepositoryCustom {
     }
 
     @Override
-    public Page<Space> findByUserWithFilters(User user, StatusGroup statusGroup, Pageable pageable) {
+    public Page<Space> findMySpacesByStatus(Long userId, StatusGroup status, Sort sort, Pageable pageable){
         QSpace space = QSpace.space;
 
-        BooleanBuilder builder = new BooleanBuilder()
-                .and(space.user.eq(user))
-                .and(statusGroupCondition(statusGroup));
-
-        List<Space> content = findSpaces(space, builder, pageable);
-
-        Long total = countSpace(space, builder);
-
-        return new PageImpl<>(content, pageable, total != null ? total : 0L);
-    }
-
-    private BooleanExpression statusGroupCondition(StatusGroup statusGroup) {
-        if (statusGroup == null || statusGroup == StatusGroup.ALL) {
-            return null;
-        }
-        return switch (statusGroup) {
-            case PENDING -> space.status.in(
-                    Status.PENDING
-            );
-            case DONE -> space.status.in(
-                    Status.APPROVED,
-                    Status.REJECTED
-            );
-            default -> null;
-        };
-    }
-
-    private List<Space> findSpaces(QSpace space, BooleanBuilder builder, Pageable pageable) {
-        return queryFactory
-                .selectFrom(space)
-                .where(builder)
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .orderBy(space.createdAt.desc())
-                .fetch();
-    }
-
-    private Long countSpace(QSpace space, BooleanBuilder builder) {
-        return queryFactory
+        Long total = queryFactory
                 .select(space.count())
                 .from(space)
-                .where(builder)
+                .where(
+                        space.user.id.eq(userId),
+                        statusCondition(space, status))
                 .fetchOne();
+
+        // 정렬, 디폴트 최신순
+        OrderSpecifier<?> order = getOrder(sort, space);
+
+        List<Space> content = queryFactory
+                .selectFrom(space)
+                .where(
+                        space.user.id.eq(userId),
+                        statusCondition(space, status))
+                .orderBy(order, space.id.desc()) // 최신순 정렬
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0L);
     }
 
     private BooleanExpression noOverlappingReservation(
@@ -219,6 +197,14 @@ public class SpaceRepositoryImpl implements SpaceRepositoryCustom {
             case ALL -> space.createdAt.goe(sevenDaysAgo);
             case PENDING -> space.status.eq(Status.PENDING).and(space.createdAt.goe(sevenDaysAgo));
             case DONE -> space.status.in(Status.APPROVED, Status.REJECTED).and(space.createdAt.goe(sevenDaysAgo));
+        };
+    }
+
+    private static OrderSpecifier<?> getOrder(Sort sort, QSpace space) {
+        return switch (sort == null ? Sort.POPULAR : sort) {
+            case OLD -> space.createdAt.asc();
+            case POPULAR -> space.reviewCount.desc().nullsLast();
+            case NEW -> space.createdAt.desc();
         };
     }
 }

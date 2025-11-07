@@ -16,7 +16,7 @@ public interface ExhibitionQueryService {
     ExhibitionResDTO.ExhibitionDetailResDTO findExhibitionDetail(Long userId, Long exhibitionId);
 
     // 전시 검색
-    ExhibitionResDTO.ExhibitionSearchPageResDTO searchExhibitions(ExhibitionCategory exhibitionCategory, String district, ExhibitionMood exhibitionMood, LocalDate date, Sort sort, int page);
+    ExhibitionResDTO.ExhibitionSearchPageResDTO searchExhibitions(ExhibitionCategory exhibitionCategory, String district, ExhibitionMood exhibitionMood, LocalDate date, Sort sort, Pageable pageable);
 
     // 지금뜨는 전시회
     List<ExhibitionResDTO.ExhibitionHotNowResDTO> getHotNowExhibitions(Long userId);
@@ -31,7 +31,7 @@ public interface ExhibitionQueryService {
     List<ExhibitionResDTO.ArtieRecommendationResDTO> getTodayArtieRecommendations(Long userId);
 
     //내가 등록한 전시
-    Page<ExhibitionResDTO.ExhibitionSummaryResDTO> getSummaryExhibitionList(Long userId, StatusGroup status, int page);
+    Page<ExhibitionResDTO.ExhibitionSummaryResDTO> getMyExhibitions(Long userId, StatusGroup status, Sort sort, Pageable pageable);
 
     //내가 등록한 전시 조회
     ExhibitionResDTO.MyExhibitionDetailResDTO getMyDetailExhibition(Long userId, Long exhibitionId);

@@ -1,5 +1,7 @@
 package com.project.team5backend.domain.space.controller;
 
+import com.project.team5backend.domain.common.enums.Sort;
+import com.project.team5backend.domain.common.enums.StatusGroup;
 import com.project.team5backend.domain.space.dto.request.SpaceReqDTO;
 import com.project.team5backend.domain.space.dto.response.SpaceResDTO;
 import com.project.team5backend.domain.space.entity.enums.SpaceMood;
@@ -9,8 +11,6 @@ import com.project.team5backend.domain.space.service.command.SpaceCommandService
 import com.project.team5backend.domain.space.service.query.SpaceQueryService;
 import com.project.team5backend.global.SwaggerBody;
 import com.project.team5backend.global.apiPayload.CustomResponse;
-import com.project.team5backend.domain.common.enums.Sort;
-import com.project.team5backend.domain.common.enums.StatusGroup;
 import com.project.team5backend.global.security.userdetails.CurrentUser;
 import com.project.team5backend.global.util.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -45,7 +45,9 @@ public class SpaceController {
 
     @SwaggerBody(content = @Content(
             encoding = {
-                    @Encoding(name = "request", contentType = MediaType.APPLICATION_JSON_VALUE)
+                    @Encoding(name = "request", contentType = MediaType.APPLICATION_JSON_VALUE),
+                    // 선택: 이미지도 의도 명시
+                    @Encoding(name = "images", contentType = "image/*")
             }
     ))
     @PostMapping(
@@ -56,7 +58,7 @@ public class SpaceController {
             description = "등록시 공간 객체가 심사 대상에 포함됩니다.<br>" +
                     "사업자 인증 api가 선행되어 성공해야함 -> 그렇지 않으면 예외<br>" +
                     "facilities -> [\"WIFI\", \"[RESTROOM]\", \"[STROLLER_RENTAL]\"]<br>" +
-                    "operatingStartHour, operatingEndHour -> \"12:34\"<br>" +
+                    "operatingStartHour, closingTime -> \"12:34\"<br>" +
                     "spaceMood (WHITE_BOX, INDUSTRIAL, VINTAGE_CLASSIC, NATURE_LIGHT, FOCUSED_LIGHTING)<br>" +
                     "spaceSize (SMALL(~10), MEDIUM_SMALL(~30), MEDIUM(~50), LARGE(50~)<br>" +
                     "spaceType (EXHIBITION(전시), POPUP_STORE(팝업), EXPERIENCE_EXHIBITION(체험 전시)")
@@ -67,7 +69,7 @@ public class SpaceController {
             @RequestParam(value = "buildingRegisterFile") MultipartFile buildingRegisterFile,
             @RequestPart(value = "images", required = false) List<MultipartFile> images
     ) {
-        return CustomResponse.onSuccess(HttpStatus.CREATED, spaceCommandService.createSpace(spaceCreateReqDTO, currentUser.getId(), businessLicenseFile, buildingRegisterFile, images));
+        return CustomResponse.onSuccess(spaceCommandService.createSpace(spaceCreateReqDTO, currentUser.getId(), businessLicenseFile, buildingRegisterFile, images));
     }
 
     @PostMapping("/{spaceId}/like")
@@ -81,8 +83,10 @@ public class SpaceController {
 
     @Operation(summary = "전시 공간 상세 조회", description = "공간 id를 이용해 공간의 상세 정보 조회")
     @GetMapping("/{spaceId}")
-    public CustomResponse<SpaceResDTO.SpaceDetailResDTO> getSpaceDetail(@PathVariable Long spaceId) {
-        return CustomResponse.onSuccess(spaceQueryService.getSpaceDetail(spaceId));
+    public CustomResponse<SpaceResDTO.SpaceDetailResDTO> getSpaceDetail(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @PathVariable Long spaceId) {
+        return CustomResponse.onSuccess(spaceQueryService.getSpaceDetail(currentUser.getId(), spaceId));
     }
 
     @Operation(
@@ -109,19 +113,25 @@ public class SpaceController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate requestedStartDate,
             @Parameter(description = "대여 종료일", example = "2025-09-13")
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate requestedEndDate,
+            @Parameter(description = "행정구역")
             @RequestParam(name = "distinct", required = false) String district,
-            @RequestParam(name = "size", required = false) SpaceSize size,
-            @RequestParam(name = "type", required = false) SpaceType type,
-            @RequestParam(name = "mood", required = false) SpaceMood mood,
+            @RequestParam(name = "size", required = false) SpaceSize spaceSize,
+            @RequestParam(name = "type", required = false) SpaceType spaceType,
+            @RequestParam(name = "mood", required = false) SpaceMood spaceMood,
             @Parameter(
                     description = "시설 목록 (예: WIFI, RESTROOM, STROLLER_RENTAL)",
                     array = @ArraySchema(schema = @Schema(type = "string"))
             )
             @RequestParam(name = "facilities", required = false) List<String> facilities, // 스웨거 편의성을 위해 enum 설정
+            @Parameter(description = "정렬 기준")
             @RequestParam(defaultValue = "POPULAR") Sort sort,
-            @RequestParam(name = "page", defaultValue = "0") int page
+            @Parameter(description = "페이지 번호")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "페이지당 표시할 전시 개수")
+            @RequestParam(defaultValue = "8") int size
     ) {
-        return CustomResponse.onSuccess(spaceQueryService.searchSpace(requestedStartDate, requestedEndDate, district, size, type, mood, facilities, sort, page));
+        Pageable pageable = PageRequest.of(page, size);
+        return CustomResponse.onSuccess(spaceQueryService.searchSpace(requestedStartDate, requestedEndDate, district, spaceSize, spaceType, spaceMood, facilities, sort, pageable));
     }
 
     @Operation(summary = "전시 공간 삭제")
@@ -144,21 +154,30 @@ public class SpaceController {
         return CustomResponse.onSuccess(PageResponse.of(spaceQueryService.getInterestedSpaces(currentUser.getId(), pageable)));
     }
 
-    @Operation(summary = "내가 등록한 공간")
+    @Operation(summary = "내가 등록한 공간",
+            description = "사용자가 등록한 모든 공간를 검색합니다. <br> " +
+                    "[RequestParam statusGroup] : [ALL], [PENDING], [DONE] 3가지 선택<br><br>" +
+                    "ALL : 모든 상태의 공간 <br><br>" +
+                    "PENDING : 대기중 <br>PENDING(호스트의 확정 대기) <br><br>" +
+                    "DONE : 완료됨 <br>APPROVED(호스트의 공간 승인 확정), REJECTED(호스트의 공간 거절 확정), <br>")
     @GetMapping("/my")
-    public CustomResponse<PageResponse<SpaceResDTO.SpaceDetailResDTO>> getMySpaces(
+    public CustomResponse<PageResponse<SpaceResDTO.SpaceSummaryResDTO>> getMySpaces(
             @AuthenticationPrincipal CurrentUser currentUser,
-            @RequestParam(required = false) StatusGroup statusGroup,
+            @RequestParam(required = false, defaultValue = "ALL") StatusGroup status,
+            @Parameter(description = "정렬 기준")
+            @RequestParam(defaultValue = "NEW") Sort sort,
+            @Parameter(description = "페이지 번호")
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @Parameter(description = "페이지당 표시할 공간 개수")
+            @RequestParam(defaultValue = "8") int size
     ) {
-        Pageable pageable = PageRequest.of(page, size, org.springframework.data.domain.Sort.by("createdAt").descending());
-        return CustomResponse.onSuccess(PageResponse.of(spaceQueryService.getMySpace(currentUser.getId(), statusGroup, pageable)));
+        Pageable pageable = PageRequest.of(page, size);
+        return CustomResponse.onSuccess(PageResponse.of(spaceQueryService.getMySpaces(currentUser.getId(), status, sort, pageable)));
     }
 
     @Operation(summary = "내가 등록한 공간 상세 조회")
     @GetMapping("/my/{spaceId}")
-    public CustomResponse<SpaceResDTO.MySpaceDetailResDTO> getDetailSpace(
+    public CustomResponse<SpaceResDTO.MySpaceDetailResDTO> getMySpaceDetail(
             @AuthenticationPrincipal CurrentUser currentUser,
             @PathVariable Long spaceId
     ) {

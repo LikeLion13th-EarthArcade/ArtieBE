@@ -18,5 +18,5 @@ public interface ExhibitionRepositoryCustom {
 
     Page<Exhibition> findAdminExhibitionsByStatus(StatusGroup status, Pageable pageable);
 
-    Page<Exhibition> findMyExhibitionsByStatus(Long userId, StatusGroup status, Pageable pageable);
+    Page<Exhibition> findMyExhibitionsByStatus(Long userId, StatusGroup status, Sort sort, Pageable pageable);
 }

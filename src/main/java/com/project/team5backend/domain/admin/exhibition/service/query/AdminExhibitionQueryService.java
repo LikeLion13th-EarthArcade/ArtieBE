@@ -7,5 +7,5 @@ import org.springframework.data.domain.Page;
 public interface AdminExhibitionQueryService {
     Page<AdminExhibitionResDTO.ExhibitionSummaryResDTO> getSummaryExhibitionList(StatusGroup status, int page);
 
-    AdminExhibitionResDTO.ExhibitionDetailResDTO getDetailExhibition(long exhibitionId);
+    AdminExhibitionResDTO.ExhibitionDetailResDTO getDetailExhibition(Long exhibitionId);
 }

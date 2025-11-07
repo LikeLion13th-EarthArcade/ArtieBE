@@ -1,5 +1,7 @@
 package com.project.team5backend.domain.exhibition.controller;
 
+import com.project.team5backend.domain.common.enums.Sort;
+import com.project.team5backend.domain.common.enums.StatusGroup;
 import com.project.team5backend.domain.exhibition.dto.request.ExhibitionReqDTO;
 import com.project.team5backend.domain.exhibition.dto.response.ExhibitionResDTO;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionCategory;
@@ -8,8 +10,6 @@ import com.project.team5backend.domain.exhibition.service.command.ExhibitionComm
 import com.project.team5backend.domain.exhibition.service.query.ExhibitionQueryService;
 import com.project.team5backend.global.SwaggerBody;
 import com.project.team5backend.global.apiPayload.CustomResponse;
-import com.project.team5backend.domain.common.enums.Sort;
-import com.project.team5backend.domain.common.enums.StatusGroup;
 import com.project.team5backend.global.security.userdetails.CurrentUser;
 import com.project.team5backend.global.util.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -59,7 +59,8 @@ public class ExhibitionController {
                     "exhibitionType (PERSON, GROUP)<br>" +
                     "price -> 무료 0원 입력, 나머지 가격<br>" +
                     "startDate, endDate -> 2025-09-24<br>" +
-                    "operatingStartHour, operatingEndHour -> \"12:34\"<br>")
+                    "openingTime, closingTime -> \"12:34\"<br>" +
+                    "operatingInfo -> 기타 정보(휴관일)<br>")
     public CustomResponse<ExhibitionResDTO.ExhibitionCreateResDTO> createExhibition(
             @AuthenticationPrincipal CurrentUser currentUser,
             @RequestPart("request") @Valid ExhibitionReqDTO.ExhibitionCreateReqDTO request,
@@ -102,15 +103,23 @@ public class ExhibitionController {
                     + "- `page` : 페이지 번호 (기본값 0)")
     @GetMapping("/search")
     public CustomResponse<ExhibitionResDTO.ExhibitionSearchPageResDTO> searchExhibitions(
-            @RequestParam(name = "exhibitionCategory", required = false) ExhibitionCategory exhibitionCategory,
+            @Parameter(description = "전시 카테고리")
+            @RequestParam(required = false) ExhibitionCategory exhibitionCategory,
+            @Parameter(description = "행정구역")
             @RequestParam(name = "distinct", required = false) String district,
+            @Parameter(description = "전시 분위기")
             @RequestParam(name = "exhibitionMood", required = false) ExhibitionMood exhibitionMood,
             @Parameter(description = "날짜", example = "2025-09-13")
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate localDate,
-            @RequestParam(defaultValue = "POPULAR") Sort sort,   // new | old | popular
-            @RequestParam(name = "page", defaultValue = "0") int page
+            @Parameter(description = "정렬 기준")
+            @RequestParam(defaultValue = "POPULAR") Sort sort,
+            @Parameter(description = "페이지 번호")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "페이지당 표시할 전시 개수")
+            @RequestParam(defaultValue = "8") int size
     ) {
-        return CustomResponse.onSuccess(exhibitionQueryService.searchExhibitions(exhibitionCategory, district, exhibitionMood, localDate, sort, page));
+        Pageable pageable = PageRequest.of(page, size);
+        return CustomResponse.onSuccess(exhibitionQueryService.searchExhibitions(exhibitionCategory, district, exhibitionMood, localDate, sort, pageable));
     }
 
     @Operation(summary = "지금 뜨는 전시회", description = "현재 진행중인 전시중에서 reviewCount가 가장 높은 전시 반환")
@@ -150,10 +159,17 @@ public class ExhibitionController {
     @GetMapping("/my")
     public CustomResponse<PageResponse<ExhibitionResDTO.ExhibitionSummaryResDTO>> getExhibitionList(
             @AuthenticationPrincipal CurrentUser currentUser,
-            @RequestParam(name = "status", required = false, defaultValue = "ALL") StatusGroup status,
-            @RequestParam(name = "page", defaultValue = "0") int page
+            @Parameter(description = "전시 등록 상태")
+            @RequestParam(required = false, defaultValue = "ALL") StatusGroup status,
+            @Parameter(description = "정렬 기준")
+            @RequestParam(defaultValue = "NEW") Sort sort,
+            @Parameter(description = "페이지 번호")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "페이지당 표시할 전시 개수")
+            @RequestParam(defaultValue = "8") int size
     ) {
-        return CustomResponse.onSuccess(PageResponse.of(exhibitionQueryService.getSummaryExhibitionList(currentUser.getId(), status, page)));
+        Pageable pageable = PageRequest.of(page, size);
+        return CustomResponse.onSuccess(PageResponse.of(exhibitionQueryService.getMyExhibitions(currentUser.getId(), status, sort, pageable)));
     }
 
     @Operation(summary = "내 전시 상세 보기", description = "상태에 상관없이 내 전시 상세 보기 가능")
