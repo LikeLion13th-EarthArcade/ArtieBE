@@ -52,6 +52,18 @@ public class ExhibitionReviewController {
         return CustomResponse.onSuccess(exhibitionReviewCommandService.createExhibitionReview(exhibitionId, currentUser.getId(), request, images));
     }
 
+    @Operation(summary = "내 전시 리뷰 목록 조회")
+    @GetMapping("/reviews/my")
+    public CustomResponse<PageResponse<ExhibitionReviewResDTO.ExReviewDetailResDTO>> getMyExhibitionReviews(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        return CustomResponse.onSuccess(PageResponse.of(exhibitionReviewQueryService.getMyExhibitionReviews(currentUser.getId(), pageable)));
+
+    }
+
     @Operation(summary = "전시 리뷰 목록 조회", description = "전시 리뷰 목록 조회 api")
     @GetMapping("{exhibitionId}/reviews")
     public CustomResponse<PageResponse<ExhibitionReviewResDTO.ExReviewDetailResDTO>> getExhibitionReviews(
@@ -74,17 +86,5 @@ public class ExhibitionReviewController {
             @PathVariable("reviewId") Long exhibitionReviewId) {
         exhibitionReviewCommandService.deleteExhibitionReview(exhibitionReviewId, currentUser.getId());
         return CustomResponse.onSuccess("해당 전시 리뷰가 삭제되었습니다.");
-    }
-
-    @Operation(summary = "내 전시 리뷰 목록 조회")
-    @GetMapping("/reviews/my")
-    public CustomResponse<PageResponse<ExhibitionReviewResDTO.ExReviewDetailResDTO>> getMyExhibitionReviews(
-            @AuthenticationPrincipal CurrentUser currentUser,
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ) {
-        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        return CustomResponse.onSuccess(PageResponse.of(exhibitionReviewQueryService.getMyExhibitionReviews(currentUser.getId(), pageable)));
-
     }
 }
