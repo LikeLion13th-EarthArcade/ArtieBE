@@ -1,6 +1,7 @@
 package com.project.team5backend.domain.review.exhibition.service.query;
 
 import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
+import com.project.team5backend.domain.common.enums.Sort;
 import com.project.team5backend.domain.image.entity.ExhibitionReviewImage;
 import com.project.team5backend.domain.image.repository.ExhibitionReviewImageRepository;
 import com.project.team5backend.domain.review.exhibition.converter.ExhibitionReviewConverter;
@@ -16,9 +17,7 @@ import com.project.team5backend.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -44,16 +43,11 @@ public class ExhibitionReviewQueryServiceImpl implements ExhibitionReviewQuerySe
     }
 
     @Override
-    public Page<ExhibitionReviewResDTO.ExReviewDetailResDTO> getExhibitionReviews(Long exhibitionId, int page) {
-        Pageable pageable = PageRequest.of(page, 10, Sort.by("createdAt").descending());
-
-        Page<ExhibitionReview> reviewPage = exhibitionReviewRepository.findByExhibitionIdAndIsDeletedFalse(exhibitionId, pageable);
+    public Page<ExhibitionReviewResDTO.ExReviewDetailResDTO> getExhibitionReviews(Long exhibitionId, Sort sort, Pageable pageable) {
+        Page<ExhibitionReview> reviewPage = exhibitionReviewRepository.findByExhibitionIdAndIsDeletedFalse(exhibitionId, sort, pageable);
 
         return reviewPage.map(review -> {
-            List<String> imageUrls = review.getExhibitionReviewImages().stream()
-                    .map(ExhibitionReviewImage::getFileKey)
-                    .map(fileUrlResolverPort::toFileUrl)
-                    .toList();
+            List<String> imageUrls = getFileUrls(review);
             return ExhibitionReviewConverter.toExReviewDetailResDTO(review, imageUrls);
         });
     }
@@ -76,7 +70,8 @@ public class ExhibitionReviewQueryServiceImpl implements ExhibitionReviewQuerySe
 
 
     private List<String> getFileUrls(ExhibitionReview exhibitionReview) {
-        return exhibitionReviewImageRepository.findImageUrlsByExhibitionReviewId(exhibitionReview.getId()).stream()
+        return exhibitionReview.getExhibitionReviewImages().stream()
+                .map(ExhibitionReviewImage::getFileKey)
                 .map(fileUrlResolverPort::toFileUrl)
                 .toList();
     }

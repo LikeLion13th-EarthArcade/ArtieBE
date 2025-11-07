@@ -12,7 +12,7 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface ExhibitionReviewRepository extends JpaRepository<ExhibitionReview, Long> {
+public interface ExhibitionReviewRepository extends JpaRepository<ExhibitionReview, Long>, ExhibitionReviewRepositoryCustom{
     @Modifying
     @Query("update ExhibitionReview er set er.isDeleted = true where er.exhibition.id =:exhibitionId")
     void softDeleteByExhibitionId(@Param("exhibitionId") Long exhibitionId);
@@ -28,6 +28,7 @@ public interface ExhibitionReviewRepository extends JpaRepository<ExhibitionRevi
 
     @Query("""
         select er from ExhibitionReview er
+        left join fetch er.exhibitionReviewImages eri
         where er.id =:exhibitionReviewId
         and er.isDeleted == false
     """)

@@ -4,11 +4,13 @@ import com.project.team5backend.domain.review.exhibition.dto.request.ExhibitionR
 import com.project.team5backend.domain.review.exhibition.dto.response.ExhibitionReviewResDTO;
 import com.project.team5backend.domain.review.exhibition.service.command.ExhibitionReviewCommandService;
 import com.project.team5backend.domain.review.exhibition.service.query.ExhibitionReviewQueryService;
+import com.project.team5backend.domain.common.enums.Sort;
 import com.project.team5backend.global.SwaggerBody;
 import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.global.security.userdetails.CurrentUser;
 import com.project.team5backend.global.util.PageResponse;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.media.Encoding;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -16,7 +18,6 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
@@ -64,12 +65,20 @@ public class ExhibitionReviewController {
 
     }
 
-    @Operation(summary = "전시 리뷰 목록 조회", description = "전시 리뷰 목록 조회 api")
+    @Operation(summary = "전시 리뷰 목록 조회",
+            description = "확장성을 위해 정렬을 선택 가능하게 했지만, 어떤 정렬 방법을 선택하든 무조건 최근 생성 순으로 정렬되게 설정했습니다.")
     @GetMapping("{exhibitionId}/reviews")
     public CustomResponse<PageResponse<ExhibitionReviewResDTO.ExReviewDetailResDTO>> getExhibitionReviews(
             @PathVariable Long exhibitionId,
-            @RequestParam(defaultValue = "0") int page){
-        return CustomResponse.onSuccess(PageResponse.of(exhibitionReviewQueryService.getExhibitionReviews(exhibitionId, page)));
+            @Parameter(description = "정렬 기준")
+            @RequestParam(defaultValue = "NEW") Sort sort,
+            @Parameter(description = "페이지 번호")
+            @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "페이지당 표시할 전시 리뷰 개수")
+            @RequestParam(defaultValue = "8") int size){
+        Pageable pageable = PageRequest.of(page, size);
+        Sort resolved = Sort.NEW;
+        return CustomResponse.onSuccess(PageResponse.of(exhibitionReviewQueryService.getExhibitionReviews(exhibitionId, resolved, pageable)));
     }
 
     @Operation(summary = "전시 리뷰 상세 조회", description = "전시 리뷰 상세 조회 api")
