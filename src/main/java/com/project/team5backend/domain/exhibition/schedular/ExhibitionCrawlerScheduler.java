@@ -1,5 +1,6 @@
-package com.project.team5backend.domain.exhibition.service.schedular;
+package com.project.team5backend.domain.exhibition.schedular;
 
+import com.project.team5backend.domain.exhibition.service.schedular.ExhibitionCrawlerService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
