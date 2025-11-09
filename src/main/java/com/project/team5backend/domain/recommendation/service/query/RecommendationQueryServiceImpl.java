@@ -1,5 +1,6 @@
-package com.project.team5backend.domain.recommendation.service;
+package com.project.team5backend.domain.recommendation.service.query;
 
+import com.project.team5backend.domain.common.enums.Status;
 import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
 import com.project.team5backend.domain.exhibition.converter.ExhibitionConverter;
 import com.project.team5backend.domain.exhibition.entity.Exhibition;
@@ -12,10 +13,11 @@ import com.project.team5backend.domain.recommendation.dto.response.RecommendResD
 import com.project.team5backend.domain.recommendation.entity.ExhibitionEmbedding;
 import com.project.team5backend.domain.recommendation.repository.ExhibitionEmbeddingRepository;
 import com.project.team5backend.domain.recommendation.repository.ExhibitionInteractLogRepository;
-import com.project.team5backend.domain.common.enums.Status;
+import com.project.team5backend.domain.recommendation.service.Reranker;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -27,7 +29,8 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class RecommendationService {
+@Transactional
+public class RecommendationQueryServiceImpl implements RecommendationQueryService {
 
     private final ExhibitionInteractLogRepository logRepo;
     private final ExhibitionRepository exhibitionRepo;
@@ -55,7 +58,7 @@ public class RecommendationService {
     }
 
     // 홈 요약(프리뷰 1개)
-    public RecommendResDTO.PersonalizedSummaryResDTO summary(Long userId) {
+    public RecommendResDTO.PersonalizedSummaryResDTO getPersonalizedSummary(Long userId) {
         var k = computeKeys(userId);
         if (!k.eligible()) return new RecommendResDTO.PersonalizedSummaryResDTO(false, null, null, null,null,null,null,null,null,null,0.0,0,null);
 
@@ -82,7 +85,7 @@ public class RecommendationService {
     }
 
     // 상세(4개 + 키워드 라벨)
-    public RecommendResDTO.PersonalizedDetailResDTO detail(Long userId) {
+    public RecommendResDTO.PersonalizedDetailResDTO getPersonalizedDetail(Long userId) {
         var k = computeKeys(userId);
         if (!k.eligible()) return new RecommendResDTO.PersonalizedDetailResDTO(null, null, List.of());
 
