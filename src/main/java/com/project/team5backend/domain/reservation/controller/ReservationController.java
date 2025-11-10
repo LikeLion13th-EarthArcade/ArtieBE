@@ -3,6 +3,7 @@ package com.project.team5backend.domain.reservation.controller;
 import com.project.team5backend.domain.reservation.dto.request.ReservationReqDTO;
 import com.project.team5backend.domain.reservation.dto.response.ReservationResDTO;
 import com.project.team5backend.domain.reservation.service.command.ReservationCommandService;
+import com.project.team5backend.domain.reservation.service.lock.DistributedLockService;
 import com.project.team5backend.domain.reservation.service.query.ReservationQueryService;
 import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.domain.common.enums.StatusGroup;
@@ -27,6 +28,7 @@ public class ReservationController {
 
     private final ReservationCommandService reservationCommandService;
     private final ReservationQueryService reservationQueryService;
+    private final DistributedLockService distributedLockService;
 
     @Operation(summary = "전시 공간 예약")
     @PostMapping("/spaces/{spaceId}/reservations")
@@ -121,6 +123,18 @@ public class ReservationController {
             @RequestBody @Valid ReservationReqDTO.ReservationCancellationReqDTO reservationCancellationReqDTO
     ) {
         return CustomResponse.onSuccess(reservationCommandService.requestCancellation(currentUser.getId(), reservationId, reservationCancellationReqDTO));
+    }
+
+    @Operation(summary = "예약 날짜 락 획득",
+            description = "락 생성 성공시 allLocked = true, result -> 모든 성공한 락 리스트 <br>" +
+                    "락 생성 실패시(예약 시도 겹침 또는 이미 예약됨) allLocked = false, result -> 모든 실패한 락 리스트")
+    @PostMapping("/reservations/spaces/{spaceId}/locks/acquire")
+    public CustomResponse<ReservationResDTO.ReservationLockAcquireResDTO> acquireLocks(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @PathVariable Long spaceId,
+            @RequestBody @Valid ReservationReqDTO.ReservationLockAcquireReqDTO reservationLockAcquireReqDTO
+    ) {
+        return CustomResponse.onSuccess(distributedLockService.acquireLocks(currentUser.getEmail(), spaceId, reservationLockAcquireReqDTO));
     }
 }
 

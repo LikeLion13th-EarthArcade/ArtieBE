@@ -9,6 +9,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import java.time.LocalDate;
+
 
 public interface ReservationRepository extends JpaRepository<Reservation, Long> {
 
@@ -19,4 +21,11 @@ public interface ReservationRepository extends JpaRepository<Reservation, Long> 
             @Param("user") User user,
             Pageable pageable
     );
+
+    @Query("""
+        SELECT CASE WHEN COUNT(r) > 0 THEN TRUE ELSE FALSE END
+        FROM Reservation r
+        WHERE (r.startDate <= :date AND r.endDate >= :date)
+    """)
+    boolean existsByDateAndTimeSlots(@Param("date") LocalDate date);
 }

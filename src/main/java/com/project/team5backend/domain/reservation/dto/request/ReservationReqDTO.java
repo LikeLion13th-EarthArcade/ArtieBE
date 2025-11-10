@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
 import java.time.LocalDate;
+import java.util.List;
 
 import static com.project.team5backend.global.constant.valid.MessageConstant.*;
 import static com.project.team5backend.global.constant.valid.PatternConstant.PHONE_NUMBER_PATTERN;
@@ -43,6 +44,11 @@ public class ReservationReqDTO {
     public record ReservationCancellationReqDTO(
             @NotBlank(message = BLANK_RESERVATION_CANCEL_REASON)
             String bookerCancelReason
+    ) {
+    }
+
+    public record ReservationLockAcquireReqDTO(
+            List<LocalDate> timeSlots
     ) {
     }
 }

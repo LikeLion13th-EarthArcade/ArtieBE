@@ -38,4 +38,12 @@ public class ReservationResDTO {
             Status status
     ) {
     }
+
+    @Builder
+    public record ReservationLockAcquireResDTO(
+            Object spaceId,
+//            boolean allLocked,
+            Object result
+    ) {
+    }
 }

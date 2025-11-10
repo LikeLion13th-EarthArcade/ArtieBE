@@ -19,18 +19,18 @@ public class LuaConfig {
     }
 
     @Bean(name = "lockReleaseScript")
-    public DefaultRedisScript<List> lockReleaseScript() {
-        DefaultRedisScript<List> script = new DefaultRedisScript<>();
+    public DefaultRedisScript<Long> lockReleaseScript() {
+        DefaultRedisScript<Long> script = new DefaultRedisScript<>();
         script.setLocation(new ClassPathResource("scripts/lockRelease.lua"));
-        script.setResultType(List.class);
+        script.setResultType(Long.class);
         return script;
     }
 
     @Bean(name = "lockRenewScript")
-    public DefaultRedisScript<List> lockRenewScript() {
-        DefaultRedisScript<List> script = new DefaultRedisScript<>();
+    public DefaultRedisScript<Long> lockRenewScript() {
+        DefaultRedisScript<Long> script = new DefaultRedisScript<>();
         script.setLocation(new ClassPathResource("scripts/lockRenew.lua"));
-        script.setResultType(List.class);
+        script.setResultType(Long.class);
         return script;
     }
 
