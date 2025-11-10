@@ -48,7 +48,8 @@ public class ReservationReqDTO {
     }
 
     public record ReservationLockAcquireReqDTO(
-            List<LocalDate> timeSlots
+            LocalDate startDate,
+            LocalDate endDate
     ) {
     }
 }

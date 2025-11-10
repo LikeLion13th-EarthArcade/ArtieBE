@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -31,15 +32,18 @@ public class DistributedLockServiceImpl implements  DistributedLockService {
 
     @Override
     public ReservationResDTO.ReservationLockAcquireResDTO acquireLocks(String email, Long spaceId, ReservationReqDTO.ReservationLockAcquireReqDTO reservationLockAcquireReqDTO) {
-        List<LocalDate> timeSlots = reservationLockAcquireReqDTO.timeSlots();
+        LocalDate startDate = reservationLockAcquireReqDTO.startDate();
+        LocalDate endDate = reservationLockAcquireReqDTO.endDate();
 
-        for (LocalDate date : timeSlots) {
+        List<LocalDate> dateSlots = generateSlots(startDate, endDate);
+
+        for (LocalDate date : dateSlots) {
             if (reservationRepository.existsByDateAndTimeSlots(date)) {
                 throw new ReservationException(ReservationErrorCode.ALREADY_RESERVED);
             }
         }
 
-        List<String> keys = timeSlots.stream()
+        List<String> keys = dateSlots.stream()
                 .map(date -> "lock:" + spaceId + ":" + date)
                 .toList();
 
@@ -49,5 +53,14 @@ public class DistributedLockServiceImpl implements  DistributedLockService {
             throw new ReservationException(ReservationErrorCode.LOCK_CONFLICT);
         }
         return ReservationConverter.toReservationLockAcquireResDTO(spaceId, result);
+    }
+
+    private List<LocalDate> generateSlots(LocalDate startDate, LocalDate endDate) {
+        List<LocalDate> dateSlots = new ArrayList<>();
+        while (!startDate.isAfter(endDate)) {
+            dateSlots.add(startDate);
+            startDate = startDate.plusDays(1);
+        }
+        return dateSlots;
     }
 }
