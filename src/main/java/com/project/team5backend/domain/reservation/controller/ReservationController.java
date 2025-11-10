@@ -125,9 +125,7 @@ public class ReservationController {
         return CustomResponse.onSuccess(reservationCommandService.requestCancellation(currentUser.getId(), reservationId, reservationCancellationReqDTO));
     }
 
-    @Operation(summary = "예약 날짜 락 획득",
-            description = "락 생성 성공시 allLocked = true, result -> 모든 성공한 락 리스트 <br>" +
-                    "락 생성 실패시(예약 시도 겹침 또는 이미 예약됨) allLocked = false, result -> 모든 실패한 락 리스트")
+    @Operation(summary = "예약 날짜 락 획득", description = "락 생성 성공시 모든 성공한 락 리스트")
     @PostMapping("/reservations/spaces/{spaceId}/locks/acquire")
     public CustomResponse<ReservationResDTO.ReservationLockAcquireResDTO> acquireLocks(
             @AuthenticationPrincipal CurrentUser currentUser,
