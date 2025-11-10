@@ -22,19 +22,13 @@ public class EmbeddingBackfillJob {
     private final EmbeddingService embeddingService;
 
     // 매일 00:30 (누락건만 보정)
-    @Scheduled(cron = "0 30 0 * * *", zone = "Asia/Seoul")
+    @Scheduled(cron = "0 30 1 * * *", zone = "Asia/Seoul")
     public void backfillApprovedWithoutEmbedding() {
         // 간단하게: 최근 3일 승인 전시 중 임베딩 없는 것
         var threeDaysAgo = java.time.LocalDate.now().minusDays(3);
-        List<Exhibition> candidates = exhibitionRepository.findAll().stream()
-                .filter(e -> e.getStatus() == Status.APPROVED)
-                .filter(e -> e.getCreatedAt() == null || !e.getCreatedAt().toLocalDate().isBefore(threeDaysAgo))
-                .filter(e -> !embRepo.existsById(e.getId()))
-                .toList();
+        List<Exhibition> candidates = exhibitionRepository.findApprovedWithoutEmbedding(threeDaysAgo);
 
-        for (Exhibition e : candidates) {
-            embeddingService.upsertExhibitionEmbedding(e);
-        }
+        candidates.forEach(embeddingService::upsertExhibitionEmbedding);
         log.info("[EmbeddingBackfill] 완료, processed={}", candidates.size());
     }
 }
