@@ -9,6 +9,8 @@ import com.project.team5backend.domain.common.enums.Status;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReservationConverter {
 
@@ -57,4 +59,23 @@ public class ReservationConverter {
                 .status(reservation.getStatus())
                 .build();
     }
+
+    public static ReservationResDTO.ReservationLockAcquireResDTO toReservationLockAcquireResDTO(Long spaceId, List<Object> result) {
+        return ReservationResDTO.ReservationLockAcquireResDTO.builder()
+                .spaceId(spaceId)
+//                .allLocked(isAllLocked(result.get(0)))
+                .result(result.get(1))
+                .build();
+    }
+
+    public static ReservationResDTO.ReservationLockReleaseResDTO toReservationLockReleaseResDTO(Long spaceId, Long count) {
+        return ReservationResDTO.ReservationLockReleaseResDTO.builder()
+                .spaceId(spaceId)
+                .count(count)
+                .build();
+    }
+
+//    private static boolean isAllLocked(Object result) {
+//        return Objects.equals(result, 1L);
+//    }
 }

@@ -38,4 +38,19 @@ public class ReservationResDTO {
             Status status
     ) {
     }
+
+    @Builder
+    public record ReservationLockAcquireResDTO(
+            Long spaceId,
+//            boolean allLocked,
+            Object result
+    ) {
+    }
+
+    @Builder
+    public record ReservationLockReleaseResDTO(
+            Long spaceId,
+            Long count
+    ) {
+    }
 }
