@@ -2,8 +2,6 @@ package com.project.team5backend.domain.recommendation.batch.job;
 
 import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.exhibition.repository.ExhibitionRepository;
-import com.project.team5backend.domain.recommendation.repository.ExhibitionEmbeddingRepository;
-import com.project.team5backend.domain.common.enums.Status;
 import com.project.team5backend.domain.recommendation.service.EmbeddingService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -18,7 +16,6 @@ import java.util.List;
 public class EmbeddingBackfillJob {
 
     private final ExhibitionRepository exhibitionRepository;
-    private final ExhibitionEmbeddingRepository embRepo;
     private final EmbeddingService embeddingService;
 
     // 매일 00:30 (누락건만 보정)
