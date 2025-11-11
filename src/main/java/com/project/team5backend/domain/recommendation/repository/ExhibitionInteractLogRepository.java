@@ -49,6 +49,22 @@ public interface ExhibitionInteractLogRepository extends JpaRepository<Exhibitio
     KeyScoreRow topMood(@Param("userId") Long userId, @Param("since") LocalDateTime since);
 
     @Query(value = """
+        SELECT e.exhibition_type AS keyName,
+               CAST(SUM(CASE l.action_type WHEN 'LIKE' THEN 1.6 WHEN 'CLICK' THEN 1.0 ELSE 1.0 END) AS DOUBLE) AS score
+        FROM exhibition_interact_log l
+        JOIN exhibition e ON e.id = l.exhibition_id
+        WHERE l.user_id = :userId AND l.created_at >= :since
+        GROUP BY e.exhibition_type
+        ORDER BY
+            SUM(CASE l.action_type WHEN 'LIKE' THEN 1.6 WHEN 'CLICK' THEN 1.0 ELSE 1.0 END) DESC,  -- 1순위: 가중치 합
+            MAX(l.created_at) DESC,   -- 2순위: 가장 최근 상호작용
+            COUNT(*) DESC             -- 3순위: 상호작용 개수
+        LIMIT 1
+        """, nativeQuery = true)
+    KeyScoreRow topType(@Param("userId") Long userId, @Param("since") LocalDateTime since);
+
+
+    @Query(value = """
         SELECT exhibition_id
         FROM exhibition_interact_log
         WHERE user_id = :userId AND created_at >= :since

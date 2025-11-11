@@ -151,7 +151,7 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
             @Param("exhibitionMood") ExhibitionMood exhibitionMood,
             @Param("status") Status status,
             @Param("today") LocalDate today,
-            org.springframework.data.domain.Pageable pageable
+            Pageable pageable
     );
 
     @Query("select count(e) from Exhibition e where e.status = :status")
@@ -167,6 +167,16 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
     order by e.createdAt desc
     """)
     List<ExhibitionSummaryResDTO> findTop3ByStatus(@Param("status") Status status);
+
+    @Query(value = """
+       select * from Exhibition e
+       where e.status = 'APPROVED'
+       and (e.created_at is null or e.created_at >= :threeDaysAgo)
+       and e.id not in (
+           select  exhibition_id from exhibition_embedding
+           )
+    """, nativeQuery = true)
+    List<Exhibition> findApprovedWithoutEmbedding(@Param("threeDaysAgo") LocalDate threeDaysAgo);
 
     boolean existsByPortalExhibitionId(@Param("portalExhibitionId") Long portalExhibitionId);
 

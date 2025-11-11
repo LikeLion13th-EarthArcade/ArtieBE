@@ -11,7 +11,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class RedisUtils<T> {
 
-    private final RedisTemplate<String, T> redisTemplate;
+    private final RedisTemplate<String, Object> redisTemplate;
 
     public void save(String key, T val, Long time, TimeUnit timeUnit) {
         redisTemplate.opsForValue().set(key, val, time, timeUnit);
@@ -21,8 +21,9 @@ public class RedisUtils<T> {
         return Objects.equals(Boolean.TRUE, redisTemplate.hasKey(key));
     }
 
+    @SuppressWarnings("unchecked")
     public T get(String key) {
-        return redisTemplate.opsForValue().get(key);
+        return (T) redisTemplate.opsForValue().get(key);
     }
 
     public void delete(String key) {

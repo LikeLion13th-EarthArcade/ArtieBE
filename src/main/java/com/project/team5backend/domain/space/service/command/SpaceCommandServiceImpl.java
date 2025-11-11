@@ -1,6 +1,6 @@
 package com.project.team5backend.domain.space.service.command;
 
-import com.project.team5backend.domain.common.cache.CachePort;
+import com.project.team5backend.domain.space.cache.SpaceCachePort;
 import com.project.team5backend.domain.common.embedded.Address;
 import com.project.team5backend.domain.common.enums.Status;
 import com.project.team5backend.domain.common.storage.FileStoragePort;
@@ -58,7 +58,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
     private final FileStoragePort fileStoragePort;
     private final ImageCommandService imageCommandService;
     private final FileUrlResolverPort fileUrlResolverPort;
-    private final CachePort cachePort;
+    private final SpaceCachePort spaceCachePort;
 
     @Override
     public SpaceResDTO.SpaceCreateResDTO createSpace(SpaceReqDTO.SpaceCreateReqDTO spaceCreateReqDTO,
@@ -69,7 +69,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
 
         // 사업자 번호 검증을 완료 했는지?
         final String bizNumber = spaceCreateReqDTO.bizNumber();
-        if (!cachePort.isValidated(bizNumber)) {
+        if (!spaceCachePort.isValidated(bizNumber)) {
             throw new SpaceException(SpaceErrorCode.BIZ_NUMBER_VALIDATION_DOES_NOT_EXIST);
         }
 
@@ -87,7 +87,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
         saveSpaceFacilities(spaceCreateReqDTO, space);
         saveSpaceImages(imageUrls, space);
 
-        cachePort.invalidate(bizNumber); //redis key 제거
+        spaceCachePort.invalidate(bizNumber); //redis key 제거
         return SpaceConverter.toSpaceCreateResDTO(space);
     }
 
