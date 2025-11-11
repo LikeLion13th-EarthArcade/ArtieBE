@@ -30,7 +30,7 @@ public class ReservationController {
     private final ReservationQueryService reservationQueryService;
     private final DistributedLockService distributedLockService;
 
-    @Operation(summary = "전시 공간 예약")
+    @Operation(summary = "전시 공간 예약", description = "예약 날짜 락 획득이 선행되어야 함")
     @PostMapping("/spaces/{spaceId}/reservations")
     public CustomResponse<ReservationResDTO.ReservationCreateResDTO> createReservation(
             @PathVariable Long spaceId,
