@@ -1,9 +1,9 @@
 package com.project.team5backend.domain.recommendation.service.query;
 
-import com.project.team5backend.domain.recommendation.dto.response.RecommendResDTO;
+import com.project.team5backend.domain.recommendation.dto.response.RecommendationResDTO;
 
 public interface RecommendationQueryService {
-    RecommendResDTO.PersonalizedSummaryResDTO getPersonalizedSummary(Long userId);
+    RecommendationResDTO.PersonalizedSummaryResDTO getPersonalizedSummary(Long userId);
 
-    RecommendResDTO.PersonalizedDetailResDTO getPersonalizedDetail(Long userId);
+    RecommendationResDTO.PersonalizedDetailResDTO getPersonalizedDetail(Long userId);
 }
