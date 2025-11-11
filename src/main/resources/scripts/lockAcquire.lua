@@ -10,6 +10,9 @@ for i = 1, #KEYS do
     if current and current ~= owner then
         -- 실패한 키를 저장
         table.insert(failedKeys, KEYS[i])
+    elseif current == owner then
+        -- 이미 생성된 키가 내 소유일 때
+        table.insert(failedKeys, KEYS[i])
     end
 end
 
@@ -20,8 +23,8 @@ end
 
 -- 인덱스 1부터 KEYS의 #(COUNT)만큼 반복문
 for i = 1, #KEYS do
-    -- 각각의 VALUE를 owner 값을 넣고 ms 단위의 ttl 설정
-    redis.call('SET', KEYS[i], owner, 'PX', ttl)
+    -- 각각의 VALUE를 owner 값을 넣고 ms 단위의 ttl 설정 // PX : ms, NX : 존재하지 않을 때
+    redis.call('SET', KEYS[i], owner, 'PX', ttl, 'NX')
 end
 -- 모든 락 설정이 끝남
 return {1, KEYS}
