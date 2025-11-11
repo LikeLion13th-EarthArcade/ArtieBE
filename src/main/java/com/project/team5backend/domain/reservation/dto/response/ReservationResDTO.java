@@ -41,7 +41,7 @@ public class ReservationResDTO {
 
     @Builder
     public record ReservationLockAcquireResDTO(
-            Object spaceId,
+            Long spaceId,
 //            boolean allLocked,
             Object result
     ) {
