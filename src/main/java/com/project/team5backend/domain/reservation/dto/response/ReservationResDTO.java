@@ -46,4 +46,11 @@ public class ReservationResDTO {
             Object result
     ) {
     }
+
+    @Builder
+    public record ReservationLockReleaseResDTO(
+            Long spaceId,
+            Long count
+    ) {
+    }
 }

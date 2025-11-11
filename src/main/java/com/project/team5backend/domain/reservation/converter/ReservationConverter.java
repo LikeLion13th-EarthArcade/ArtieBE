@@ -68,6 +68,13 @@ public class ReservationConverter {
                 .build();
     }
 
+    public static ReservationResDTO.ReservationLockReleaseResDTO toReservationLockReleaseResDTO(Long spaceId, Long count) {
+        return ReservationResDTO.ReservationLockReleaseResDTO.builder()
+                .spaceId(spaceId)
+                .count(count)
+                .build();
+    }
+
 //    private static boolean isAllLocked(Object result) {
 //        return Objects.equals(result, 1L);
 //    }

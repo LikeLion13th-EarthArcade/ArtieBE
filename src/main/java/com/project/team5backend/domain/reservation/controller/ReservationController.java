@@ -134,6 +134,16 @@ public class ReservationController {
     ) {
         return CustomResponse.onSuccess(distributedLockService.acquireLocks(currentUser.getEmail(), spaceId, reservationLockAcquireReqDTO));
     }
+
+    @Operation(summary = "락 삭제(프론트 개발용)", description = "락은 예약을 생성하면서 사라지는데, 개발할 때 혹시 삭제가 필요할까봐 만듦")
+    @PostMapping("reservation/spaces/{spaceId}/locks/renew")
+    public CustomResponse<ReservationResDTO.ReservationLockReleaseResDTO> releaseLocksProd(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @PathVariable Long spaceId,
+            @RequestBody @Valid ReservationReqDTO.ReservationLockReleaseReqDTO reservationLockReleaseReqDTO
+    ) {
+        return CustomResponse.onSuccess(distributedLockService.releaseLocksProd(spaceId, currentUser.getEmail(), reservationLockReleaseReqDTO));
+    }
 }
 
 

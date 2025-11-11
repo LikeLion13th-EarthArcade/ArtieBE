@@ -65,4 +65,23 @@ public class DistributedLockServiceImpl implements  DistributedLockService {
 
         return redisUtils.executeLua(lockReleaseScript, keys, email, String.valueOf(TimeUnit.MINUTES.toMillis(5)));
     }
+
+    @Override
+    public ReservationResDTO.ReservationLockReleaseResDTO releaseLocksProd(Long spaceId, String email, ReservationReqDTO.ReservationLockReleaseReqDTO reservationLockReleaseReqDTO) {
+        LocalDate startDate = reservationLockReleaseReqDTO.startDate();
+        LocalDate endDate = reservationLockReleaseReqDTO.endDate();
+
+        List<LocalDate> dateSlots = generateSlots(startDate, endDate);
+
+        List<String> keys = dateSlots.stream()
+                .map(date -> "lock:" + spaceId + ":" + date)
+                .toList();
+
+        Long count = redisUtils.executeLua(lockReleaseScript, keys, email);
+
+        if (count == 0) {
+            throw new ReservationException(ReservationErrorCode.NO_LOCK_TO_RELEASE);
+        }
+        return ReservationConverter.toReservationLockReleaseResDTO(spaceId, count);
+    }
 }
