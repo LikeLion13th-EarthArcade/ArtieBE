@@ -31,7 +31,7 @@ public class RedisUtils<T> {
         redisTemplate.delete(key);
     }
 
-    public List<Object> executeLua(DefaultRedisScript<List> script, List<String> keys, Object... args) {
+    public <R> R executeLua(DefaultRedisScript<R> script, List<String> keys, Object... args) {
         return redisTemplate.execute(script, keys, args);
     }
 }

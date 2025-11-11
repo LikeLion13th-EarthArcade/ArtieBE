@@ -10,7 +10,7 @@ public interface DistributedLockService {
 
     ReservationResDTO.ReservationLockAcquireResDTO acquireLocks(String email, Long spaceId, ReservationReqDTO.ReservationLockAcquireReqDTO reservationLockAcquireReqDTO);
 
-//    int releaseLocks(Long spaceId, String email, List<LocalDate> timeSlots);
+    long releaseLocks(Long spaceId, String email, List<LocalDate> dateSlots);
 //
 //    int renewLocks(Long spaceId, String email, List<LocalDate> timeSlots);
 }

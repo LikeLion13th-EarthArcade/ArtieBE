@@ -18,6 +18,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import static com.project.team5backend.domain.reservation.util.ReservationDateUtils.generateSlots;
+
 @Service
 @RequiredArgsConstructor
 @Transactional
@@ -55,12 +57,12 @@ public class DistributedLockServiceImpl implements  DistributedLockService {
         return ReservationConverter.toReservationLockAcquireResDTO(spaceId, result);
     }
 
-    private List<LocalDate> generateSlots(LocalDate startDate, LocalDate endDate) {
-        List<LocalDate> dateSlots = new ArrayList<>();
-        while (!startDate.isAfter(endDate)) {
-            dateSlots.add(startDate);
-            startDate = startDate.plusDays(1);
-        }
-        return dateSlots;
+    @Override
+    public long releaseLocks(Long spaceId, String email, List<LocalDate> dateSlots) {
+        List<String> keys = dateSlots.stream()
+                .map(date -> "lock:" + spaceId + ":" + date)
+                .toList();
+
+        return redisUtils.executeLua(lockReleaseScript, keys, email, String.valueOf(TimeUnit.MINUTES.toMillis(5)));
     }
 }

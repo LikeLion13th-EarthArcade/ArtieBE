@@ -7,7 +7,7 @@ for i = 1, #KEYS do
     if redis.call('GET', KEYS[i]) == owner then
         -- 삭제
         redis.call('DEL', KEYS[i])
-        release = released + 1
+        released = released + 1
     end
 end
 
