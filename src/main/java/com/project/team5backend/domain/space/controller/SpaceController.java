@@ -184,7 +184,7 @@ public class SpaceController {
         return CustomResponse.onSuccess(spaceQueryService.getMySpaceDetail(currentUser.getId(), spaceId));
     }
 
-    @Operation(summary = "공간 예약 가능 여부 확인")
+    @Operation(summary = "공간 예약 가능 여부 확인", description = "isAvailable 이 false라면 예약 불가, 예약이 가능한 날짜와 예약이 불가한 날짜 리턴 (예약이 불가한 이유는 락이 걸려있거나(누군가 예약중), 이미 예약된 날짜)")
     @GetMapping("/{spaceId}/availability")
     public CustomResponse<SpaceResDTO.SpaceAvailabilityResDTO> getAvailability(
             @PathVariable Long spaceId,
