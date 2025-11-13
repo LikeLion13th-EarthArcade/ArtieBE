@@ -45,4 +45,16 @@ public class ReservationReqDTO {
             String bookerCancelReason
     ) {
     }
+
+    public record ReservationLockAcquireReqDTO(
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+    }
+
+    public record ReservationLockReleaseReqDTO(
+            LocalDate startDate,
+            LocalDate endDate
+    ) {
+    }
 }

@@ -1,4 +1,4 @@
-package com.project.team5backend.global.schedular;
+package com.project.team5backend.domain.exhibition.batch.job;
 
 import com.project.team5backend.domain.exhibition.service.schedular.ExhibitionCrawlerService;
 import lombok.RequiredArgsConstructor;
@@ -7,7 +7,7 @@ import org.springframework.stereotype.Component;
 
 @Component
 @RequiredArgsConstructor
-public class ExhibitionCrawlerScheduler {
+public class ExhibitionCrawlerJob {
 
     private final ExhibitionCrawlerService exhibitionCrawlerService;
 

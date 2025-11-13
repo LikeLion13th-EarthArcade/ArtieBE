@@ -2,18 +2,19 @@ package com.project.team5backend.domain.recommendation.entity;
 
 import com.project.team5backend.domain.common.BaseOnlyCreateTimeEntity;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Entity
 @Table(name = "exhibition_embedding")
 @Getter @Setter
 @NoArgsConstructor @AllArgsConstructor
+@Builder
 public class ExhibitionEmbedding extends BaseOnlyCreateTimeEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long EmbeddingId;
+
     private Long exhibitionId;
 
     @Lob

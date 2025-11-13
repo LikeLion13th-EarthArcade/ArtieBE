@@ -7,6 +7,7 @@ import com.project.team5backend.domain.reservation.entity.Reservation;
 import com.project.team5backend.domain.reservation.exception.ReservationErrorCode;
 import com.project.team5backend.domain.reservation.exception.ReservationException;
 import com.project.team5backend.domain.reservation.repository.ReservationRepository;
+import com.project.team5backend.domain.reservation.service.lock.DistributedLockService;
 import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.space.exception.SpaceErrorCode;
 import com.project.team5backend.domain.space.exception.SpaceException;
@@ -16,11 +17,16 @@ import com.project.team5backend.domain.user.exception.UserErrorCode;
 import com.project.team5backend.domain.user.exception.UserException;
 import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.domain.common.enums.Status;
+import com.project.team5backend.global.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.util.List;
 import java.util.Objects;
+
+import static com.project.team5backend.domain.common.util.DateUtils.generateSlots;
 
 @Service
 @RequiredArgsConstructor
@@ -30,16 +36,25 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     private final SpaceRepository spaceRepository;
     private final UserRepository userRepository;
     private final ReservationRepository reservationRepository;
+    private final RedisUtils<String> redisUtils;
+    private final DistributedLockService lockService;
 
     @Override
     public ReservationResDTO.ReservationCreateResDTO createReservation(Long spaceId, Long userId, ReservationReqDTO.ReservationCreateReqDTO reservationCreateReqDTO) {
-
         Space space = getSpace(spaceId);
         User user = getUser(userId);
+
+        LocalDate startDate = reservationCreateReqDTO.startDate();
+        LocalDate endDate = reservationCreateReqDTO.endDate();
+        List<LocalDate> dateSlots = generateSlots(startDate, endDate);
+
+        // 락이 제대로 존재하는지 확인
+        validateLock(user, spaceId, dateSlots);
 
         Reservation reservation = ReservationConverter.toReservation(space, user, reservationCreateReqDTO);
         reservationRepository.save(reservation);
 
+        lockService.releaseLocks(spaceId, user.getEmail(), dateSlots);
         return ReservationConverter.toReservationCreateResDTO(reservation);
     }
 
@@ -106,6 +121,14 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
             throw new ReservationException(ReservationErrorCode.RESERVATION_ACCESS_DENIED);
         }
         return reservation;
+    }
+
+    private void validateLock(User user, Long spaceId, List<LocalDate> dateSlots) {
+        for (LocalDate date : dateSlots) {
+            if (!Objects.equals(redisUtils.get("lock:" + spaceId + ":" + date), user.getEmail())) {
+                throw new ReservationException(ReservationErrorCode.RESERVATION_DATE_LOCK_FAILED);
+            }
+        }
     }
 
     private User getUser(Long userId) {

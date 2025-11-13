@@ -3,6 +3,7 @@ package com.project.team5backend.domain.reservation.controller;
 import com.project.team5backend.domain.reservation.dto.request.ReservationReqDTO;
 import com.project.team5backend.domain.reservation.dto.response.ReservationResDTO;
 import com.project.team5backend.domain.reservation.service.command.ReservationCommandService;
+import com.project.team5backend.domain.reservation.service.lock.DistributedLockService;
 import com.project.team5backend.domain.reservation.service.query.ReservationQueryService;
 import com.project.team5backend.global.apiPayload.CustomResponse;
 import com.project.team5backend.domain.common.enums.StatusGroup;
@@ -27,8 +28,9 @@ public class ReservationController {
 
     private final ReservationCommandService reservationCommandService;
     private final ReservationQueryService reservationQueryService;
+    private final DistributedLockService distributedLockService;
 
-    @Operation(summary = "전시 공간 예약")
+    @Operation(summary = "전시 공간 예약", description = "예약 날짜 락 획득이 선행되어야 함")
     @PostMapping("/spaces/{spaceId}/reservations")
     public CustomResponse<ReservationResDTO.ReservationCreateResDTO> createReservation(
             @PathVariable Long spaceId,
@@ -121,6 +123,26 @@ public class ReservationController {
             @RequestBody @Valid ReservationReqDTO.ReservationCancellationReqDTO reservationCancellationReqDTO
     ) {
         return CustomResponse.onSuccess(reservationCommandService.requestCancellation(currentUser.getId(), reservationId, reservationCancellationReqDTO));
+    }
+
+    @Operation(summary = "예약 날짜 락 획득", description = "락 생성 성공시 모든 성공한 락 리스트")
+    @PostMapping("/reservations/spaces/{spaceId}/locks/acquire")
+    public CustomResponse<ReservationResDTO.ReservationLockAcquireResDTO> acquireLocks(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @PathVariable Long spaceId,
+            @RequestBody @Valid ReservationReqDTO.ReservationLockAcquireReqDTO reservationLockAcquireReqDTO
+    ) {
+        return CustomResponse.onSuccess(distributedLockService.acquireLocks(currentUser.getEmail(), spaceId, reservationLockAcquireReqDTO));
+    }
+
+    @Operation(summary = "락 삭제(프론트 개발용)", description = "락은 예약을 생성하면서 사라지는데, 개발할 때 혹시 삭제가 필요할까봐 만듦")
+    @PostMapping("reservation/spaces/{spaceId}/locks/renew")
+    public CustomResponse<ReservationResDTO.ReservationLockReleaseResDTO> releaseLocksProd(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @PathVariable Long spaceId,
+            @RequestBody @Valid ReservationReqDTO.ReservationLockReleaseReqDTO reservationLockReleaseReqDTO
+    ) {
+        return CustomResponse.onSuccess(distributedLockService.releaseLocksProd(spaceId, currentUser.getEmail(), reservationLockReleaseReqDTO));
     }
 }
 

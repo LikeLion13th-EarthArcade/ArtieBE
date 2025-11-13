@@ -1,4 +1,4 @@
-package com.project.team5backend.domain.recommendation.scheduler;
+package com.project.team5backend.domain.recommendation.batch.job;
 
 import com.project.team5backend.domain.recommendation.repository.ExhibitionInteractLogRepository;
 import lombok.RequiredArgsConstructor;
@@ -13,7 +13,7 @@ import java.time.LocalDateTime;
 @Component
 @RequiredArgsConstructor
 @Transactional
-public class InteractLogRetentionJob {
+public class LogCleanupJob {
 
     private final ExhibitionInteractLogRepository logRepo;
 
