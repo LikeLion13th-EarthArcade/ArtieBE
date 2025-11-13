@@ -25,6 +25,7 @@ import com.project.team5backend.domain.common.enums.Sort;
 import com.project.team5backend.domain.common.enums.Status;
 import com.project.team5backend.domain.common.enums.StatusGroup;
 import com.project.team5backend.global.util.PageResponse;
+import com.project.team5backend.global.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -50,6 +51,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
     private final UserRepository userRepository;
     private final SpaceLikeRepository spaceLikeRepository;
     private final ClosedDayRepository closedDayRepository;
+    private final RedisUtils<String> redisUtils;
 
     private static final double SEOUL_CENTER_LAT = 37.5665;
     private static final double SEOUL_CENTER_LNG = 126.9780;
@@ -115,10 +117,12 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
 
         for (LocalDate date : dateSlots) {
             // 현재 요청 날짜가 어떤 휴무 규칙에 위배되는 순간 false
-            boolean isClosed = closedDays.stream()
-                    .anyMatch(cd -> cd.isClosedOn(date));
+//            boolean isClosed = closedDays.stream()
+//                    .anyMatch(cd -> cd.isClosedOn(date));
             boolean isReserved = reservationRepository.existsByDateAndTimeSlots(date);
-            if (isClosed || isReserved) {
+            boolean isLocked = redisUtils.hasKey("lock:" + spaceId + ":" + date);
+//            if (isClosed || isReserved) {
+            if (isReserved || isLocked) {
                 unavailableDates.add(date);
                 isAvailable = false;
             } else {
