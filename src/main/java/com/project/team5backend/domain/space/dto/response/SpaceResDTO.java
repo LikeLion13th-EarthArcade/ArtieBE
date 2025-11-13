@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -117,4 +118,13 @@ public class SpaceResDTO {
             LocalDateTime createdAt,
             Status status
     ) {}
+
+    @Builder
+    public record SpaceAvailabilityResDTO(
+            Long spaceId,
+            boolean isAvailable,
+            List<LocalDate> availableDate,
+            List<LocalDate> unavailableDate
+    ) {
+    }
 }

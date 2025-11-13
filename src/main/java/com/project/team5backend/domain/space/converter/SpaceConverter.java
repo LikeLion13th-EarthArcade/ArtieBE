@@ -11,6 +11,7 @@ import com.project.team5backend.domain.common.embedded.Address;
 import com.project.team5backend.domain.common.enums.Status;
 import com.project.team5backend.global.util.PageResponse;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -155,6 +156,15 @@ public class SpaceConverter {
                 .thumbnail(thumbnail)
                 .address(space.getAddress().getRoadAddress() + " " + space.getAddress().getDetail())
                 .isLiked(isLiked)
+                .build();
+    }
+
+    public static SpaceResDTO.SpaceAvailabilityResDTO toSpaceAvailabilityResDTO(Long spaceId, List<LocalDate> availableDate, List<LocalDate> unavailableDate, boolean isAvailable){
+        return SpaceResDTO.SpaceAvailabilityResDTO.builder()
+                .spaceId(spaceId)
+                .isAvailable(isAvailable)
+                .availableDate(availableDate)
+                .unavailableDate(unavailableDate)
                 .build();
     }
 

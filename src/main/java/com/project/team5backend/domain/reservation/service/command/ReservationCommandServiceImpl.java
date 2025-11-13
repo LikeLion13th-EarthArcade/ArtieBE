@@ -26,7 +26,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
-import static com.project.team5backend.domain.reservation.util.ReservationDateUtils.generateSlots;
+import static com.project.team5backend.domain.common.util.DateUtils.generateSlots;
 
 @Service
 @RequiredArgsConstructor

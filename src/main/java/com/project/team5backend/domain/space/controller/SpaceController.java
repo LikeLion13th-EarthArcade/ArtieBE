@@ -183,4 +183,14 @@ public class SpaceController {
     ) {
         return CustomResponse.onSuccess(spaceQueryService.getMySpaceDetail(currentUser.getId(), spaceId));
     }
+
+    @Operation(summary = "공간 예약 가능 여부 확인")
+    @GetMapping("/{spaceId}/availability")
+    public CustomResponse<SpaceResDTO.SpaceAvailabilityResDTO> getAvailability(
+            @PathVariable Long spaceId,
+            @RequestParam LocalDate startDate,
+            @RequestParam LocalDate endDate
+    ) {
+        return CustomResponse.onSuccess(spaceQueryService.getAvailability(spaceId, startDate, endDate));
+    }
 }

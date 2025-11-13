@@ -1,4 +1,4 @@
-package com.project.team5backend.domain.reservation.util;
+package com.project.team5backend.domain.common.util;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class ReservationDateUtils {
+public class DateUtils {
 
     public static List<LocalDate> generateSlots(LocalDate startDate, LocalDate endDate) {
         List<LocalDate> dateSlots = new ArrayList<>();
