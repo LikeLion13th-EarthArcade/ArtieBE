@@ -48,7 +48,7 @@ public class DistributedLockServiceImpl implements  DistributedLockService {
                 .map(date -> "lock:" + spaceId + ":" + date)
                 .toList();
 
-        List<Object> result = redisUtils.executeLua(lockAcquireScript, keys, email, String.valueOf(TimeUnit.MINUTES.toMillis(5)));
+        List<Object> result = redisUtils.executeLua(lockAcquireScript, keys, email, String.valueOf(TimeUnit.MINUTES.toMillis(15)));
 
         if (result.get(0).equals(0L)) {
             throw new ReservationException(ReservationErrorCode.LOCK_CONFLICT);
@@ -62,7 +62,7 @@ public class DistributedLockServiceImpl implements  DistributedLockService {
                 .map(date -> "lock:" + spaceId + ":" + date)
                 .toList();
 
-        return redisUtils.executeLua(lockReleaseScript, keys, email, String.valueOf(TimeUnit.MINUTES.toMillis(5)));
+        return redisUtils.executeLua(lockReleaseScript, keys, email);
     }
 
     @Override
