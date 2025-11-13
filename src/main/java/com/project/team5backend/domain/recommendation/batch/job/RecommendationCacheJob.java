@@ -23,7 +23,7 @@ public class RecommendationCacheJob {
 
 
      // 매일 자정(00:00)에 실행 - 사용자별 top4 추천 결과 Redis에 캐싱
-     @Scheduled(cron = "0 54 13 * * *", zone = "Asia/Seoul")
+     @Scheduled(cron = "30 15 02 * * *", zone = "Asia/Seoul")
      public void refreshDailyRecommendations() {
          log.info("[Job] Start refreshing cached recommendations...");
          List<Long> userIds = userRepository.findAllUserIds();
