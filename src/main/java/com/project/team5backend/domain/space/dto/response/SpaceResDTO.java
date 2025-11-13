@@ -11,6 +11,7 @@ import lombok.Setter;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 
 @Getter
@@ -33,6 +34,8 @@ public class SpaceResDTO {
             String address,
             BigDecimal latitude,
             BigDecimal longitude,
+            LocalTime openingTime,
+            LocalTime closingTime,
             String operatingInfo,
             SpaceSize spaceSize,
             SpaceMood spaceMood,
@@ -74,7 +77,8 @@ public class SpaceResDTO {
             BigDecimal latitude,
             BigDecimal longitude,
             String operatingInfo,
-            String thumbnail
+            String thumbnail,
+            String price
     ){}
 
     @Builder
@@ -92,10 +96,13 @@ public class SpaceResDTO {
             String name,
             SpaceVerificationResDTO spaceVerificationResDTO,
             String address,
+            LocalTime openingTime,
+            LocalTime closingTime,
             String operatingInfo,
             SpaceSize spaceSize,
             SpaceMood spaceMood,
             String description,
+            String price,
             List<String> facilities,
             String phoneNumber,
             String email,

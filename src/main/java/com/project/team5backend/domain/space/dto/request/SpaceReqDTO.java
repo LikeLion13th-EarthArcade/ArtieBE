@@ -36,19 +36,19 @@ public class SpaceReqDTO {
             @NotNull
             SpaceSize spaceSize,
 
+            @NotNull(message = BLANK_EXHIBITION_OPERATING_HOURS)
+            LocalTime openingTime,
+
+            @NotNull(message = BLANK_EXHIBITION_OPERATING_HOURS)
+            LocalTime closingTime,
+
+            String operatingInfo,
+
             @NotNull
             SpaceMood spaceMood,
 
             @NotBlank(message = BLANK_NAME)
             String name,
-
-            @NotNull(message = BLANK_EXHIBITION_OPERATING_HOURS)
-            LocalTime operatingStartHour,
-
-            @NotNull(message = BLANK_EXHIBITION_OPERATING_HOURS)
-            LocalTime operatingEndHour,
-
-            String operatingOption,
 
             String description,
 
