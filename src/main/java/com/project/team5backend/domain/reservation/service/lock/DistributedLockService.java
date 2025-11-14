@@ -8,7 +8,7 @@ import java.util.List;
 
 public interface DistributedLockService {
 
-    ReservationResDTO.ReservationLockAcquireResDTO acquireLocks(String email, Long spaceId, ReservationReqDTO.ReservationLockAcquireReqDTO reservationLockAcquireReqDTO);
+    ReservationResDTO.ReservationLockAcquireResDTO acquireLocks(String email, Long spaceId, LocalDate startDate, LocalDate endDate);
 
     long releaseLocks(Long spaceId, String email, List<LocalDate> dateSlots);
 

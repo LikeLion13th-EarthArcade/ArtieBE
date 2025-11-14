@@ -32,6 +32,10 @@ public class RedisUtils<T> {
         defaultRedisTemplate.delete(key);
     }
 
+    public String getLock(String key) {
+        return stringRedisTemplate.opsForValue().get(key);
+    }
+
     public <R> R executeLua(DefaultRedisScript<R> script, List<String> keys, Object... args) {
         return stringRedisTemplate.execute(script, keys, args);
     }

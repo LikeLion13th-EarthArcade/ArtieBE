@@ -4,9 +4,11 @@ import com.project.team5backend.domain.reservation.converter.ReservationConverte
 import com.project.team5backend.domain.reservation.dto.request.ReservationReqDTO;
 import com.project.team5backend.domain.reservation.dto.response.ReservationResDTO;
 import com.project.team5backend.domain.reservation.entity.Reservation;
+import com.project.team5backend.domain.reservation.entity.TempReservation;
 import com.project.team5backend.domain.reservation.exception.ReservationErrorCode;
 import com.project.team5backend.domain.reservation.exception.ReservationException;
 import com.project.team5backend.domain.reservation.repository.ReservationRepository;
+import com.project.team5backend.domain.reservation.repository.TempReservationRepository;
 import com.project.team5backend.domain.reservation.service.lock.DistributedLockService;
 import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.space.exception.SpaceErrorCode;
@@ -36,26 +38,39 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     private final SpaceRepository spaceRepository;
     private final UserRepository userRepository;
     private final ReservationRepository reservationRepository;
+    private final TempReservationRepository tempReservationRepository;
     private final RedisUtils<String> redisUtils;
     private final DistributedLockService lockService;
 
     @Override
-    public ReservationResDTO.ReservationCreateResDTO createReservation(Long spaceId, Long userId, ReservationReqDTO.ReservationCreateReqDTO reservationCreateReqDTO) {
-        Space space = getSpace(spaceId);
-        User user = getUser(userId);
+    public ReservationResDTO.ReservationCreateResDTO createTempReservation(Long spaceId, Long userId, ReservationReqDTO.ReservationCreateReqDTO reservationCreateReqDTO) {
 
         LocalDate startDate = reservationCreateReqDTO.startDate();
         LocalDate endDate = reservationCreateReqDTO.endDate();
         List<LocalDate> dateSlots = generateSlots(startDate, endDate);
 
-        // 락이 제대로 존재하는지 확인
-        validateLock(user, spaceId, dateSlots);
+        Space space = getSpace(spaceId);
+        User user = getUser(userId);
 
-        Reservation reservation = ReservationConverter.toReservation(space, user, reservationCreateReqDTO);
-        reservationRepository.save(reservation);
+        lockService.acquireLocks(user.getEmail(), spaceId, reservationCreateReqDTO.startDate(), reservationCreateReqDTO.endDate());
 
-        lockService.releaseLocks(spaceId, user.getEmail(), dateSlots);
-        return ReservationConverter.toReservationCreateResDTO(reservation);
+        try {
+            // 락이 제대로 존재하는지 확인
+            validateLock(user, spaceId, dateSlots);
+
+            TempReservation tempReservation = ReservationConverter.toTempReservation(space, user, reservationCreateReqDTO);
+            tempReservationRepository.save(tempReservation);
+
+//            Reservation reservation = ReservationConverter.toReservation(space, user, reservationCreateReqDTO);
+//            reservationRepository.save(reservation);
+
+//        lockService.releaseLocks(spaceId, user.getEmail(), dateSlots);
+            return ReservationConverter.toReservationCreateReqDTO(tempReservation);
+        } catch (Exception e) {
+            lockService.releaseLocks(spaceId, user.getEmail(), dateSlots);
+            throw e;
+        }
+
     }
 
     @Override
@@ -125,7 +140,7 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
     private void validateLock(User user, Long spaceId, List<LocalDate> dateSlots) {
         for (LocalDate date : dateSlots) {
-            if (!Objects.equals(redisUtils.get("lock:" + spaceId + ":" + date), user.getEmail())) {
+            if (!Objects.equals(redisUtils.getLock("lock:" + spaceId + ":" + date), user.getEmail())) {
                 throw new ReservationException(ReservationErrorCode.RESERVATION_DATE_LOCK_FAILED);
             }
         }

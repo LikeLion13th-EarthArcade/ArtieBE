@@ -3,6 +3,7 @@ package com.project.team5backend.domain.reservation.converter;
 import com.project.team5backend.domain.reservation.dto.request.ReservationReqDTO;
 import com.project.team5backend.domain.reservation.dto.response.ReservationResDTO;
 import com.project.team5backend.domain.reservation.entity.Reservation;
+import com.project.team5backend.domain.reservation.entity.TempReservation;
 import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.common.enums.Status;
@@ -73,6 +74,28 @@ public class ReservationConverter {
                 .spaceId(spaceId)
                 .count(count)
                 .build();
+    }
+
+    public static TempReservation toTempReservation (Space space, User user, ReservationReqDTO.ReservationCreateReqDTO reservationCreateReqDTO) {
+        return TempReservation.builder()
+                .startDate(reservationCreateReqDTO.startDate())
+                .endDate(reservationCreateReqDTO.endDate())
+                .name(reservationCreateReqDTO.name())
+                .email(reservationCreateReqDTO.email())
+                .phoneNumber(reservationCreateReqDTO.phoneNumber())
+                .message(reservationCreateReqDTO.message())
+                .space(space)
+                .user(user)
+                .build();
+    }
+
+    public static ReservationResDTO.ReservationCreateResDTO toReservationCreateReqDTO(TempReservation tempReservation) {
+        return ReservationResDTO.ReservationCreateResDTO.builder()
+                .id(tempReservation.getTempReservationId())
+                .startDate(tempReservation.getStartDate())
+                .endDate(tempReservation.getEndDate())
+                .build();
+
     }
 
 //    private static boolean isAllLocked(Object result) {
