@@ -37,6 +37,9 @@ public class TempReservation {
     @Column(name = "message")
     private String message;
 
+    @Column(name = "isDeposited")
+    private boolean isDeposited;
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "space_id", nullable = false)
     private Space space;
@@ -44,4 +47,8 @@ public class TempReservation {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "user_id", nullable = false)
     private User user; // 예약자
+
+    public void deposit() {
+        this.isDeposited = true;
+    }
 }

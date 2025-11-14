@@ -74,6 +74,22 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
     }
 
     @Override
+    public void deposit(Long tempReservationId, Long userId) {
+        TempReservation tempReservation = tempReservationRepository.findById(tempReservationId)
+                .orElseThrow(() -> new ReservationException(ReservationErrorCode.TEMP_RESERVATION_NOT_FOUND));
+
+        Space space = tempReservation.getSpace();
+        User user = tempReservation.getUser();
+
+        List<LocalDate> dateSlots = generateSlots(tempReservation.getStartDate(), tempReservation.getEndDate());
+
+        // 락 여부 확인
+        validateLock(user, space.getId(), dateSlots);
+        // 입금
+        tempReservation.deposit();
+    }
+
+    @Override
     public ReservationResDTO.ReservationStatusResDTO approveRequest(Long userId, Long reservationId) {
 
         Reservation reservation = validateReservation(userId, reservationId);

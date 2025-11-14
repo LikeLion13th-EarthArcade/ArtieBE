@@ -40,6 +40,16 @@ public class ReservationController {
         return CustomResponse.onSuccess(HttpStatus.CREATED, reservationCommandService.createTempReservation(spaceId, currentUser.getId(), reservationCreateReqDTO));
     }
 
+    @Operation(summary = "입금하기", description = "실제로 무통장 입금을 구현할 수 없으므로 입금하기 버튼을 만들었습니다.")
+    @PostMapping("/tempReservations/{tempReservationId}")
+    public CustomResponse<String> deposit(
+            @PathVariable Long tempReservationId,
+            @AuthenticationPrincipal CurrentUser currentUser
+    ) {
+        reservationCommandService.deposit(tempReservationId, currentUser.getId());
+        return CustomResponse.onSuccess("입금이 완료되었습니다");
+    }
+
     @Operation(summary = "예약 단일 조회")
     @GetMapping("/reservations/{reservationId}")
     public CustomResponse<ReservationResDTO.ReservationDetailResDTO> getReservationDetail(

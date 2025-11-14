@@ -84,6 +84,7 @@ public class ReservationConverter {
                 .email(reservationCreateReqDTO.email())
                 .phoneNumber(reservationCreateReqDTO.phoneNumber())
                 .message(reservationCreateReqDTO.message())
+                .isDeposited(false)
                 .space(space)
                 .user(user)
                 .build();
