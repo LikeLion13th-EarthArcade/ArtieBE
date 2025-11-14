@@ -29,6 +29,20 @@ public class ReservationConverter {
                 .build();
     }
 
+    public static Reservation toReservation(TempReservation tempReservation) {
+        return Reservation.builder()
+                .startDate(tempReservation.getStartDate())
+                .endDate(tempReservation.getEndDate())
+                .name(tempReservation.getName())
+                .email(tempReservation.getEmail())
+                .phoneNumber(tempReservation.getPhoneNumber())
+                .message(tempReservation.getMessage())
+                .status(Status.PENDING)
+                .space(tempReservation.getSpace())
+                .user(tempReservation.getUser())
+                .build();
+    }
+
     public static ReservationResDTO.ReservationCreateResDTO toReservationCreateResDTO(Reservation reservation) {
         return ReservationResDTO.ReservationCreateResDTO.builder()
                 .id(reservation.getId())

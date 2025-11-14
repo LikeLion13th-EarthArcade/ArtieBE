@@ -51,10 +51,8 @@ public class ReservationCommandServiceImpl implements ReservationCommandService 
 
         Space space = getSpace(spaceId);
         User user = getUser(userId);
-
-        lockService.acquireLocks(user.getEmail(), spaceId, reservationCreateReqDTO.startDate(), reservationCreateReqDTO.endDate());
-
         try {
+            lockService.acquireLocks(user.getEmail(), spaceId, reservationCreateReqDTO.startDate(), reservationCreateReqDTO.endDate());
             // 락이 제대로 존재하는지 확인
             validateLock(user, spaceId, dateSlots);
 

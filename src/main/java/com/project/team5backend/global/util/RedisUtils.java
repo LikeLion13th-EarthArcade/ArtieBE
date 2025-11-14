@@ -36,6 +36,10 @@ public class RedisUtils<T> {
         return stringRedisTemplate.opsForValue().get(key);
     }
 
+    public boolean hasLock(String key) {
+        return Objects.equals(Boolean.TRUE, stringRedisTemplate.hasKey(key));
+    }
+
     public <R> R executeLua(DefaultRedisScript<R> script, List<String> keys, Object... args) {
         return stringRedisTemplate.execute(script, keys, args);
     }
