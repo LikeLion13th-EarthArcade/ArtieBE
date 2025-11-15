@@ -48,7 +48,10 @@ public class EmbeddingService {
             float[] vec = new float[emb.size()];
             for (int i=0; i<emb.size(); i++) vec[i] = emb.get(i).floatValue();
 
-            embRepo.save(new ExhibitionEmbedding(e.getId(), ExhibitionEmbedding.fromArray(vec)));
+            embRepo.save(ExhibitionEmbedding.builder()
+                    .exhibitionId(e.getId())
+                    .vector(ExhibitionEmbedding.fromArray(vec))
+                    .build());
         } catch (Exception ex) {
             log.error("Embedding upsert 실패 {}: {}", e.getId(), ex.getMessage());
             // 실패는 치명적이지 않음(야간 백필에서 재시도 가능)

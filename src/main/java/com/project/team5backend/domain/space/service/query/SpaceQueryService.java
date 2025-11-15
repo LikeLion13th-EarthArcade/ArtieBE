@@ -1,5 +1,6 @@
 package com.project.team5backend.domain.space.service.query;
 
+import com.project.team5backend.domain.space.dto.request.SpaceReqDTO;
 import com.project.team5backend.domain.space.dto.response.SpaceResDTO;
 import com.project.team5backend.domain.space.entity.enums.SpaceMood;
 import com.project.team5backend.domain.space.entity.enums.SpaceSize;
@@ -25,4 +26,6 @@ public interface SpaceQueryService {
     Page<SpaceResDTO.SpaceSummaryResDTO> getMySpaces(Long userId, StatusGroup status, Sort sort, Pageable pageable);
 
     SpaceResDTO.MySpaceDetailResDTO getMySpaceDetail(Long userId, Long spaceId);
+
+    SpaceResDTO.SpaceAvailabilityResDTO getAvailability(Long spaceId, LocalDate startDate, LocalDate endDate);
 }

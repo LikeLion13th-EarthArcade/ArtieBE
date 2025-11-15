@@ -11,6 +11,7 @@ import com.project.team5backend.domain.user.entity.User;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,7 +34,11 @@ public class Space extends BaseTimeEntity {
     @Column(name = "thumbnail", nullable = false)
     private String thumbnail; // 썸네일
 
+    @Column(name = "opening_time")
+    private LocalTime openingTime;
 
+    @Column(name = "closing_time")
+    private LocalTime closingTime;
 
     @Column(name = "operating_info", nullable = false)
     private String operatingInfo; // 운영 시간

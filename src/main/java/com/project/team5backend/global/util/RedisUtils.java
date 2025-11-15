@@ -13,26 +13,34 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 public class RedisUtils<T> {
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final RedisTemplate<String, T> defaultRedisTemplate;
+    private final RedisTemplate<String, String> stringRedisTemplate;
 
     public void save(String key, T val, Long time, TimeUnit timeUnit) {
-        redisTemplate.opsForValue().set(key, val, time, timeUnit);
+        defaultRedisTemplate.opsForValue().set(key, val, time, timeUnit);
     }
 
     public boolean hasKey(String key) {
-        return Objects.equals(Boolean.TRUE, redisTemplate.hasKey(key));
+        return Objects.equals(Boolean.TRUE, defaultRedisTemplate.hasKey(key));
     }
 
-    @SuppressWarnings("unchecked")
     public T get(String key) {
-        return (T) redisTemplate.opsForValue().get(key);
+        return defaultRedisTemplate.opsForValue().get(key);
     }
 
     public void delete(String key) {
-        redisTemplate.delete(key);
+        defaultRedisTemplate.delete(key);
+    }
+
+    public String getLock(String key) {
+        return stringRedisTemplate.opsForValue().get(key);
+    }
+
+    public boolean hasLock(String key) {
+        return Objects.equals(Boolean.TRUE, stringRedisTemplate.hasKey(key));
     }
 
     public <R> R executeLua(DefaultRedisScript<R> script, List<String> keys, Object... args) {
-        return redisTemplate.execute(script, keys, args);
+        return stringRedisTemplate.execute(script, keys, args);
     }
 }

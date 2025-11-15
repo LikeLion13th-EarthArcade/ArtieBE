@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Pattern;
 
+import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
 
@@ -35,19 +36,19 @@ public class SpaceReqDTO {
             @NotNull
             SpaceSize spaceSize,
 
+            @NotNull(message = BLANK_EXHIBITION_OPERATING_HOURS)
+            LocalTime openingTime,
+
+            @NotNull(message = BLANK_EXHIBITION_OPERATING_HOURS)
+            LocalTime closingTime,
+
+            String operatingInfo,
+
             @NotNull
             SpaceMood spaceMood,
 
             @NotBlank(message = BLANK_NAME)
             String name,
-
-            @NotNull(message = BLANK_EXHIBITION_OPERATING_HOURS)
-            LocalTime operatingStartHour,
-
-            @NotNull(message = BLANK_EXHIBITION_OPERATING_HOURS)
-            LocalTime operatingEndHour,
-
-            String operatingOption,
 
             String description,
 

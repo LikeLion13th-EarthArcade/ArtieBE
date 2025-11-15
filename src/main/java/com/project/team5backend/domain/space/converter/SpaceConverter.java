@@ -11,6 +11,7 @@ import com.project.team5backend.domain.common.embedded.Address;
 import com.project.team5backend.domain.common.enums.Status;
 import com.project.team5backend.global.util.PageResponse;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Objects;
 
@@ -20,7 +21,9 @@ public class SpaceConverter {
         return Space.builder()
                 .name(spaceCreateReqDTO.name())
                 .description(spaceCreateReqDTO.description())
-                .operatingInfo(spaceCreateReqDTO.operatingStartHour() + "/" +  spaceCreateReqDTO.operatingEndHour() + "/" + spaceCreateReqDTO.operatingOption())
+                .openingTime(spaceCreateReqDTO.openingTime())
+                .closingTime(spaceCreateReqDTO.closingTime())
+                .operatingInfo(spaceCreateReqDTO.operatingInfo())
                 .thumbnail(thumbnail)
                 .phoneNumber(spaceCreateReqDTO.phoneNumber())
                 .email(spaceCreateReqDTO.email())
@@ -82,6 +85,8 @@ public class SpaceConverter {
                 .address(formatAddress(space.getAddress()))
                 .latitude(space.getAddress().getLatitude())
                 .longitude(space.getAddress().getLongitude())
+                .openingTime(space.getOpeningTime())
+                .closingTime(space.getClosingTime())
                 .operatingInfo(space.getOperatingInfo())
                 .spaceSize(space.getSpaceSize())
                 .spaceMood(space.getSpaceMood())
@@ -108,10 +113,13 @@ public class SpaceConverter {
                 .name(space.getName())
                 .spaceVerificationResDTO(toVerificationResDTO(spaceVerification, businessLicenseFile, buildingRegisterFile))
                 .address(space.getAddress().getRoadAddress())
+                .openingTime(space.getOpeningTime())
+                .closingTime(space.getClosingTime())
                 .operatingInfo(space.getOperatingInfo())
                 .spaceSize(space.getSpaceSize())
                 .spaceMood(space.getSpaceMood())
                 .description(space.getDescription())
+                .price(space.getPrice())
                 .facilities(extractFacility(space))
                 .phoneNumber(space.getPhoneNumber())
                 .email(space.getEmail())
@@ -126,6 +134,7 @@ public class SpaceConverter {
                 .spaceId(space.getId())
                 .name(space.getName())
                 .thumbnail(thumbnail)
+                .price(space.getPrice())
                 .operatingInfo(space.getOperatingInfo())
                 .address(space.getAddress().getRoadAddress() + " " + space.getAddress().getDetail())
                 .latitude(space.getAddress().getLatitude())
@@ -155,6 +164,15 @@ public class SpaceConverter {
                 .thumbnail(thumbnail)
                 .address(space.getAddress().getRoadAddress() + " " + space.getAddress().getDetail())
                 .isLiked(isLiked)
+                .build();
+    }
+
+    public static SpaceResDTO.SpaceAvailabilityResDTO toSpaceAvailabilityResDTO(Long spaceId, List<LocalDate> availableDate, List<LocalDate> unavailableDate, boolean isAvailable){
+        return SpaceResDTO.SpaceAvailabilityResDTO.builder()
+                .spaceId(spaceId)
+                .isAvailable(isAvailable)
+                .availableDate(availableDate)
+                .unavailableDate(unavailableDate)
                 .build();
     }
 
