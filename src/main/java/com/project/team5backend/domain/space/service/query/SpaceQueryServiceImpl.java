@@ -17,6 +17,7 @@ import com.project.team5backend.domain.space.exception.SpaceException;
 import com.project.team5backend.domain.space.repository.ClosedDayRepository;
 import com.project.team5backend.domain.space.repository.SpaceLikeRepository;
 import com.project.team5backend.domain.space.repository.SpaceRepository;
+import com.project.team5backend.domain.user.UserReader;
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.user.exception.UserErrorCode;
 import com.project.team5backend.domain.user.exception.UserException;
@@ -48,7 +49,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
     private final SpaceRepository spaceRepository;
     private final SpaceImageRepository spaceImageRepository;
     private final FileUrlResolverPort fileUrlResolverPort;
-    private final UserRepository userRepository;
+    private final UserReader userReader;
     private final SpaceLikeRepository spaceLikeRepository;
     private final ClosedDayRepository closedDayRepository;
     private final RedisUtils<String> redisUtils;
@@ -81,7 +82,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
 
     @Override
     public Page<SpaceResDTO.SpaceLikeSummaryResDTO> getInterestedSpaces(Long userId, Pageable pageable) {
-        User user = getActiveUser(userId);
+        User user = userReader.readUser(userId);
 
         List<Long> interestedSpaceIds = spaceLikeRepository.findSpaceIdsByInterestedUser(user);
         Page<Space> interestedSpaces = spaceRepository.findByIdIn(interestedSpaceIds, pageable);
@@ -141,11 +142,6 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
     private Space getActiveSpace(long spaceId) {
         return spaceRepository.findByIdAndIsDeletedFalse(spaceId)
                 .orElseThrow(() -> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
-    }
-
-    private User getActiveUser(long userId) {
-        return userRepository.findByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
     }
 
     private Space getApprovedSpaceWithDetails(long spaceId) {

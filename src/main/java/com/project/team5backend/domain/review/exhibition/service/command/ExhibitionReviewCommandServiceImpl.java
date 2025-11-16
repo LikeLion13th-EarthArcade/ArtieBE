@@ -18,6 +18,7 @@ import com.project.team5backend.domain.review.exhibition.entity.ExhibitionReview
 import com.project.team5backend.domain.review.exhibition.exception.ExhibitionReviewErrorCode;
 import com.project.team5backend.domain.review.exhibition.exception.ExhibitionReviewException;
 import com.project.team5backend.domain.review.exhibition.repository.ExhibitionReviewRepository;
+import com.project.team5backend.domain.user.UserReader;
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.user.exception.UserErrorCode;
 import com.project.team5backend.domain.user.exception.UserException;
@@ -38,7 +39,7 @@ import java.util.List;
 @Transactional
 public class ExhibitionReviewCommandServiceImpl implements ExhibitionReviewCommandService {
 
-    private final UserRepository userRepository;
+    private final UserReader userReader;
     private final ExhibitionRepository exhibitionRepository;
     private final ExhibitionReviewRepository exhibitionReviewRepository;
     private final ExhibitionReviewImageRepository exhibitionReviewImageRepository;
@@ -48,7 +49,7 @@ public class ExhibitionReviewCommandServiceImpl implements ExhibitionReviewComma
     @Override
     public ExhibitionReviewResDTO.ExReviewCreateResDTO createExhibitionReview(Long exhibitionId, Long userId, ExhibitionReviewReqDTO.createExReviewReqDTO createExhibitionReviewReqDTO, List<MultipartFile> images) {
         Exhibition exhibition = getActiveOpeningExhibition(exhibitionId);
-        User user = getActiveUser(userId);
+        User user = userReader.readUser(userId);
 
         ExhibitionReview exhibitionReview = ExhibitionReviewConverter.toEntity(createExhibitionReviewReqDTO, exhibition, user);
         exhibitionReviewRepository.save(exhibitionReview);
@@ -104,10 +105,5 @@ public class ExhibitionReviewCommandServiceImpl implements ExhibitionReviewComma
     private Exhibition getActiveOpeningExhibition(Long exhibitionId) {
         return exhibitionRepository.findByIdAndIsDeletedFalseAndStatusApproveAndOpening(exhibitionId, LocalDate.now(), Status.APPROVED)
                 .orElseThrow(() -> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
-    }
-
-    private User getActiveUser(Long userId) {
-        return userRepository.findByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
     }
 }

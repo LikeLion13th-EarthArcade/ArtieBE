@@ -20,6 +20,7 @@ import com.project.team5backend.domain.image.service.command.ImageCommandService
 import com.project.team5backend.domain.image.validator.ExhibitionImageValidator;
 import com.project.team5backend.domain.recommendation.service.InteractLogService;
 import com.project.team5backend.domain.review.exhibition.repository.ExhibitionReviewRepository;
+import com.project.team5backend.domain.user.UserReader;
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.user.exception.UserErrorCode;
 import com.project.team5backend.domain.user.exception.UserException;
@@ -43,7 +44,7 @@ import java.util.List;
 public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
 
     private final ExhibitionRepository exhibitionRepository;
-    private final UserRepository userRepository;
+    private final UserReader userReader;
     private final ExhibitionLikeRepository exhibitionLikeRepository;
     private final ExhibitionImageRepository exhibitionImageRepository;
     private final ExhibitionReviewRepository exhibitionReviewRepository;
@@ -58,7 +59,7 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
     public ExhibitionResDTO.ExhibitionCreateResDTO createExhibition(ExhibitionReqDTO.ExhibitionCreateReqDTO exhibitionCreateReqDTO, Long userId, List<MultipartFile> images) {
         ExhibitionImageValidator.validateImages(images); // 이미지 검증 (개수, null 여부)
 
-        User user = getActiveUser(userId);
+        User user = userReader.readUser(userId);
         Address address = resolveAddress(exhibitionCreateReqDTO);
         List<String> imageUrls = uploadImages(images);
         Exhibition exhibition = saveExhibition(exhibitionCreateReqDTO, user, address, imageUrls.get(0));
@@ -71,7 +72,7 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
 
     @Override
     public ExhibitionResDTO.ExhibitionLikeResDTO toggleLike(Long exhibitionId, Long userId) {
-        User user = getActiveUser(userId);
+        User user = userReader.readUser(userId);
         Exhibition exhibition = getActiveExhibition(exhibitionId);
         boolean alreadyLiked = exhibitionLikeRepository.existsByUserIdAndExhibitionId(user.getId(), exhibitionId);
         return alreadyLiked ? cancelLike(user, exhibition) : addLike(user, exhibition);
@@ -108,11 +109,6 @@ public class ExhibitionCommandServiceImpl implements ExhibitionCommandService {
 
     private void moveImagesToTrash(List<String> fileKeys) {
         imageCommandService.deleteImages(fileKeys);
-    }
-
-    private User getActiveUser(Long userId) {
-        return userRepository.findByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
     }
 
     private Exhibition getActiveExhibition(Long exhibitionId) {
