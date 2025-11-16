@@ -6,7 +6,6 @@ import com.project.team5backend.domain.reservation.repository.ReservationReposit
 import com.project.team5backend.domain.space.SpaceLikeReader;
 import com.project.team5backend.domain.space.SpaceReader;
 import com.project.team5backend.domain.space.converter.SpaceConverter;
-import com.project.team5backend.domain.space.dto.request.SpaceReqDTO;
 import com.project.team5backend.domain.space.dto.response.SpaceResDTO;
 import com.project.team5backend.domain.space.entity.ClosedDay;
 import com.project.team5backend.domain.space.entity.Space;
@@ -21,9 +20,6 @@ import com.project.team5backend.domain.space.repository.SpaceLikeRepository;
 import com.project.team5backend.domain.space.repository.SpaceRepository;
 import com.project.team5backend.domain.user.UserReader;
 import com.project.team5backend.domain.user.entity.User;
-import com.project.team5backend.domain.user.exception.UserErrorCode;
-import com.project.team5backend.domain.user.exception.UserException;
-import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.domain.common.enums.Sort;
 import com.project.team5backend.domain.common.enums.Status;
 import com.project.team5backend.domain.common.enums.StatusGroup;
@@ -68,7 +64,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
     public SpaceResDTO.SpaceDetailResDTO getSpaceDetail(Long userId, Long spaceId) {
         Space space = getApprovedSpaceWithDetails(spaceId);
         List<String> imageUrls = getFileKeys(spaceId);
-        boolean liked = spaceLikeReader.IsLikedByUser(userId, spaceId);
+        boolean liked = spaceLikeReader.isLikedByUser(userId, spaceId);
         return SpaceConverter.toSpaceDetailResDTO(space, imageUrls, liked);
     }
 

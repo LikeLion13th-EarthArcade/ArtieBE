@@ -2,14 +2,11 @@ package com.project.team5backend.domain.admin.exhibition.service.query;
 
 import com.project.team5backend.domain.admin.exhibition.converter.AdminExhibitionConverter;
 import com.project.team5backend.domain.admin.exhibition.dto.response.AdminExhibitionResDTO;
-import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
+import com.project.team5backend.domain.common.enums.StatusGroup;
 import com.project.team5backend.domain.exhibition.ExhibitionReader;
 import com.project.team5backend.domain.exhibition.entity.Exhibition;
-import com.project.team5backend.domain.exhibition.exception.ExhibitionErrorCode;
-import com.project.team5backend.domain.exhibition.exception.ExhibitionException;
 import com.project.team5backend.domain.exhibition.repository.ExhibitionRepository;
-import com.project.team5backend.domain.image.repository.ExhibitionImageRepository;
-import com.project.team5backend.domain.common.enums.StatusGroup;
+import com.project.team5backend.domain.image.ExhibitionImageReader;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,8 +23,7 @@ public class AdminExhibitionQueryServiceImpl implements AdminExhibitionQueryServ
 
     private final ExhibitionRepository exhibitionRepository;
     private final ExhibitionReader exhibitionReader;
-    private final ExhibitionImageRepository exhibitionImageRepository;
-    private final FileUrlResolverPort fileUrlResolverPort;
+    private final ExhibitionImageReader exhibitionImageReader;
 
     private static final int PAGE_SIZE = 10;
 
@@ -44,12 +40,7 @@ public class AdminExhibitionQueryServiceImpl implements AdminExhibitionQueryServ
     @Override
     public AdminExhibitionResDTO.ExhibitionDetailResDTO getDetailExhibition(Long exhibitionId) {
         Exhibition exhibition = exhibitionReader.readExhibition(exhibitionId);
-
-        List<String> imageUrls = exhibitionImageRepository.findImageUrlsByExhibitionId(exhibitionId).stream()
-                .map(fileUrlResolverPort::toFileUrl)
-                .toList();
-
+        List<String> imageUrls = exhibitionImageReader.getExhibitionImageUrls(exhibitionId);
         return AdminExhibitionConverter.toExhibitionDetailResDTO(exhibition, imageUrls);
-
     }
 }

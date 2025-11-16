@@ -29,9 +29,6 @@ import com.project.team5backend.domain.space.repository.SpaceRepository;
 import com.project.team5backend.domain.space.repository.SpaceVerificationRepository;
 import com.project.team5backend.domain.user.UserReader;
 import com.project.team5backend.domain.user.entity.User;
-import com.project.team5backend.domain.user.exception.UserErrorCode;
-import com.project.team5backend.domain.user.exception.UserException;
-import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.address.converter.AddressConverter;
 import com.project.team5backend.global.address.service.AddressService;
 import lombok.RequiredArgsConstructor;
@@ -100,7 +97,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
     public SpaceResDTO.SpaceLikeResDTO toggleLike(Long spaceId, Long userId) {
         User user = userReader.readUser(userId);
         Space space = spaceReader.readApprovedSpace(spaceId);
-        boolean alreadyLiked = spaceLikeReader.IsLikedByUser(user.getId(), spaceId);
+        boolean alreadyLiked = spaceLikeReader.isLikedByUser(user.getId(), spaceId);
         return alreadyLiked ? cancelLike(user, space) : addLike(user, space);
     }
 

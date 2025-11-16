@@ -11,6 +11,7 @@ import com.project.team5backend.domain.exhibition.exception.ExhibitionErrorCode;
 import com.project.team5backend.domain.exhibition.exception.ExhibitionException;
 import com.project.team5backend.domain.exhibition.repository.ExhibitionLikeRepository;
 import com.project.team5backend.domain.exhibition.repository.ExhibitionRepository;
+import com.project.team5backend.domain.image.ExhibitionImageReader;
 import com.project.team5backend.domain.image.repository.ExhibitionImageRepository;
 import com.project.team5backend.domain.recommendation.service.InteractLogService;
 import com.project.team5backend.domain.user.entity.User;
@@ -44,7 +45,7 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
     private static final double SEOUL_CITY_HALL_LNG = 126.9780;
 
     private final ExhibitionRepository exhibitionRepository;
-    private final ExhibitionImageRepository exhibitionImageRepository;
+    private final ExhibitionImageReader exhibitionImageReader;
     private final ExhibitionLikeRepository exhibitionLikeRepository;
     private final ExhibitionLikeReader exhibitionLikeReader;
     private final InteractLogService interactLogService;
@@ -56,7 +57,7 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
         Exhibition exhibition = getApprovedExhibitionWithDetails(exhibitionId);
 
         interactLogService.logClick(userId, exhibitionId); // ai 분석을 위한 로그 생성
-        List<String> imageUrls = getFileKeys(exhibitionId); // 전시 이미지들의 fileKey만 조회
+        List<String> imageUrls = exhibitionImageReader.getExhibitionImageUrls(exhibitionId); // 전시 이미지들의 fileKey만 조회
         boolean liked = exhibitionLikeReader.isLikedByUser(userId, exhibitionId);
         return ExhibitionConverter.toExhibitionDetailResDTO(exhibition, imageUrls, liked);
     }
@@ -95,7 +96,7 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
             throw new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND);
         }
         Exhibition upcomingEx = exhibitions.get(0);
-        List<String> imageUrls = getFileKeys(upcomingEx.getId());
+        List<String> imageUrls = exhibitionImageReader.getExhibitionImageUrls(upcomingEx.getId());
         return ExhibitionConverter.toUpcomingPopularExhibitionResDTO(upcomingEx.getId(), upcomingEx.getTitle(), imageUrls);
     }
 
@@ -141,7 +142,7 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
     @Override
     public ExhibitionResDTO.MyExhibitionDetailResDTO getMyDetailExhibition(Long userId, Long exhibitionId) {
         Exhibition exhibition = getOwnedActiveExhibition(userId, exhibitionId);
-        List<String> imageUrls = getFileKeys(exhibitionId);
+        List<String> imageUrls = exhibitionImageReader.getExhibitionImageUrls(exhibitionId);
         return ExhibitionConverter.toMyExhibitionDetailResDTO(exhibition, imageUrls);
     }
 
@@ -171,12 +172,6 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
         return exhibition.getStartDate() != null && exhibition.getEndDate() != null
                 && !today.isBefore(exhibition.getStartDate())
                 && !today.isAfter(exhibition.getEndDate());
-    }
-
-    private List<String> getFileKeys(Long exhibitionId){
-        return exhibitionImageRepository.findImageUrlsByExhibitionId(exhibitionId).stream()
-                .map(fileUrlResolverPort::toFileUrl)
-                .toList();
     }
 
     private Exhibition getApprovedExhibitionWithDetails(Long exhibitionId){

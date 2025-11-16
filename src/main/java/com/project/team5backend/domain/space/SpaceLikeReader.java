@@ -10,7 +10,7 @@ public class SpaceLikeReader {
 
     private final SpaceLikeRepository spaceLikeRepository;
 
-    public boolean IsLikedByUser(Long userId, Long spaceId) {
+    public boolean isLikedByUser(Long userId, Long spaceId) {
         return spaceLikeRepository.existsByUserIdAndSpaceId(userId, spaceId);
     }
 
