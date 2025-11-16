@@ -3,6 +3,7 @@ package com.project.team5backend.domain.space.service.query;
 import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
 import com.project.team5backend.domain.image.repository.SpaceImageRepository;
 import com.project.team5backend.domain.reservation.repository.ReservationRepository;
+import com.project.team5backend.domain.space.SpaceLikeReader;
 import com.project.team5backend.domain.space.converter.SpaceConverter;
 import com.project.team5backend.domain.space.dto.request.SpaceReqDTO;
 import com.project.team5backend.domain.space.dto.response.SpaceResDTO;
@@ -51,6 +52,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
     private final FileUrlResolverPort fileUrlResolverPort;
     private final UserReader userReader;
     private final SpaceLikeRepository spaceLikeRepository;
+    private final SpaceLikeReader spaceLikeReader;
     private final ClosedDayRepository closedDayRepository;
     private final RedisUtils<String> redisUtils;
 
@@ -64,7 +66,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
     public SpaceResDTO.SpaceDetailResDTO getSpaceDetail(Long userId, Long spaceId) {
         Space space = getApprovedSpaceWithDetails(spaceId);
         List<String> imageUrls = getFileKeys(spaceId);
-        boolean liked = spaceLikeRepository.existsByUserIdAndSpaceId(userId, spaceId);
+        boolean liked = spaceLikeReader.IsLikedByUser(userId, spaceId);
         return SpaceConverter.toSpaceDetailResDTO(space, imageUrls, liked);
     }
 

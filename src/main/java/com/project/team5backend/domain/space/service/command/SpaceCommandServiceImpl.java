@@ -1,5 +1,6 @@
 package com.project.team5backend.domain.space.service.command;
 
+import com.project.team5backend.domain.space.SpaceLikeReader;
 import com.project.team5backend.domain.space.cache.SpaceCachePort;
 import com.project.team5backend.domain.common.embedded.Address;
 import com.project.team5backend.domain.common.enums.Status;
@@ -49,10 +50,11 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
 
     private final SpaceRepository spaceRepository;
     private final SpaceLikeRepository spaceLikeRepository;
+    private final SpaceLikeReader spaceLikeReader;
     private final SpaceVerificationRepository spaceVerificationRepository;
-    private final UserReader userReader;
     private final SpaceImageRepository spaceImageRepository;
     private final SpaceReviewRepository spaceReviewRepository;
+    private final UserReader userReader;
     private final FacilityRepository facilityRepository;
     private final InteractLogService interactLogService;
     private final AddressService addressService;
@@ -96,7 +98,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
     public SpaceResDTO.SpaceLikeResDTO toggleLike(Long spaceId, Long userId) {
         User user = userReader.readUser(userId);
         Space space = getActiveSpace(spaceId);
-        boolean alreadyLiked = spaceLikeRepository.existsByUserIdAndSpaceId(user.getId(), spaceId);
+        boolean alreadyLiked = spaceLikeReader.IsLikedByUser(user.getId(), spaceId);
         return alreadyLiked ? cancelLike(user, space) : addLike(user, space);
     }
 
