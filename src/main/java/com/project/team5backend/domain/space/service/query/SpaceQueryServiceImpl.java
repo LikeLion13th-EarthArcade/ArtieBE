@@ -1,9 +1,11 @@
 package com.project.team5backend.domain.space.service.query;
 
+import com.project.team5backend.domain.common.enums.Sort;
+import com.project.team5backend.domain.common.enums.Status;
+import com.project.team5backend.domain.common.enums.StatusGroup;
 import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
 import com.project.team5backend.domain.image.SpaceImageReader;
-import com.project.team5backend.domain.image.repository.SpaceImageRepository;
-import com.project.team5backend.domain.reservation.repository.ReservationRepository;
+import com.project.team5backend.domain.reservation.ReservationReader;
 import com.project.team5backend.domain.space.SpaceLikeReader;
 import com.project.team5backend.domain.space.SpaceReader;
 import com.project.team5backend.domain.space.converter.SpaceConverter;
@@ -21,9 +23,6 @@ import com.project.team5backend.domain.space.repository.SpaceLikeRepository;
 import com.project.team5backend.domain.space.repository.SpaceRepository;
 import com.project.team5backend.domain.user.UserReader;
 import com.project.team5backend.domain.user.entity.User;
-import com.project.team5backend.domain.common.enums.Sort;
-import com.project.team5backend.domain.common.enums.Status;
-import com.project.team5backend.domain.common.enums.StatusGroup;
 import com.project.team5backend.global.util.PageResponse;
 import com.project.team5backend.global.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
@@ -57,7 +56,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
 
     private static final double SEOUL_CENTER_LAT = 37.5665;
     private static final double SEOUL_CENTER_LNG = 126.9780;
-    private final ReservationRepository reservationRepository;
+    private final ReservationReader reservationReader;
 
 
     //전시 공간 상세 조회
@@ -121,7 +120,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
             // 현재 요청 날짜가 어떤 휴무 규칙에 위배되는 순간 false
 //            boolean isClosed = closedDays.stream()
 //                    .anyMatch(cd -> cd.isClosedOn(date));
-            boolean isReserved = reservationRepository.existsByDateAndTimeSlots(date);
+            boolean isReserved = reservationReader.existsOnDate(date);
             boolean isLocked = redisUtils.hasKey("lock:" + spaceId + ":" + date);
 //            if (isClosed || isReserved) {
             if (isReserved || isLocked) {

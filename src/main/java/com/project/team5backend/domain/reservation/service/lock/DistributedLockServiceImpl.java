@@ -1,11 +1,11 @@
 package com.project.team5backend.domain.reservation.service.lock;
 
+import com.project.team5backend.domain.reservation.ReservationReader;
 import com.project.team5backend.domain.reservation.converter.ReservationConverter;
 import com.project.team5backend.domain.reservation.dto.request.ReservationReqDTO;
 import com.project.team5backend.domain.reservation.dto.response.ReservationResDTO;
 import com.project.team5backend.domain.reservation.exception.ReservationErrorCode;
 import com.project.team5backend.domain.reservation.exception.ReservationException;
-import com.project.team5backend.domain.reservation.repository.ReservationRepository;
 import com.project.team5backend.global.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +29,7 @@ public class DistributedLockServiceImpl implements  DistributedLockService {
     private final DefaultRedisScript<List> lockAcquireScript;
     private final DefaultRedisScript<Long> lockReleaseScript;
     private final DefaultRedisScript<Long> lockRenewScript;
-    private final ReservationRepository reservationRepository;
+    private final ReservationReader reservationReader;
 
     @Override
     public ReservationResDTO.ReservationLockAcquireResDTO acquireLocks(String email, Long spaceId, ReservationReqDTO.ReservationLockAcquireReqDTO reservationLockAcquireReqDTO) {
@@ -39,7 +39,7 @@ public class DistributedLockServiceImpl implements  DistributedLockService {
         List<LocalDate> dateSlots = generateSlots(startDate, endDate);
 
         for (LocalDate date : dateSlots) {
-            if (reservationRepository.existsByDateAndTimeSlots(date)) {
+            if (reservationReader.existsOnDate(date)) {
                 throw new ReservationException(ReservationErrorCode.ALREADY_RESERVED);
             }
         }
