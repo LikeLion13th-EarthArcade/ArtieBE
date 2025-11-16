@@ -4,6 +4,7 @@ import com.project.team5backend.domain.common.enums.ReviewSearchType;
 import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
 import com.project.team5backend.domain.common.enums.Sort;
 import com.project.team5backend.domain.image.entity.ExhibitionReviewImage;
+import com.project.team5backend.domain.review.exhibition.ExhibitionReviewReader;
 import com.project.team5backend.domain.review.exhibition.converter.ExhibitionReviewConverter;
 import com.project.team5backend.domain.review.exhibition.dto.response.ExhibitionReviewResDTO;
 import com.project.team5backend.domain.review.exhibition.entity.ExhibitionReview;
@@ -26,6 +27,7 @@ import java.util.List;
 public class ExhibitionReviewQueryServiceImpl implements ExhibitionReviewQueryService {
 
     private final ExhibitionReviewRepository exhibitionReviewRepository;
+    private final ExhibitionReviewReader exhibitionReviewReader;
     private final FileUrlResolverPort fileUrlResolverPort;
 
     @Override
@@ -38,13 +40,13 @@ public class ExhibitionReviewQueryServiceImpl implements ExhibitionReviewQuerySe
 
     @Override
     public Page<ExhibitionReviewResDTO.ExReviewDetailResDTO> getExhibitionReviews(Long exhibitionId, Sort sort, Pageable pageable) {
-        Page<ExhibitionReview> reviewPage = exhibitionReviewRepository.findReviewsByTargetId(exhibitionId, ReviewSearchType.EXHIBITION, sort, pageable);
+        Page<ExhibitionReview> reviewPage = exhibitionReviewReader.readByExhibition(exhibitionId, sort, pageable);
         return toReviewDetailPage(reviewPage);
     }
 
     @Override
     public Page<ExhibitionReviewResDTO.ExReviewDetailResDTO> getMyExhibitionReviews(Long userId, Sort sort, Pageable pageable) {
-        Page<ExhibitionReview> reviewPage = exhibitionReviewRepository.findReviewsByTargetId(userId, ReviewSearchType.USER, sort, pageable);
+        Page<ExhibitionReview> reviewPage = exhibitionReviewReader.readByUser(userId, sort, pageable);
         return toReviewDetailPage(reviewPage);
     }
 
