@@ -12,7 +12,6 @@ import com.project.team5backend.domain.exhibition.exception.ExhibitionException;
 import com.project.team5backend.domain.exhibition.repository.ExhibitionLikeRepository;
 import com.project.team5backend.domain.exhibition.repository.ExhibitionRepository;
 import com.project.team5backend.domain.image.ExhibitionImageReader;
-import com.project.team5backend.domain.image.repository.ExhibitionImageRepository;
 import com.project.team5backend.domain.recommendation.service.InteractLogService;
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.user.exception.UserErrorCode;

@@ -2,7 +2,6 @@ package com.project.team5backend.domain.space.repository;
 
 import com.project.team5backend.domain.admin.dashboard.dto.response.SpaceSummaryResDTO;
 import com.project.team5backend.domain.space.entity.Space;
-import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.common.enums.Status;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

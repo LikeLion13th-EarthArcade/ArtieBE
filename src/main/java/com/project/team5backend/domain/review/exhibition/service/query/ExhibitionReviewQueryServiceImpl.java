@@ -1,6 +1,5 @@
 package com.project.team5backend.domain.review.exhibition.service.query;
 
-import com.project.team5backend.domain.common.enums.ReviewSearchType;
 import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
 import com.project.team5backend.domain.common.enums.Sort;
 import com.project.team5backend.domain.image.entity.ExhibitionReviewImage;

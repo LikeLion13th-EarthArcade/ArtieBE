@@ -20,9 +20,6 @@ import com.project.team5backend.domain.review.exhibition.exception.ExhibitionRev
 import com.project.team5backend.domain.review.exhibition.repository.ExhibitionReviewRepository;
 import com.project.team5backend.domain.user.UserReader;
 import com.project.team5backend.domain.user.entity.User;
-import com.project.team5backend.domain.user.exception.UserErrorCode;
-import com.project.team5backend.domain.user.exception.UserException;
-import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.domain.common.enums.Status;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

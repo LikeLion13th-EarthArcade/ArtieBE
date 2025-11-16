@@ -1,7 +1,6 @@
 package com.project.team5backend.domain.review.space.service.query;
 
 
-import com.project.team5backend.domain.common.enums.ReviewSearchType;
 import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
 import com.project.team5backend.domain.common.enums.Sort;
 import com.project.team5backend.domain.image.entity.SpaceReviewImage;

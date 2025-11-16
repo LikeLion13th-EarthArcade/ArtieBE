@@ -4,9 +4,6 @@ import com.project.team5backend.domain.admin.space.converter.AdminSpaceConverter
 import com.project.team5backend.domain.admin.space.dto.response.AdminSpaceResDTO;
 import com.project.team5backend.domain.space.SpaceReader;
 import com.project.team5backend.domain.space.entity.Space;
-import com.project.team5backend.domain.space.exception.SpaceErrorCode;
-import com.project.team5backend.domain.space.exception.SpaceException;
-import com.project.team5backend.domain.space.repository.SpaceRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

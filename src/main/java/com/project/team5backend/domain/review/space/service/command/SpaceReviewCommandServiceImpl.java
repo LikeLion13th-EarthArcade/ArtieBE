@@ -1,6 +1,5 @@
 package com.project.team5backend.domain.review.space.service.command;
 
-import com.project.team5backend.domain.common.enums.Status;
 import com.project.team5backend.domain.common.storage.FileStoragePort;
 import com.project.team5backend.domain.image.converter.ImageConverter;
 import com.project.team5backend.domain.image.entity.SpaceReviewImage;
@@ -17,14 +16,9 @@ import com.project.team5backend.domain.review.space.exception.SpaceReviewExcepti
 import com.project.team5backend.domain.review.space.repository.SpaceReviewRepository;
 import com.project.team5backend.domain.space.SpaceReader;
 import com.project.team5backend.domain.space.entity.Space;
-import com.project.team5backend.domain.space.exception.SpaceErrorCode;
-import com.project.team5backend.domain.space.exception.SpaceException;
 import com.project.team5backend.domain.space.repository.SpaceRepository;
 import com.project.team5backend.domain.user.UserReader;
 import com.project.team5backend.domain.user.entity.User;
-import com.project.team5backend.domain.user.exception.UserErrorCode;
-import com.project.team5backend.domain.user.exception.UserException;
-import com.project.team5backend.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -17,7 +17,7 @@ public class SpaceReader {
     public Space readSpace(Long spaceId){
         return spaceRepository.findByIdAndIsDeletedFalse(spaceId)
                 .orElseThrow(() -> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
-    };
+    }
 
     public Space readApprovedSpace(Long spaceId){
         return spaceRepository.findByIdAndIsDeletedFalseAndStatusApproved(spaceId, Status.APPROVED)

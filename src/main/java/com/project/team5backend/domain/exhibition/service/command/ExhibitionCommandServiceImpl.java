@@ -23,9 +23,6 @@ import com.project.team5backend.domain.recommendation.service.InteractLogService
 import com.project.team5backend.domain.review.exhibition.repository.ExhibitionReviewRepository;
 import com.project.team5backend.domain.user.UserReader;
 import com.project.team5backend.domain.user.entity.User;
-import com.project.team5backend.domain.user.exception.UserErrorCode;
-import com.project.team5backend.domain.user.exception.UserException;
-import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.address.converter.AddressConverter;
 import com.project.team5backend.global.address.service.AddressService;
 import com.project.team5backend.domain.common.embedded.Address;

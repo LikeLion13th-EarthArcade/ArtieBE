@@ -2,7 +2,6 @@ package com.project.team5backend.domain.review.space;
 
 import com.project.team5backend.domain.common.enums.ReviewSearchType;
 import com.project.team5backend.domain.common.enums.Sort;
-import com.project.team5backend.domain.review.exhibition.entity.ExhibitionReview;
 import com.project.team5backend.domain.review.space.entity.SpaceReview;
 import com.project.team5backend.domain.review.space.repository.SpaceReviewRepository;
 import lombok.RequiredArgsConstructor;
