@@ -1,6 +1,7 @@
 package com.project.team5backend.domain.space.service.query;
 
 import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
+import com.project.team5backend.domain.image.SpaceImageReader;
 import com.project.team5backend.domain.image.repository.SpaceImageRepository;
 import com.project.team5backend.domain.reservation.repository.ReservationRepository;
 import com.project.team5backend.domain.space.SpaceLikeReader;
@@ -45,7 +46,7 @@ import static com.project.team5backend.domain.common.util.DateUtils.generateSlot
 public class SpaceQueryServiceImpl implements SpaceQueryService {
 
     private final SpaceRepository spaceRepository;
-    private final SpaceImageRepository spaceImageRepository;
+    private final SpaceImageReader spaceImageReader;
     private final FileUrlResolverPort fileUrlResolverPort;
     private final SpaceLikeRepository spaceLikeRepository;
     private final SpaceLikeReader spaceLikeReader;
@@ -63,7 +64,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
     @Override
     public SpaceResDTO.SpaceDetailResDTO getSpaceDetail(Long userId, Long spaceId) {
         Space space = getApprovedSpaceWithDetails(spaceId);
-        List<String> imageUrls = getFileKeys(spaceId);
+        List<String> imageUrls = spaceImageReader.readSpaceImageUrls(spaceId);
         boolean liked = spaceLikeReader.isLikedByUser(userId, spaceId);
         return SpaceConverter.toSpaceDetailResDTO(space, imageUrls, liked);
     }
@@ -99,7 +100,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
     @Override
     public SpaceResDTO.MySpaceDetailResDTO getMySpaceDetail(Long userId, Long spaceId) {
         Space space = spaceReader.readSpace(spaceId);
-        List<String> imageUrls = getFileKeys(spaceId);
+        List<String> imageUrls = spaceImageReader.readSpaceImageUrls(spaceId);
 
         SpaceVerification spaceVerification = space.getSpaceVerification();
         String businessLicenseFile = fileUrlResolverPort.toFileUrl(spaceVerification.getBusinessLicenseKey());
@@ -133,13 +134,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
         return SpaceConverter.toSpaceAvailabilityResDTO(spaceId, availableDates, unavailableDates, isAvailable);
     }
 
-    private List<String> getFileKeys(long spaceId) {
-        return spaceImageRepository.findImageUrlsBySpaceId(spaceId).stream()
-                .map(fileUrlResolverPort::toFileUrl)
-                .toList();
-    }
-
-    private Space getApprovedSpaceWithDetails(long spaceId) {
+    private Space getApprovedSpaceWithDetails(Long spaceId) {
         return spaceRepository.findByIdAndIsDeletedFalseAndStatusApprovedWithUserAndFacilities(spaceId, Status.APPROVED)
                 .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
     }
