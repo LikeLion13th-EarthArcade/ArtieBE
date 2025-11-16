@@ -95,6 +95,4 @@ public interface SpaceRepository extends JpaRepository<Space, Long>,SpaceReposit
     List<SpaceSummaryResDTO> findTop3ByStatus(@Param("status") Status status);
 
     Page<Space> findByIdIn(List<Long> ids, Pageable pageable);
-
-    Page<Space> findByUser(User user, Pageable pageable);
 }

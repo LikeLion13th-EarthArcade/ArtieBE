@@ -15,6 +15,7 @@ import com.project.team5backend.domain.review.space.entity.SpaceReview;
 import com.project.team5backend.domain.review.space.exception.SpaceReviewErrorCode;
 import com.project.team5backend.domain.review.space.exception.SpaceReviewException;
 import com.project.team5backend.domain.review.space.repository.SpaceReviewRepository;
+import com.project.team5backend.domain.space.SpaceReader;
 import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.space.exception.SpaceErrorCode;
 import com.project.team5backend.domain.space.exception.SpaceException;
@@ -39,6 +40,7 @@ public class SpaceReviewCommandServiceImpl implements SpaceReviewCommandService 
 
     private final SpaceReviewRepository spaceReviewRepository;
     private final SpaceRepository spaceRepository;
+    private final SpaceReader spaceReader;
     private final UserReader userReader;
     private final FileStoragePort fileStoragePort;
     private final SpaceReviewImageRepository spaceReviewImageRepository;
@@ -46,7 +48,7 @@ public class SpaceReviewCommandServiceImpl implements SpaceReviewCommandService 
 
     @Override
     public SpaceReviewResDTO.SpaceReviewCreateResDTO createSpaceReview(Long spaceId, Long userId, SpaceReviewReqDTO.SpaceReviewCreateReqDTO spaceReviewCreateReqDTO, List<MultipartFile> images) {
-        Space space = getActiveSpace(spaceId);
+        Space space = spaceReader.readApprovedSpace(spaceId);
         User user = userReader.readUser(userId);
 
         SpaceReview spaceReview = SpaceReviewConverter.toSpaceReview(spaceReviewCreateReqDTO, space, user);
@@ -101,11 +103,6 @@ public class SpaceReviewCommandServiceImpl implements SpaceReviewCommandService 
         } catch (ImageException e) {
             throw new ImageException(ImageErrorCode.S3_MOVE_TRASH_FAIL);
         }
-    }
-
-    private Space getActiveSpace(Long spaceId) {
-        return spaceRepository.findByIdAndIsDeletedFalseAndStatusApproved(spaceId, Status.APPROVED)
-                .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
     }
 }
 

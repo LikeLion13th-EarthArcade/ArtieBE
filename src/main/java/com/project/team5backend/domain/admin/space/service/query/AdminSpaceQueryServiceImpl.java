@@ -4,6 +4,7 @@ import com.project.team5backend.domain.admin.space.converter.AdminSpaceConverter
 import com.project.team5backend.domain.admin.space.dto.response.AdminSpaceResDTO;
 import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
 import com.project.team5backend.domain.image.repository.SpaceImageRepository;
+import com.project.team5backend.domain.space.SpaceReader;
 import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.space.entity.SpaceVerification;
 import com.project.team5backend.domain.space.exception.SpaceErrorCode;
@@ -27,6 +28,7 @@ public class AdminSpaceQueryServiceImpl implements AdminSpaceQueryService {
 
     private final SpaceRepository spaceRepository;
     private final SpaceImageRepository spaceImageRepository;
+    private final SpaceReader spaceReader;
     private final FileUrlResolverPort fileUrlResolverPort;
 
     private static final int PAGE_SIZE = 10;
@@ -42,7 +44,7 @@ public class AdminSpaceQueryServiceImpl implements AdminSpaceQueryService {
 
     @Override
     public AdminSpaceResDTO.SpaceDetailResDTO getDetailSpace(Long spaceId){
-        Space space = getSpace(spaceId);
+        Space space = spaceReader.readSpace(spaceId);
 
         List<String> imageUrls = spaceImageRepository.findImageUrlsBySpaceId(spaceId).stream()
                 .map(fileUrlResolverPort::toFileUrl)
@@ -53,10 +55,5 @@ public class AdminSpaceQueryServiceImpl implements AdminSpaceQueryService {
         String buildingRegisterFile = fileUrlResolverPort.toFileUrl(spaceVerification.getBuildingRegisterKey());
 
         return AdminSpaceConverter.toSpaceDetailResDTO(space, spaceVerification, imageUrls, businessLicenseFile, buildingRegisterFile);
-    }
-
-    private Space getSpace(Long spaceId) {
-        return spaceRepository.findByIdAndIsDeletedFalse(spaceId)
-                .orElseThrow(() -> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
     }
 }

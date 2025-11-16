@@ -4,6 +4,7 @@ import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
 import com.project.team5backend.domain.image.repository.SpaceImageRepository;
 import com.project.team5backend.domain.reservation.repository.ReservationRepository;
 import com.project.team5backend.domain.space.SpaceLikeReader;
+import com.project.team5backend.domain.space.SpaceReader;
 import com.project.team5backend.domain.space.converter.SpaceConverter;
 import com.project.team5backend.domain.space.dto.request.SpaceReqDTO;
 import com.project.team5backend.domain.space.dto.response.SpaceResDTO;
@@ -50,9 +51,10 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
     private final SpaceRepository spaceRepository;
     private final SpaceImageRepository spaceImageRepository;
     private final FileUrlResolverPort fileUrlResolverPort;
-    private final UserReader userReader;
     private final SpaceLikeRepository spaceLikeRepository;
     private final SpaceLikeReader spaceLikeReader;
+    private final SpaceReader spaceReader;
+    private final UserReader userReader;
     private final ClosedDayRepository closedDayRepository;
     private final RedisUtils<String> redisUtils;
 
@@ -100,7 +102,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
 
     @Override
     public SpaceResDTO.MySpaceDetailResDTO getMySpaceDetail(Long userId, Long spaceId) {
-        Space space = getActiveSpace(spaceId);
+        Space space = spaceReader.readSpace(spaceId);
         List<String> imageUrls = getFileKeys(spaceId);
 
         SpaceVerification spaceVerification = space.getSpaceVerification();
@@ -139,11 +141,6 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
         return spaceImageRepository.findImageUrlsBySpaceId(spaceId).stream()
                 .map(fileUrlResolverPort::toFileUrl)
                 .toList();
-    }
-
-    private Space getActiveSpace(long spaceId) {
-        return spaceRepository.findByIdAndIsDeletedFalse(spaceId)
-                .orElseThrow(() -> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
     }
 
     private Space getApprovedSpaceWithDetails(long spaceId) {

@@ -1,6 +1,7 @@
 package com.project.team5backend.domain.space.service.command;
 
 import com.project.team5backend.domain.space.SpaceLikeReader;
+import com.project.team5backend.domain.space.SpaceReader;
 import com.project.team5backend.domain.space.cache.SpaceCachePort;
 import com.project.team5backend.domain.common.embedded.Address;
 import com.project.team5backend.domain.common.enums.Status;
@@ -51,6 +52,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
     private final SpaceRepository spaceRepository;
     private final SpaceLikeRepository spaceLikeRepository;
     private final SpaceLikeReader spaceLikeReader;
+    private final SpaceReader spaceReader;
     private final SpaceVerificationRepository spaceVerificationRepository;
     private final SpaceImageRepository spaceImageRepository;
     private final SpaceReviewRepository spaceReviewRepository;
@@ -97,7 +99,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
     @Override
     public SpaceResDTO.SpaceLikeResDTO toggleLike(Long spaceId, Long userId) {
         User user = userReader.readUser(userId);
-        Space space = getActiveSpace(spaceId);
+        Space space = spaceReader.readApprovedSpace(spaceId);
         boolean alreadyLiked = spaceLikeReader.IsLikedByUser(user.getId(), spaceId);
         return alreadyLiked ? cancelLike(user, space) : addLike(user, space);
     }
@@ -150,11 +152,6 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
 
     private void moveImagesToTrash(List<String> fileKeys) {
         imageCommandService.deleteImages(fileKeys);
-    }
-
-    private Space getActiveSpace(Long spaceId) {
-        return spaceRepository.findByIdAndIsDeletedFalseAndStatusApproved(spaceId, Status.APPROVED)
-                .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
     }
 
     private Space saveSpace(SpaceReqDTO.SpaceCreateReqDTO spaceCreateReqDTO, User user, Address address, String image) {
