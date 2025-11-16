@@ -3,6 +3,7 @@ package com.project.team5backend.domain.admin.exhibition.service.query;
 import com.project.team5backend.domain.admin.exhibition.converter.AdminExhibitionConverter;
 import com.project.team5backend.domain.admin.exhibition.dto.response.AdminExhibitionResDTO;
 import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
+import com.project.team5backend.domain.exhibition.ExhibitionReader;
 import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.exhibition.exception.ExhibitionErrorCode;
 import com.project.team5backend.domain.exhibition.exception.ExhibitionException;
@@ -24,6 +25,7 @@ import java.util.List;
 public class AdminExhibitionQueryServiceImpl implements AdminExhibitionQueryService {
 
     private final ExhibitionRepository exhibitionRepository;
+    private final ExhibitionReader exhibitionReader;
     private final ExhibitionImageRepository exhibitionImageRepository;
     private final FileUrlResolverPort fileUrlResolverPort;
 
@@ -41,7 +43,7 @@ public class AdminExhibitionQueryServiceImpl implements AdminExhibitionQueryServ
 
     @Override
     public AdminExhibitionResDTO.ExhibitionDetailResDTO getDetailExhibition(Long exhibitionId) {
-        Exhibition exhibition = getExhibition(exhibitionId);
+        Exhibition exhibition = exhibitionReader.readExhibition(exhibitionId);
 
         List<String> imageUrls = exhibitionImageRepository.findImageUrlsByExhibitionId(exhibitionId).stream()
                 .map(fileUrlResolverPort::toFileUrl)
@@ -49,10 +51,5 @@ public class AdminExhibitionQueryServiceImpl implements AdminExhibitionQueryServ
 
         return AdminExhibitionConverter.toExhibitionDetailResDTO(exhibition, imageUrls);
 
-    }
-
-    private Exhibition getExhibition(Long exhibitionId) {
-        return exhibitionRepository.findByIdAndIsDeletedFalse(exhibitionId)
-                .orElseThrow(() -> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
     }
 }
