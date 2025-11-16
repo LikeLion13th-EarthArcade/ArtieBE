@@ -2,6 +2,7 @@ package com.project.team5backend.domain.recommendation.service.query;
 
 import com.project.team5backend.domain.common.enums.Status;
 import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
+import com.project.team5backend.domain.exhibition.ExhibitionLikeReader;
 import com.project.team5backend.domain.exhibition.converter.ExhibitionConverter;
 import com.project.team5backend.domain.exhibition.entity.Exhibition;
 import com.project.team5backend.domain.exhibition.entity.enums.ExhibitionCategory;
@@ -36,6 +37,7 @@ public class RecommendationQueryServiceImpl implements RecommendationQueryServic
     private final ExhibitionRepository exhibitionRepo;
     private final ExhibitionEmbeddingRepository embRepo;
     private final ExhibitionLikeRepository likeRepo;
+    private final ExhibitionLikeReader exhibitionLikeReader;
     private final FileUrlResolverPort fileUrlResolverPort;
     private final RecommendationCachePort recommendationCachePort;
 
@@ -50,7 +52,7 @@ public class RecommendationQueryServiceImpl implements RecommendationQueryServic
         if (cache != null && cache.exhibitionIds() != null && !cache.exhibitionIds().isEmpty()) {
             var exhibition = exhibitionRepo.findById(cache.exhibitionIds().get(0)).orElse(null);
             if (exhibition != null) {
-                boolean isLiked = likeRepo.existsByUserIdAndExhibitionId(userId, exhibition.getId());
+                boolean isLiked = exhibitionLikeReader.isLikedByUser(userId, exhibition.getId());
                 return RecommendationConverter.toPersonalizedSummaryResDTO(exhibition, isLiked);
             }
         }
