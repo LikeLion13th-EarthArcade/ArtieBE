@@ -2,8 +2,11 @@ package com.project.team5backend.domain.space.service.query;
 
 import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
 import com.project.team5backend.domain.image.repository.SpaceImageRepository;
+import com.project.team5backend.domain.reservation.repository.ReservationRepository;
 import com.project.team5backend.domain.space.converter.SpaceConverter;
+import com.project.team5backend.domain.space.dto.request.SpaceReqDTO;
 import com.project.team5backend.domain.space.dto.response.SpaceResDTO;
+import com.project.team5backend.domain.space.entity.ClosedDay;
 import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.space.entity.SpaceVerification;
 import com.project.team5backend.domain.space.entity.enums.SpaceMood;
@@ -11,6 +14,7 @@ import com.project.team5backend.domain.space.entity.enums.SpaceSize;
 import com.project.team5backend.domain.space.entity.enums.SpaceType;
 import com.project.team5backend.domain.space.exception.SpaceErrorCode;
 import com.project.team5backend.domain.space.exception.SpaceException;
+import com.project.team5backend.domain.space.repository.ClosedDayRepository;
 import com.project.team5backend.domain.space.repository.SpaceLikeRepository;
 import com.project.team5backend.domain.space.repository.SpaceRepository;
 import com.project.team5backend.domain.user.entity.User;
@@ -21,6 +25,7 @@ import com.project.team5backend.domain.common.enums.Sort;
 import com.project.team5backend.domain.common.enums.Status;
 import com.project.team5backend.domain.common.enums.StatusGroup;
 import com.project.team5backend.global.util.PageResponse;
+import com.project.team5backend.global.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -29,7 +34,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+
+import static com.project.team5backend.domain.common.util.DateUtils.generateSlots;
 
 @Service
 @RequiredArgsConstructor
@@ -42,9 +50,12 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
     private final FileUrlResolverPort fileUrlResolverPort;
     private final UserRepository userRepository;
     private final SpaceLikeRepository spaceLikeRepository;
+    private final ClosedDayRepository closedDayRepository;
+    private final RedisUtils<String> redisUtils;
 
     private static final double SEOUL_CENTER_LAT = 37.5665;
     private static final double SEOUL_CENTER_LNG = 126.9780;
+    private final ReservationRepository reservationRepository;
 
 
     //전시 공간 상세 조회
@@ -95,6 +106,31 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
         return SpaceConverter.toMySpaceDetailResDTO(space, spaceVerification, imageUrls, businessLicenseFile, buildingRegisterFile);
     }
 
+    @Override
+    public SpaceResDTO.SpaceAvailabilityResDTO getAvailability(Long spaceId, LocalDate startDate, LocalDate endDate) {
+        List<ClosedDay> closedDays = closedDayRepository.findBySpaceId(spaceId);
+        List<LocalDate> dateSlots = generateSlots(startDate, endDate);
+
+        List<LocalDate> availableDates = new ArrayList<>();
+        List<LocalDate> unavailableDates = new ArrayList<>();
+        boolean isAvailable = true;
+
+        for (LocalDate date : dateSlots) {
+            // 현재 요청 날짜가 어떤 휴무 규칙에 위배되는 순간 false
+//            boolean isClosed = closedDays.stream()
+//                    .anyMatch(cd -> cd.isClosedOn(date));
+            boolean isReserved = reservationRepository.existsByDateAndTimeSlots(date);
+            boolean isLocked = redisUtils.hasKey("system:lock:" + spaceId + ":" + date);
+//            if (isClosed || isReserved) {
+            if (isReserved || isLocked) {
+                unavailableDates.add(date);
+                isAvailable = false;
+            } else {
+                availableDates.add(date);
+            }
+        }
+        return SpaceConverter.toSpaceAvailabilityResDTO(spaceId, availableDates, unavailableDates, isAvailable);
+    }
 
     private List<String> getFileKeys(long spaceId) {
         return spaceImageRepository.findImageUrlsBySpaceId(spaceId).stream()

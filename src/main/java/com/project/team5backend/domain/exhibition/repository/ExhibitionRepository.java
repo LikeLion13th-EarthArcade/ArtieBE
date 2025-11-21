@@ -169,7 +169,7 @@ public interface ExhibitionRepository extends JpaRepository<Exhibition, Long>, E
     List<ExhibitionSummaryResDTO> findTop3ByStatus(@Param("status") Status status);
 
     @Query(value = """
-       select * from Exhibition e
+       select * from exhibition e
        where e.status = 'APPROVED'
        and (e.created_at is null or e.created_at >= :threeDaysAgo)
        and e.id not in (

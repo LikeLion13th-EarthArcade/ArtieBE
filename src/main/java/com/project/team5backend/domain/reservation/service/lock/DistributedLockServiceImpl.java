@@ -14,11 +14,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
-import static com.project.team5backend.domain.reservation.util.ReservationDateUtils.generateSlots;
+import static com.project.team5backend.domain.common.util.DateUtils.generateSlots;
 
 @Service
 @RequiredArgsConstructor
@@ -33,9 +32,9 @@ public class DistributedLockServiceImpl implements  DistributedLockService {
     private final ReservationRepository reservationRepository;
 
     @Override
-    public ReservationResDTO.ReservationLockAcquireResDTO acquireLocks(String email, Long spaceId, ReservationReqDTO.ReservationLockAcquireReqDTO reservationLockAcquireReqDTO) {
-        LocalDate startDate = reservationLockAcquireReqDTO.startDate();
-        LocalDate endDate = reservationLockAcquireReqDTO.endDate();
+    public ReservationResDTO.ReservationLockAcquireResDTO acquireLocks(String email, Long spaceId, LocalDate startDate, LocalDate endDate) {
+//        LocalDate startDate = reservationLockAcquireReqDTO.startDate();
+//        LocalDate endDate = reservationLockAcquireReqDTO.endDate();
 
         List<LocalDate> dateSlots = generateSlots(startDate, endDate);
 
@@ -49,7 +48,7 @@ public class DistributedLockServiceImpl implements  DistributedLockService {
                 .map(date -> "lock:" + spaceId + ":" + date)
                 .toList();
 
-        List<Object> result = redisUtils.executeLua(lockAcquireScript, keys, email, String.valueOf(TimeUnit.MINUTES.toMillis(5)));
+        List<Object> result = redisUtils.executeLua(lockAcquireScript, keys, email, String.valueOf(TimeUnit.MINUTES.toMillis(15)));
 
         if (result.get(0).equals(0L)) {
             throw new ReservationException(ReservationErrorCode.LOCK_CONFLICT);
@@ -63,7 +62,7 @@ public class DistributedLockServiceImpl implements  DistributedLockService {
                 .map(date -> "lock:" + spaceId + ":" + date)
                 .toList();
 
-        return redisUtils.executeLua(lockReleaseScript, keys, email, String.valueOf(TimeUnit.MINUTES.toMillis(5)));
+        return redisUtils.executeLua(lockReleaseScript, keys, email);
     }
 
     @Override
