@@ -1,6 +1,5 @@
 package com.project.team5backend.domain.review.space.service.command;
 
-import com.project.team5backend.domain.common.enums.Status;
 import com.project.team5backend.domain.common.storage.FileStoragePort;
 import com.project.team5backend.domain.image.converter.ImageConverter;
 import com.project.team5backend.domain.image.entity.SpaceReviewImage;
@@ -15,14 +14,11 @@ import com.project.team5backend.domain.review.space.entity.SpaceReview;
 import com.project.team5backend.domain.review.space.exception.SpaceReviewErrorCode;
 import com.project.team5backend.domain.review.space.exception.SpaceReviewException;
 import com.project.team5backend.domain.review.space.repository.SpaceReviewRepository;
+import com.project.team5backend.domain.space.SpaceReader;
 import com.project.team5backend.domain.space.entity.Space;
-import com.project.team5backend.domain.space.exception.SpaceErrorCode;
-import com.project.team5backend.domain.space.exception.SpaceException;
 import com.project.team5backend.domain.space.repository.SpaceRepository;
+import com.project.team5backend.domain.user.UserReader;
 import com.project.team5backend.domain.user.entity.User;
-import com.project.team5backend.domain.user.exception.UserErrorCode;
-import com.project.team5backend.domain.user.exception.UserException;
-import com.project.team5backend.domain.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,15 +34,16 @@ public class SpaceReviewCommandServiceImpl implements SpaceReviewCommandService 
 
     private final SpaceReviewRepository spaceReviewRepository;
     private final SpaceRepository spaceRepository;
-    private final UserRepository userRepository;;
+    private final SpaceReader spaceReader;
+    private final UserReader userReader;
     private final FileStoragePort fileStoragePort;
     private final SpaceReviewImageRepository spaceReviewImageRepository;
     private final ImageCommandService imageCommandService;
 
     @Override
     public SpaceReviewResDTO.SpaceReviewCreateResDTO createSpaceReview(Long spaceId, Long userId, SpaceReviewReqDTO.SpaceReviewCreateReqDTO spaceReviewCreateReqDTO, List<MultipartFile> images) {
-        Space space = getActiveSpace(spaceId);
-        User user = getActiveUser(userId);
+        Space space = spaceReader.readApprovedSpace(spaceId);
+        User user = userReader.readUser(userId);
 
         SpaceReview spaceReview = SpaceReviewConverter.toSpaceReview(spaceReviewCreateReqDTO, space, user);
         spaceReviewRepository.save(spaceReview);
@@ -100,16 +97,6 @@ public class SpaceReviewCommandServiceImpl implements SpaceReviewCommandService 
         } catch (ImageException e) {
             throw new ImageException(ImageErrorCode.S3_MOVE_TRASH_FAIL);
         }
-    }
-
-    private User getActiveUser(Long userId) {
-        return userRepository.findByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
-    }
-
-    private Space getActiveSpace(Long spaceId) {
-        return spaceRepository.findByIdAndIsDeletedFalseAndStatusApproved(spaceId, Status.APPROVED)
-                .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
     }
 }
 

@@ -1,5 +1,7 @@
 package com.project.team5backend.domain.space.service.command;
 
+import com.project.team5backend.domain.space.SpaceLikeReader;
+import com.project.team5backend.domain.space.SpaceReader;
 import com.project.team5backend.domain.space.cache.SpaceCachePort;
 import com.project.team5backend.domain.common.embedded.Address;
 import com.project.team5backend.domain.common.enums.Status;
@@ -25,10 +27,8 @@ import com.project.team5backend.domain.space.exception.SpaceException;
 import com.project.team5backend.domain.space.repository.SpaceLikeRepository;
 import com.project.team5backend.domain.space.repository.SpaceRepository;
 import com.project.team5backend.domain.space.repository.SpaceVerificationRepository;
+import com.project.team5backend.domain.user.UserReader;
 import com.project.team5backend.domain.user.entity.User;
-import com.project.team5backend.domain.user.exception.UserErrorCode;
-import com.project.team5backend.domain.user.exception.UserException;
-import com.project.team5backend.domain.user.repository.UserRepository;
 import com.project.team5backend.global.address.converter.AddressConverter;
 import com.project.team5backend.global.address.service.AddressService;
 import lombok.RequiredArgsConstructor;
@@ -48,10 +48,12 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
 
     private final SpaceRepository spaceRepository;
     private final SpaceLikeRepository spaceLikeRepository;
+    private final SpaceLikeReader spaceLikeReader;
+    private final SpaceReader spaceReader;
     private final SpaceVerificationRepository spaceVerificationRepository;
-    private final UserRepository userRepository;
     private final SpaceImageRepository spaceImageRepository;
     private final SpaceReviewRepository spaceReviewRepository;
+    private final UserReader userReader;
     private final FacilityRepository facilityRepository;
     private final InteractLogService interactLogService;
     private final AddressService addressService;
@@ -74,7 +76,7 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
         }
 
         ExhibitionImageValidator.validateImages(images); // 이미지 검증 (개수, null 여부)
-        User user = getActiveUser(userId);
+        User user = userReader.readUser(userId);
         Address address = resolveAddress(spaceCreateReqDTO);
 
         var verificationFiles = uploadVerificationFiles(businessLicenseFile, buildingRegisterFile);
@@ -93,9 +95,9 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
 
     @Override
     public SpaceResDTO.SpaceLikeResDTO toggleLike(Long spaceId, Long userId) {
-        User user = getActiveUser(userId);
-        Space space = getActiveSpace(spaceId);
-        boolean alreadyLiked = spaceLikeRepository.existsByUserIdAndSpaceId(user.getId(), spaceId);
+        User user = userReader.readUser(userId);
+        Space space = spaceReader.readApprovedSpace(spaceId);
+        boolean alreadyLiked = spaceLikeReader.isLikedByUser(user.getId(), spaceId);
         return alreadyLiked ? cancelLike(user, space) : addLike(user, space);
     }
 
@@ -149,11 +151,6 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
         imageCommandService.deleteImages(fileKeys);
     }
 
-    private Space getActiveSpace(Long spaceId) {
-        return spaceRepository.findByIdAndIsDeletedFalseAndStatusApproved(spaceId, Status.APPROVED)
-                .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
-    }
-
     private Space saveSpace(SpaceReqDTO.SpaceCreateReqDTO spaceCreateReqDTO, User user, Address address, String image) {
         String thumbnail = fileUrlResolverPort.toFileKey(image);
         Space space = SpaceConverter.toSpace(spaceCreateReqDTO, user, thumbnail, address);
@@ -173,11 +170,6 @@ public class SpaceCommandServiceImpl implements SpaceCommandService {
                         .map(facility -> SpaceConverter.toSpaceFacility(space, facility))
                         .toList()
         );
-    }
-
-    private User getActiveUser(Long userId) {
-        return userRepository.findByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
     }
 
     private Address resolveAddress(SpaceReqDTO.SpaceCreateReqDTO spaceCreateReqDTO) {

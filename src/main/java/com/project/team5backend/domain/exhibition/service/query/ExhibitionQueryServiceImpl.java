@@ -1,6 +1,7 @@
 package com.project.team5backend.domain.exhibition.service.query;
 
 import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
+import com.project.team5backend.domain.exhibition.ExhibitionLikeReader;
 import com.project.team5backend.domain.exhibition.converter.ExhibitionConverter;
 import com.project.team5backend.domain.exhibition.dto.response.ExhibitionResDTO;
 import com.project.team5backend.domain.exhibition.entity.Exhibition;
@@ -10,7 +11,7 @@ import com.project.team5backend.domain.exhibition.exception.ExhibitionErrorCode;
 import com.project.team5backend.domain.exhibition.exception.ExhibitionException;
 import com.project.team5backend.domain.exhibition.repository.ExhibitionLikeRepository;
 import com.project.team5backend.domain.exhibition.repository.ExhibitionRepository;
-import com.project.team5backend.domain.image.repository.ExhibitionImageRepository;
+import com.project.team5backend.domain.image.ExhibitionImageReader;
 import com.project.team5backend.domain.recommendation.service.InteractLogService;
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.user.exception.UserErrorCode;
@@ -43,9 +44,10 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
     private static final double SEOUL_CITY_HALL_LNG = 126.9780;
 
     private final ExhibitionRepository exhibitionRepository;
-    private final ExhibitionImageRepository exhibitionImageRepository;
-    private final InteractLogService interactLogService;
+    private final ExhibitionImageReader exhibitionImageReader;
     private final ExhibitionLikeRepository exhibitionLikeRepository;
+    private final ExhibitionLikeReader exhibitionLikeReader;
+    private final InteractLogService interactLogService;
     private final FileUrlResolverPort fileUrlResolverPort;
     private final UserRepository userRepository;
 
@@ -54,8 +56,8 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
         Exhibition exhibition = getApprovedExhibitionWithDetails(exhibitionId);
 
         interactLogService.logClick(userId, exhibitionId); // ai 분석을 위한 로그 생성
-        List<String> imageUrls = getFileKeys(exhibitionId); // 전시 이미지들의 fileKey만 조회
-        boolean liked = exhibitionLikeRepository.existsByUserIdAndExhibitionId(userId, exhibitionId);
+        List<String> imageUrls = exhibitionImageReader.getExhibitionImageUrls(exhibitionId); // 전시 이미지들의 fileKey만 조회
+        boolean liked = exhibitionLikeReader.isLikedByUser(userId, exhibitionId);
         return ExhibitionConverter.toExhibitionDetailResDTO(exhibition, imageUrls, liked);
     }
 
@@ -93,7 +95,7 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
             throw new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND);
         }
         Exhibition upcomingEx = exhibitions.get(0);
-        List<String> imageUrls = getFileKeys(upcomingEx.getId());
+        List<String> imageUrls = exhibitionImageReader.getExhibitionImageUrls(upcomingEx.getId());
         return ExhibitionConverter.toUpcomingPopularExhibitionResDTO(upcomingEx.getId(), upcomingEx.getTitle(), imageUrls);
     }
 
@@ -139,7 +141,7 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
     @Override
     public ExhibitionResDTO.MyExhibitionDetailResDTO getMyDetailExhibition(Long userId, Long exhibitionId) {
         Exhibition exhibition = getOwnedActiveExhibition(userId, exhibitionId);
-        List<String> imageUrls = getFileKeys(exhibitionId);
+        List<String> imageUrls = exhibitionImageReader.getExhibitionImageUrls(exhibitionId);
         return ExhibitionConverter.toMyExhibitionDetailResDTO(exhibition, imageUrls);
     }
 
@@ -171,12 +173,6 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
                 && !today.isAfter(exhibition.getEndDate());
     }
 
-    private List<String> getFileKeys(Long exhibitionId){
-        return exhibitionImageRepository.findImageUrlsByExhibitionId(exhibitionId).stream()
-                .map(fileUrlResolverPort::toFileUrl)
-                .toList();
-    }
-
     private Exhibition getApprovedExhibitionWithDetails(Long exhibitionId){
         return exhibitionRepository.findByIdAndIsDeletedFalseAndStatusApprovedWithUserAndExhibitionFacilities(exhibitionId, Status.APPROVED)
                 .orElseThrow(() -> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
@@ -192,10 +188,9 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
 
     private ExhibitionResDTO.ExhibitionHotNowResDTO getExhibitionHotNowResDTO(Long userId, Exhibition exhibition) {
         String thumbnail = fileUrlResolverPort.toFileUrl(exhibition.getThumbnail());
-        boolean liked = isExhibitionLiked(userId, exhibition.getId());
+        boolean liked = exhibitionLikeReader.isLikedByUser(userId, exhibition.getId());
         return ExhibitionConverter.toExhibitionHotNowResDTO(exhibition, liked, thumbnail);
     }
-
 
     private ExhibitionResDTO.RegionalPopularExhibitionResDTO getRegionalPopularExhibitionResDTO(Exhibition exhibition) {
         String thumbnail = fileUrlResolverPort.toFileUrl(exhibition.getThumbnail());
@@ -204,16 +199,12 @@ public class ExhibitionQueryServiceImpl implements ExhibitionQueryService {
 
     private ExhibitionResDTO.ArtieRecommendationResDTO getArtieRecommendationResDTO(Long userId, Exhibition exhibition) {
         String thumbnail = fileUrlResolverPort.toFileUrl(exhibition.getThumbnail());
-        boolean liked = isExhibitionLiked(userId, exhibition.getId());
+        boolean liked = exhibitionLikeReader.isLikedByUser(userId, exhibition.getId());
         return ExhibitionConverter.toArtieRecommendationResDTO(exhibition, liked, thumbnail);
     }
 
     private Exhibition getOwnedActiveExhibition(Long userId, Long exhibitionId) {
         return exhibitionRepository.findByIdAndUserIdAndIsDeletedFalse(userId, exhibitionId)
                 .orElseThrow(() -> new ExhibitionException(ExhibitionErrorCode.EXHIBITION_NOT_FOUND));
-    }
-
-    private boolean isExhibitionLiked(Long userId, Long exhibitionId) {
-        return exhibitionLikeRepository.existsByUserIdAndExhibitionId(userId, exhibitionId);
     }
 }

@@ -11,7 +11,6 @@ import com.project.team5backend.domain.space.entity.enums.SpaceType;
 import com.project.team5backend.domain.common.enums.Sort;
 import com.project.team5backend.domain.common.enums.Status;
 import com.project.team5backend.domain.common.enums.StatusGroup;
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
@@ -25,8 +24,6 @@ import org.springframework.stereotype.Repository;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
-
-import static com.project.team5backend.domain.space.entity.QSpace.space;
 
 @Repository
 @RequiredArgsConstructor
