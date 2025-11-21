@@ -51,7 +51,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
     private final SpaceLikeReader spaceLikeReader;
     private final SpaceReader spaceReader;
     private final UserReader userReader;
-    private final ClosedDayRepository closedDayRepository;
+    private final ReservationRepository reservationRepository;
     private final RedisUtils<String> redisUtils;
 
     private static final double SEOUL_CENTER_LAT = 37.5665;
@@ -109,7 +109,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
 
     @Override
     public SpaceResDTO.SpaceAvailabilityResDTO getAvailability(Long spaceId, LocalDate startDate, LocalDate endDate) {
-        List<ClosedDay> closedDays = closedDayRepository.findBySpaceId(spaceId);
+//        List<ClosedDay> closedDays = closedDayRepository.findBySpaceId(spaceId);
         List<LocalDate> dateSlots = generateSlots(startDate, endDate);
 
         List<LocalDate> availableDates = new ArrayList<>();
