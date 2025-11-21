@@ -9,9 +9,11 @@ public interface ReservationQueryService {
 
     ReservationResDTO.ReservationDetailResDTO getReservationDetail(Long userId, Long reservationId);
 
+    ReservationResDTO.TempReservationDetailResDTO getTempReservationDetail(Long userId, Long tempReservationId);
+
     Page<ReservationResDTO.ReservationDetailResDTO> getReservationListForSpaceOwner(Long userId, StatusGroup statusGroup, Pageable pageable);
 
-    Page<ReservationResDTO.ReservationDetailResDTO> getMyReservationList(Long userId, StatusGroup statusGroup, Pageable pageable);
+    Page<ReservationResDTO.ReservationDetailResDTO> getMyReservationPage(Long userId, StatusGroup statusGroup, Pageable pageable);
 
-    Page<ReservationResDTO.TempReservationDetailResDTO> getMyTempReservation(Long userId, Pageable pageable);
+    Page<ReservationResDTO.TempReservationDetailResDTO> getMyTempReservationPage(Long userId, Pageable pageable);
 }

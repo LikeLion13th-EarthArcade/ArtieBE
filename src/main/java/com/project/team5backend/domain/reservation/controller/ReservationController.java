@@ -93,18 +93,27 @@ public class ReservationController {
             @RequestParam(defaultValue = "10") int size
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        return CustomResponse.onSuccess(PageResponse.of(reservationQueryService.getMyReservationList(currentUser.getId(), statusGroup, pageable)));
+        return CustomResponse.onSuccess(PageResponse.of(reservationQueryService.getMyReservationPage(currentUser.getId(), statusGroup, pageable)));
     }
 
-    @Operation(summary = "임시 예약 목록 조회 (예약자 전용)", description = "사용자가 생성한 임시 예약을 조회합니다")
+    @Operation(summary = "임시 예약 단일 조회 (예약자 전용)", description = "사용자가 생성한 임시 예약을 조회합니다")
+    @GetMapping("/temp-reservation/{tempReservationId}")
+    public CustomResponse<ReservationResDTO.TempReservationDetailResDTO> getTempReservationDetail(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @PathVariable Long tempReservationId
+    ) {
+        return CustomResponse.onSuccess(reservationQueryService.getTempReservationDetail(currentUser.getId(), tempReservationId));
+    }
+
+    @Operation(summary = "임시 예약 목록 조회 (예약자 전용)", description = "사용자가 생성한 임시 예약 목록을 조회합니다")
     @GetMapping("/temp-reservation/my")
-    public CustomResponse<PageResponse<ReservationResDTO.TempReservationDetailResDTO>> getMyTempReservationList(
+    public CustomResponse<PageResponse<ReservationResDTO.TempReservationDetailResDTO>> getMyTempReservationPage(
             @AuthenticationPrincipal CurrentUser currentUser,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
-        return CustomResponse.onSuccess(PageResponse.of(reservationQueryService.getMyTempReservation(currentUser.getId(), pageable)));
+        return CustomResponse.onSuccess(PageResponse.of(reservationQueryService.getMyTempReservationPage(currentUser.getId(), pageable)));
     }
 
     @Operation(summary = "예약자의 요청 수락 (호스트 전용)",

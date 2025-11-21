@@ -8,6 +8,7 @@ import com.project.team5backend.domain.reservation.exception.ReservationErrorCod
 import com.project.team5backend.domain.reservation.exception.ReservationException;
 import com.project.team5backend.domain.reservation.repository.CustomReservationRepository;
 import com.project.team5backend.domain.reservation.repository.ReservationRepository;
+import com.project.team5backend.domain.reservation.repository.TempReservationRepository;
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.user.exception.UserErrorCode;
 import com.project.team5backend.domain.user.exception.UserException;
@@ -29,6 +30,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     private final UserRepository userRepository;
     private final ReservationRepository reservationRepository;
     private final CustomReservationRepository customReservationRepository;
+    private final TempReservationRepository tempReservationRepository;
 
     @Override
     public ReservationResDTO.ReservationDetailResDTO getReservationDetail(Long userId, Long reservationId) {
@@ -45,6 +47,19 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     }
 
     @Override
+    public ReservationResDTO.TempReservationDetailResDTO getTempReservationDetail(Long userId, Long tempReservationId) {
+        User user = getUser(userId);
+
+        TempReservation tempReservation = getTempReservation(tempReservationId);
+
+        if (!Objects.equals(user, tempReservation.getUser())) {
+            throw new ReservationException(ReservationErrorCode.RESERVATION_ACCESS_DENIED);
+        }
+
+        return  ReservationConverter.toTempReservationDetailResDTO(tempReservation);
+    }
+
+    @Override
     public Page<ReservationResDTO.ReservationDetailResDTO> getReservationListForSpaceOwner(Long userId, StatusGroup statusGroup, Pageable pageable) {
 
         User user = getUser(userId);
@@ -55,7 +70,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     }
 
     @Override
-    public Page<ReservationResDTO.ReservationDetailResDTO> getMyReservationList(Long userId, StatusGroup statusGroup, Pageable pageable) {
+    public Page<ReservationResDTO.ReservationDetailResDTO> getMyReservationPage(Long userId, StatusGroup statusGroup, Pageable pageable) {
 
         User user = getUser(userId);
 
@@ -65,7 +80,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     }
 
     @Override
-    public Page<ReservationResDTO.TempReservationDetailResDTO> getMyTempReservation(Long userId, Pageable pageable) {
+    public Page<ReservationResDTO.TempReservationDetailResDTO> getMyTempReservationPage(Long userId, Pageable pageable) {
         User user = getUser(userId);
 
         Page<TempReservation> tempReservationPage = customReservationRepository.findTempReservationByUser(user, pageable);
@@ -81,6 +96,11 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
     private Reservation getReservation(Long reservationId) {
         return reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+    }
+
+    private TempReservation getTempReservation(Long tempReservationId) {
+        return tempReservationRepository.findById(tempReservationId)
+                .orElseThrow(() -> new ReservationException(ReservationErrorCode.TEMP_RESERVATION_NOT_FOUND));
     }
 }
 
