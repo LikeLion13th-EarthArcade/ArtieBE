@@ -120,8 +120,8 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
             // 현재 요청 날짜가 어떤 휴무 규칙에 위배되는 순간 false
 //            boolean isClosed = closedDays.stream()
 //                    .anyMatch(cd -> cd.isClosedOn(date));
-            boolean isReserved = reservationReader.existsOnDate(date);
-            boolean isLocked = redisUtils.hasKey("lock:" + spaceId + ":" + date);
+            boolean isReserved = reservationRepository.existsByDateAndTimeSlots(date);
+            boolean isLocked = redisUtils.hasKey("system:lock:" + spaceId + ":" + date);
 //            if (isClosed || isReserved) {
             if (isReserved || isLocked) {
                 unavailableDates.add(date);

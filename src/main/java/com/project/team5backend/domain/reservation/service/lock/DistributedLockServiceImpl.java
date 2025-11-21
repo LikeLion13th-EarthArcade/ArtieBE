@@ -32,9 +32,9 @@ public class DistributedLockServiceImpl implements  DistributedLockService {
     private final ReservationReader reservationReader;
 
     @Override
-    public ReservationResDTO.ReservationLockAcquireResDTO acquireLocks(String email, Long spaceId, ReservationReqDTO.ReservationLockAcquireReqDTO reservationLockAcquireReqDTO) {
-        LocalDate startDate = reservationLockAcquireReqDTO.startDate();
-        LocalDate endDate = reservationLockAcquireReqDTO.endDate();
+    public ReservationResDTO.ReservationLockAcquireResDTO acquireLocks(String email, Long spaceId, LocalDate startDate, LocalDate endDate) {
+//        LocalDate startDate = reservationLockAcquireReqDTO.startDate();
+//        LocalDate endDate = reservationLockAcquireReqDTO.endDate();
 
         List<LocalDate> dateSlots = generateSlots(startDate, endDate);
 
