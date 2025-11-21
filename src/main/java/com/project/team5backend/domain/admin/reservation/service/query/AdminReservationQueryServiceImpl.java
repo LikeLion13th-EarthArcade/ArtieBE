@@ -3,6 +3,7 @@ package com.project.team5backend.domain.admin.reservation.service.query;
 import com.project.team5backend.domain.reservation.converter.ReservationConverter;
 import com.project.team5backend.domain.reservation.dto.response.ReservationResDTO;
 import com.project.team5backend.domain.reservation.entity.Reservation;
+import com.project.team5backend.domain.reservation.entity.TempReservation;
 import com.project.team5backend.domain.reservation.exception.ReservationErrorCode;
 import com.project.team5backend.domain.reservation.exception.ReservationException;
 import com.project.team5backend.domain.reservation.repository.CustomReservationRepository;
@@ -26,6 +27,12 @@ public class AdminReservationQueryServiceImpl implements  AdminReservationQueryS
     public Page<ReservationResDTO.ReservationDetailResDTO> getReservationList(StatusGroup statusGroup, Pageable pageable) {
         Page<Reservation> reservationPage = customReservationRepository.findAllReservationWithFilters(statusGroup, pageable);
         return reservationPage.map(ReservationConverter::toReservationDetailResDTO);
+    }
+
+    @Override
+    public Page<ReservationResDTO.TempReservationDetailResDTO> getTempReservationList(Pageable pageable) {
+        Page<TempReservation> tempReservationPage = customReservationRepository.findAllTempReservation(pageable);
+        return tempReservationPage.map(ReservationConverter::toTempReservationDetailResDTO);
     }
 
     @Override

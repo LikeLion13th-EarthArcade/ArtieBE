@@ -26,6 +26,7 @@ import static com.project.team5backend.domain.reservation.entity.QReservation.re
 public class CustomReservationRepositoryImpl implements CustomReservationRepository{
 
     private final JPAQueryFactory queryFactory;
+    private final TempReservationRepository tempReservationRepository;
 
     @Override
     public Page<Reservation> findReservationBySpaceOwnerWithFilters(User user, StatusGroup statusGroup, Pageable pageable) {
@@ -96,6 +97,17 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
         List<Reservation> content = findReservations(reservation, builder, pageable);
 
         Long total = countReservation(reservation, builder);
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0L);
+    }
+
+    @Override
+    public Page<TempReservation> findAllTempReservation(Pageable pageable) {
+        QTempReservation tempReservation = QTempReservation.tempReservation;
+
+        List<TempReservation> content = findTempReservations(tempReservation, null, pageable);
+
+        Long total = countTempReservation(tempReservation, null);
 
         return new PageImpl<>(content, pageable, total != null ? total : 0L);
     }

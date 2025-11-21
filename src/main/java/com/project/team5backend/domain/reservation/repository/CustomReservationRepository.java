@@ -16,4 +16,6 @@ public interface CustomReservationRepository {
     Page<TempReservation> findTempReservationByUser(User user,Pageable pageable);
 
     Page<Reservation> findAllReservationWithFilters(StatusGroup statusGroup, Pageable pageable);
+
+    Page<TempReservation> findAllTempReservation(Pageable pageable);
 }
