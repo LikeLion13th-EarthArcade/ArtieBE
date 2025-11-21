@@ -32,6 +32,21 @@ public class ReservationResDTO {
     }
 
     @Builder
+    public record TempReservationDetailResDTO(
+            Long spaceId,
+            Long tempReservationId,
+            LocalDate startDate,
+            LocalDate endDate,
+            String name,
+            String email,
+            String phoneNumber,
+            String message,
+            String accountNumber,
+            boolean isDeposited
+    ) {
+    }
+
+    @Builder
     public record ReservationStatusResDTO(
             Long spaceId,
             Long reservationId,

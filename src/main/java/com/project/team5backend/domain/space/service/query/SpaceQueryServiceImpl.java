@@ -1,10 +1,14 @@
 package com.project.team5backend.domain.space.service.query;
 
+import com.project.team5backend.domain.common.enums.Sort;
+import com.project.team5backend.domain.common.enums.Status;
+import com.project.team5backend.domain.common.enums.StatusGroup;
 import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
-import com.project.team5backend.domain.image.repository.SpaceImageRepository;
-import com.project.team5backend.domain.reservation.repository.ReservationRepository;
+import com.project.team5backend.domain.image.SpaceImageReader;
+import com.project.team5backend.domain.reservation.ReservationReader;
+import com.project.team5backend.domain.space.SpaceLikeReader;
+import com.project.team5backend.domain.space.SpaceReader;
 import com.project.team5backend.domain.space.converter.SpaceConverter;
-import com.project.team5backend.domain.space.dto.request.SpaceReqDTO;
 import com.project.team5backend.domain.space.dto.response.SpaceResDTO;
 import com.project.team5backend.domain.space.entity.ClosedDay;
 import com.project.team5backend.domain.space.entity.Space;
@@ -17,13 +21,8 @@ import com.project.team5backend.domain.space.exception.SpaceException;
 import com.project.team5backend.domain.space.repository.ClosedDayRepository;
 import com.project.team5backend.domain.space.repository.SpaceLikeRepository;
 import com.project.team5backend.domain.space.repository.SpaceRepository;
+import com.project.team5backend.domain.user.UserReader;
 import com.project.team5backend.domain.user.entity.User;
-import com.project.team5backend.domain.user.exception.UserErrorCode;
-import com.project.team5backend.domain.user.exception.UserException;
-import com.project.team5backend.domain.user.repository.UserRepository;
-import com.project.team5backend.domain.common.enums.Sort;
-import com.project.team5backend.domain.common.enums.Status;
-import com.project.team5backend.domain.common.enums.StatusGroup;
 import com.project.team5backend.global.util.PageResponse;
 import com.project.team5backend.global.util.RedisUtils;
 import lombok.RequiredArgsConstructor;
@@ -46,24 +45,26 @@ import static com.project.team5backend.domain.common.util.DateUtils.generateSlot
 public class SpaceQueryServiceImpl implements SpaceQueryService {
 
     private final SpaceRepository spaceRepository;
-    private final SpaceImageRepository spaceImageRepository;
+    private final SpaceImageReader spaceImageReader;
     private final FileUrlResolverPort fileUrlResolverPort;
-    private final UserRepository userRepository;
     private final SpaceLikeRepository spaceLikeRepository;
+    private final SpaceLikeReader spaceLikeReader;
+    private final SpaceReader spaceReader;
+    private final UserReader userReader;
     private final ClosedDayRepository closedDayRepository;
     private final RedisUtils<String> redisUtils;
 
     private static final double SEOUL_CENTER_LAT = 37.5665;
     private static final double SEOUL_CENTER_LNG = 126.9780;
-    private final ReservationRepository reservationRepository;
+    private final ReservationReader reservationReader;
 
 
     //전시 공간 상세 조회
     @Override
     public SpaceResDTO.SpaceDetailResDTO getSpaceDetail(Long userId, Long spaceId) {
         Space space = getApprovedSpaceWithDetails(spaceId);
-        List<String> imageUrls = getFileKeys(spaceId);
-        boolean liked = spaceLikeRepository.existsByUserIdAndSpaceId(userId, spaceId);
+        List<String> imageUrls = spaceImageReader.readSpaceImageUrls(spaceId);
+        boolean liked = spaceLikeReader.isLikedByUser(userId, spaceId);
         return SpaceConverter.toSpaceDetailResDTO(space, imageUrls, liked);
     }
 
@@ -81,7 +82,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
 
     @Override
     public Page<SpaceResDTO.SpaceLikeSummaryResDTO> getInterestedSpaces(Long userId, Pageable pageable) {
-        User user = getActiveUser(userId);
+        User user = userReader.readUser(userId);
 
         List<Long> interestedSpaceIds = spaceLikeRepository.findSpaceIdsByInterestedUser(user);
         Page<Space> interestedSpaces = spaceRepository.findByIdIn(interestedSpaceIds, pageable);
@@ -97,8 +98,8 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
 
     @Override
     public SpaceResDTO.MySpaceDetailResDTO getMySpaceDetail(Long userId, Long spaceId) {
-        Space space = getActiveSpace(spaceId);
-        List<String> imageUrls = getFileKeys(spaceId);
+        Space space = spaceReader.readSpace(spaceId);
+        List<String> imageUrls = spaceImageReader.readSpaceImageUrls(spaceId);
 
         SpaceVerification spaceVerification = space.getSpaceVerification();
         String businessLicenseFile = fileUrlResolverPort.toFileUrl(spaceVerification.getBusinessLicenseKey());
@@ -120,7 +121,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
 //            boolean isClosed = closedDays.stream()
 //                    .anyMatch(cd -> cd.isClosedOn(date));
             boolean isReserved = reservationRepository.existsByDateAndTimeSlots(date);
-            boolean isLocked = redisUtils.hasKey("lock:" + spaceId + ":" + date);
+            boolean isLocked = redisUtils.hasKey("system:lock:" + spaceId + ":" + date);
 //            if (isClosed || isReserved) {
             if (isReserved || isLocked) {
                 unavailableDates.add(date);
@@ -132,23 +133,7 @@ public class SpaceQueryServiceImpl implements SpaceQueryService {
         return SpaceConverter.toSpaceAvailabilityResDTO(spaceId, availableDates, unavailableDates, isAvailable);
     }
 
-    private List<String> getFileKeys(long spaceId) {
-        return spaceImageRepository.findImageUrlsBySpaceId(spaceId).stream()
-                .map(fileUrlResolverPort::toFileUrl)
-                .toList();
-    }
-
-    private Space getActiveSpace(long spaceId) {
-        return spaceRepository.findByIdAndIsDeletedFalse(spaceId)
-                .orElseThrow(() -> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
-    }
-
-    private User getActiveUser(long userId) {
-        return userRepository.findByIdAndIsDeletedFalse(userId)
-                .orElseThrow(() -> new UserException(UserErrorCode.USER_NOT_FOUND));
-    }
-
-    private Space getApprovedSpaceWithDetails(long spaceId) {
+    private Space getApprovedSpaceWithDetails(Long spaceId) {
         return spaceRepository.findByIdAndIsDeletedFalseAndStatusApprovedWithUserAndFacilities(spaceId, Status.APPROVED)
                 .orElseThrow(() -> new SpaceException(SpaceErrorCode.APPROVED_SPACE_NOT_FOUND));
     }

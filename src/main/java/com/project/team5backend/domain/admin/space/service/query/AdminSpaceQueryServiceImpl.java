@@ -2,14 +2,13 @@ package com.project.team5backend.domain.admin.space.service.query;
 
 import com.project.team5backend.domain.admin.space.converter.AdminSpaceConverter;
 import com.project.team5backend.domain.admin.space.dto.response.AdminSpaceResDTO;
+import com.project.team5backend.domain.common.enums.StatusGroup;
 import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
-import com.project.team5backend.domain.image.repository.SpaceImageRepository;
+import com.project.team5backend.domain.image.SpaceImageReader;
+import com.project.team5backend.domain.space.SpaceReader;
 import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.space.entity.SpaceVerification;
-import com.project.team5backend.domain.space.exception.SpaceErrorCode;
-import com.project.team5backend.domain.space.exception.SpaceException;
 import com.project.team5backend.domain.space.repository.SpaceRepository;
-import com.project.team5backend.domain.common.enums.StatusGroup;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -26,7 +25,8 @@ import java.util.List;
 public class AdminSpaceQueryServiceImpl implements AdminSpaceQueryService {
 
     private final SpaceRepository spaceRepository;
-    private final SpaceImageRepository spaceImageRepository;
+    private final SpaceImageReader spaceImageReader;
+    private final SpaceReader spaceReader;
     private final FileUrlResolverPort fileUrlResolverPort;
 
     private static final int PAGE_SIZE = 10;
@@ -42,21 +42,14 @@ public class AdminSpaceQueryServiceImpl implements AdminSpaceQueryService {
 
     @Override
     public AdminSpaceResDTO.SpaceDetailResDTO getDetailSpace(Long spaceId){
-        Space space = getSpace(spaceId);
+        Space space = spaceReader.readSpace(spaceId);
 
-        List<String> imageUrls = spaceImageRepository.findImageUrlsBySpaceId(spaceId).stream()
-                .map(fileUrlResolverPort::toFileUrl)
-                .toList();
+        List<String> imageUrls = spaceImageReader.readSpaceImageUrls(spaceId);
 
         SpaceVerification spaceVerification = space.getSpaceVerification();
         String businessLicenseFile = fileUrlResolverPort.toFileUrl(spaceVerification.getBusinessLicenseKey());
         String buildingRegisterFile = fileUrlResolverPort.toFileUrl(spaceVerification.getBuildingRegisterKey());
 
         return AdminSpaceConverter.toSpaceDetailResDTO(space, spaceVerification, imageUrls, businessLicenseFile, buildingRegisterFile);
-    }
-
-    private Space getSpace(Long spaceId) {
-        return spaceRepository.findByIdAndIsDeletedFalse(spaceId)
-                .orElseThrow(() -> new SpaceException(SpaceErrorCode.SPACE_NOT_FOUND));
     }
 }

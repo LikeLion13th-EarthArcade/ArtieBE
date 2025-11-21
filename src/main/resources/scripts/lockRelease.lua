@@ -5,10 +5,13 @@ local released = 0
 for i = 1, #KEYS do
     -- KEY의 VALUE가 소유자라면
     if redis.call('GET', KEYS[i]) == owner then
-        -- 삭제
         redis.call('DEL', KEYS[i])
         released = released + 1
     end
-end
+    if redis.call('GET', 'system:' .. KEYS[i]) == owner then
+        redis.call('DEL', 'system:' .. KEYS[i])
+        released = released + 1
+    end
 
+end
 return released
