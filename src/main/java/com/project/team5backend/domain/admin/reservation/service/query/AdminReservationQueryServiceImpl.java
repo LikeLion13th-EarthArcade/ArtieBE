@@ -9,6 +9,7 @@ import com.project.team5backend.domain.reservation.exception.ReservationExceptio
 import com.project.team5backend.domain.reservation.repository.CustomReservationRepository;
 import com.project.team5backend.domain.common.enums.StatusGroup;
 import com.project.team5backend.domain.reservation.repository.ReservationRepository;
+import com.project.team5backend.domain.reservation.repository.TempReservationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -22,6 +23,7 @@ public class AdminReservationQueryServiceImpl implements  AdminReservationQueryS
 
     private final CustomReservationRepository customReservationRepository;
     private final ReservationRepository reservationRepository;
+    private final TempReservationRepository tempReservationRepository;
 
     @Override
     public Page<ReservationResDTO.ReservationDetailResDTO> getReservationList(StatusGroup statusGroup, Pageable pageable) {
@@ -42,8 +44,20 @@ public class AdminReservationQueryServiceImpl implements  AdminReservationQueryS
         return ReservationConverter.toReservationDetailResDTO(reservation);
     }
 
+    @Override
+    public ReservationResDTO.TempReservationDetailResDTO getTempReservationDetail(Long tempReservationId) {
+        TempReservation tempReservation = getTempReservation(tempReservationId);
+
+        return ReservationConverter.toTempReservationDetailResDTO(tempReservation);
+    }
+
     private Reservation getReservation(Long reservationId) {
         return reservationRepository.findById(reservationId)
                 .orElseThrow(() -> new ReservationException(ReservationErrorCode.RESERVATION_NOT_FOUND));
+    }
+
+    private TempReservation getTempReservation(Long tempReservationId) {
+        return tempReservationRepository.findById(tempReservationId)
+                .orElseThrow(() -> new ReservationException(ReservationErrorCode.TEMP_RESERVATION_NOT_FOUND));
     }
 }

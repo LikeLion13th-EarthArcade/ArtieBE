@@ -60,4 +60,13 @@ public class AdminReservationController {
     ) {
         return CustomResponse.onSuccess(adminReservationQueryService.getReservationDetail(reservationId));
     }
+
+    @Operation(summary = "임시 예약 단일 조회")
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/temp-reservations/{tempReservationId}")
+    public CustomResponse<ReservationResDTO.TempReservationDetailResDTO> getTempReservationDetail(
+            @PathVariable Long tempReservationId
+    ) {
+        return CustomResponse.onSuccess(adminReservationQueryService.getTempReservationDetail(tempReservationId));
+    }
 }
