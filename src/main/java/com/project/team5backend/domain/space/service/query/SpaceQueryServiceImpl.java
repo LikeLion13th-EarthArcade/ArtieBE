@@ -6,6 +6,7 @@ import com.project.team5backend.domain.common.enums.StatusGroup;
 import com.project.team5backend.domain.common.storage.FileUrlResolverPort;
 import com.project.team5backend.domain.image.SpaceImageReader;
 import com.project.team5backend.domain.reservation.ReservationReader;
+import com.project.team5backend.domain.reservation.repository.ReservationRepository;
 import com.project.team5backend.domain.space.SpaceLikeReader;
 import com.project.team5backend.domain.space.SpaceReader;
 import com.project.team5backend.domain.space.converter.SpaceConverter;
