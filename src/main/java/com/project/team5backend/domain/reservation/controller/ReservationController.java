@@ -31,7 +31,7 @@ public class ReservationController {
     private final DistributedLockService distributedLockService;
 
     @Operation(summary = "임시 전시 공간 예약", description = "입금 전 임시 예약 객체를 생성합니다")
-    @PostMapping("/spaces/{spaceId}/tempReservations")
+    @PostMapping("/spaces/{spaceId}/temp-reservations")
     public CustomResponse<ReservationResDTO.ReservationCreateResDTO> createTempReservation(
             @PathVariable Long spaceId,
             @AuthenticationPrincipal CurrentUser currentUser,
@@ -41,7 +41,7 @@ public class ReservationController {
     }
 
     @Operation(summary = "입금하기", description = "실제로 무통장 입금을 구현할 수 없으므로 입금하기 버튼을 만들었습니다.")
-    @PostMapping("/tempReservations/{tempReservationId}")
+    @PostMapping("/temp-reservations/{tempReservationId}")
     public CustomResponse<String> deposit(
             @PathVariable Long tempReservationId,
             @AuthenticationPrincipal CurrentUser currentUser
@@ -94,6 +94,17 @@ public class ReservationController {
     ) {
         Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
         return CustomResponse.onSuccess(PageResponse.of(reservationQueryService.getMyReservationList(currentUser.getId(), statusGroup, pageable)));
+    }
+
+    @Operation(summary = "임시 예약 목록 조회 (예약자 전용)", description = "사용자가 생성한 임시 예약을 조회합니다")
+    @GetMapping("/temp-reservation/my")
+    public CustomResponse<PageResponse<ReservationResDTO.TempReservationDetailResDTO>> getMyTempReservationList(
+            @AuthenticationPrincipal CurrentUser currentUser,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+        Pageable pageable = PageRequest.of(page, size, Sort.by("createdAt").descending());
+        return CustomResponse.onSuccess(PageResponse.of(reservationQueryService.getMyTempReservation(currentUser.getId(), pageable)));
     }
 
     @Operation(summary = "예약자의 요청 수락 (호스트 전용)",

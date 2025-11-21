@@ -1,7 +1,9 @@
 package com.project.team5backend.domain.reservation.repository;
 
 import com.project.team5backend.domain.reservation.entity.QReservation;
+import com.project.team5backend.domain.reservation.entity.QTempReservation;
 import com.project.team5backend.domain.reservation.entity.Reservation;
+import com.project.team5backend.domain.reservation.entity.TempReservation;
 import com.project.team5backend.domain.space.entity.QSpace;
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.common.enums.Status;
@@ -26,7 +28,7 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Page<Reservation> findBySpaceOwnerWithFilters(User user, StatusGroup statusGroup, Pageable pageable) {
+    public Page<Reservation> findReservationBySpaceOwnerWithFilters(User user, StatusGroup statusGroup, Pageable pageable) {
         QReservation reservation = QReservation.reservation;
         QSpace space = QSpace.space;
 
@@ -56,7 +58,7 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
     }
 
     @Override
-    public Page<Reservation> findByUserWithFilters(User user, StatusGroup statusGroup, Pageable pageable) {
+    public Page<Reservation> findReservationByUserWithFilters(User user, StatusGroup statusGroup, Pageable pageable) {
         QReservation reservation = QReservation.reservation;
 
         BooleanBuilder builder = new BooleanBuilder()
@@ -66,6 +68,20 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
         List<Reservation> content = findReservations(reservation, builder, pageable);
 
         Long total = countReservation(reservation, builder);
+
+        return new PageImpl<>(content, pageable, total != null ? total : 0L);
+    }
+
+    @Override
+    public Page<TempReservation> findTempReservationByUser(User user, Pageable pageable) {
+        QTempReservation tempReservation = QTempReservation.tempReservation;
+
+        BooleanBuilder builder = new BooleanBuilder()
+                .and(tempReservation.user.eq(user));
+
+        List<TempReservation> content = findTempReservations(tempReservation, builder, pageable);
+
+        Long total = countTempReservation(tempReservation, builder);
 
         return new PageImpl<>(content, pageable, total != null ? total : 0L);
     }
@@ -114,10 +130,28 @@ public class CustomReservationRepositoryImpl implements CustomReservationReposit
                 .fetch();
     }
 
+    private List<TempReservation> findTempReservations(QTempReservation tempReservation, BooleanBuilder builder, Pageable pageable) {
+        return queryFactory
+                .selectFrom(tempReservation)
+                .where(builder)
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .orderBy(tempReservation.createdAt.desc())
+                .fetch();
+    }
+
     private Long countReservation(QReservation reservation, BooleanBuilder builder) {
         return queryFactory
                 .select(reservation.count())
                 .from(reservation)
+                .where(builder)
+                .fetchOne();
+    }
+
+    private Long countTempReservation(QTempReservation tempReservation, BooleanBuilder builder) {
+        return queryFactory
+                .select(tempReservation.count())
+                .from(tempReservation)
                 .where(builder)
                 .fetchOne();
     }

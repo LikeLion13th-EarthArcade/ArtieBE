@@ -67,6 +67,22 @@ public class ReservationConverter {
                 .build();
     }
 
+    public static ReservationResDTO.TempReservationDetailResDTO toTempReservationDetailResDTO(TempReservation tempReservation) {
+        return ReservationResDTO.TempReservationDetailResDTO.builder()
+                .spaceId(tempReservation.getSpace().getId())
+                .tempReservationId(tempReservation.getTempReservationId())
+                .startDate(tempReservation.getStartDate())
+                .endDate(tempReservation.getEndDate())
+                .name(tempReservation.getName())
+                .email(tempReservation.getEmail())
+                .phoneNumber(tempReservation.getPhoneNumber())
+                .message(tempReservation.getMessage())
+                .accountNumber("계좌번호 추가 예정")
+                .isDeposited(tempReservation.isDeposited())
+                .build();
+
+    }
+
     public static ReservationResDTO.ReservationStatusResDTO toReservationStatusResDTO(Reservation reservation) {
         return ReservationResDTO.ReservationStatusResDTO.builder()
                 .spaceId(reservation.getSpace().getId())

@@ -1,5 +1,6 @@
 package com.project.team5backend.domain.reservation.entity;
 
+import com.project.team5backend.domain.common.BaseOnlyCreateTimeEntity;
 import com.project.team5backend.domain.space.entity.Space;
 import com.project.team5backend.domain.user.entity.User;
 import jakarta.persistence.*;
@@ -13,7 +14,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @Builder
 @Table(name = "temp_reservation")
-public class TempReservation {
+public class TempReservation extends BaseOnlyCreateTimeEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

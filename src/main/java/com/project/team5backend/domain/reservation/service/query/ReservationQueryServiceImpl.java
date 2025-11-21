@@ -3,11 +3,11 @@ package com.project.team5backend.domain.reservation.service.query;
 import com.project.team5backend.domain.reservation.converter.ReservationConverter;
 import com.project.team5backend.domain.reservation.dto.response.ReservationResDTO;
 import com.project.team5backend.domain.reservation.entity.Reservation;
+import com.project.team5backend.domain.reservation.entity.TempReservation;
 import com.project.team5backend.domain.reservation.exception.ReservationErrorCode;
 import com.project.team5backend.domain.reservation.exception.ReservationException;
 import com.project.team5backend.domain.reservation.repository.CustomReservationRepository;
 import com.project.team5backend.domain.reservation.repository.ReservationRepository;
-import com.project.team5backend.domain.user.entity.Role;
 import com.project.team5backend.domain.user.entity.User;
 import com.project.team5backend.domain.user.exception.UserErrorCode;
 import com.project.team5backend.domain.user.exception.UserException;
@@ -49,7 +49,7 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
         User user = getUser(userId);
 
-        Page<Reservation> reservationPage = customReservationRepository.findBySpaceOwnerWithFilters(user, statusGroup, pageable);
+        Page<Reservation> reservationPage = customReservationRepository.findReservationBySpaceOwnerWithFilters(user, statusGroup, pageable);
 
         return reservationPage.map(ReservationConverter::toReservationDetailResDTO);
     }
@@ -59,9 +59,18 @@ public class ReservationQueryServiceImpl implements ReservationQueryService {
 
         User user = getUser(userId);
 
-        Page<Reservation> reservationPage = customReservationRepository.findByUserWithFilters(user, statusGroup, pageable);
+        Page<Reservation> reservationPage = customReservationRepository.findReservationByUserWithFilters(user, statusGroup, pageable);
 
         return reservationPage.map(ReservationConverter::toReservationDetailResDTO);
+    }
+
+    @Override
+    public Page<ReservationResDTO.TempReservationDetailResDTO> getMyTempReservation(Long userId, Pageable pageable) {
+        User user = getUser(userId);
+
+        Page<TempReservation> tempReservationPage = customReservationRepository.findTempReservationByUser(user, pageable);
+
+        return tempReservationPage.map(ReservationConverter::toTempReservationDetailResDTO);
     }
 
     private User getUser(Long userId) {
